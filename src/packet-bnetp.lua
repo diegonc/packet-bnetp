@@ -18,17 +18,61 @@ do
 		[0xF7] = "W3IGP",
 		[0xFF] = "BNCS",
 	})
-	local f_pid = ProtoField.uint8("bnetp.pid")
+	local f_pid  = ProtoField.uint8("bnetp.pid")
 	local f_plen = ProtoField.uint16("bnetp.plen","Packet Length",base.DEC)
+	local f_data = ProtoField.bytes("bnetp.plen","Unhandled Packet Data")
 	
 	p_bnetp.fields = {
 		-- Header fields
 		--     Type
 		f_type,
 		--     Packet Info
-		f_pid,
-		f_plen,
+		f_pid,  -- Packet id field
+		f_plen, -- Packet length field
+		f_data, -- Generic packet data field
 	}
+
+	function State()
+		return {
+			["bnet_node"] = nil,
+			["buf"] = nil,
+			["pkt"] = nil,
+			["used"] = 0,
+
+			["peek"] = function(o, count)
+				o:request(count)
+				return o.buf(o.used, count)
+			end,
+			["read"] = function(o, count)
+				local tmp = o:peek(count)
+				o.used = o.used + count
+				return tmp
+			end,
+			["request"] = function(o, count)
+				local missing = count - (o.buf:len() - o.used)
+				info ("request: "
+					.. o.buf:len() .. " "
+					.. o.used .. " "
+					.. count .. " "
+					.. missing)
+				if (missing > 0) then
+					coroutine.yield(true, missing)
+				end
+			end,
+			["tvb"] = function(o) return o.buf(o.used):tvb() end,
+			["error"] = function(o, str)
+				o.bnet_node:add_expert_info(PI_DEBUG, PI_NOTE, str)
+			end,
+		}
+	end
+
+	function do_dissection(state)
+		state.bnet_node:add(f_type, state:peek(1))
+		local handler = handlers_by_type[state:read(1):uint()]
+		if handler then handler(state) end	
+		-- TODO: reject packet when no handler can be found.
+		return false
+	end
 
 	function p_bnetp.dissector(buf,pkt,root)
 		if pkt.columns.protocol then
@@ -40,9 +84,42 @@ do
 		end
 
 		if root then
-			local bnet_node = root:add(p_bnetp, buf(0))
-			bnet_node:add(f_type, buf(0, 1))
-			handlers_by_type[buf(0,1):uint()](buf(1):tvb(), pkt, bnet_node)
+			local state = State()
+			local available = buf:len()
+
+			state.buf = buf
+			state.pkt = pkt
+			pkt.desegment_len = 0
+
+			info ("dissector: start to process pdus")
+
+			while state.used < available do
+				state.bnet_node = root:add(p_bnetp, buf(state.used))
+
+				local thread = coroutine.create(do_dissection)
+				local r, need_more, missing = coroutine.resume(thread, state)
+				if (r and need_more) then
+					if missing then
+						pkt.desegment_len = missing
+					else
+						pkt.desegment_len = DESEGMENT_ONE_MORE_SEGMENT
+					end
+					pkt.desegment_offset = 0
+					info ("dissector: requesting data -" 
+							.. " r: " .. tostring(r)
+							.. " need_more: " .. tostring(need_more)
+							.. " missing: " .. tostring(missing)
+							.. " deseg_len: " .. tostring(pkt.desegment_len))
+					return
+				elseif not r then
+					error(need_more)
+				end
+			end
+			if state.used > available then
+				error("Used more data than available.")
+			end
+			info ("dissector: finished processing pdus")
+			-- return state.used
 		end
 	end
 
@@ -51,9 +128,9 @@ do
 	udp_encap_table:add(6112,p_bnetp)
 	tcp_encap_table:add(6112,p_bnetp)
 
-	-- Boilerplate
+	-- Protocol stuff
 
-	noop_handler = function (buf, pkt, root) return end
+	noop_handler = function (state) return end
 
 	pid_label = function (pid, name)
 		return string.format("Packet ID: %s (0x%x)", name, pid)
@@ -63,19 +140,29 @@ do
 		[0x1] = noop_handler,
 		[0x2] = noop_handler,
 		[0x3] = noop_handler,
-		[0xF7] = function (buf, pkt, root)
-			root:add(f_pid, buf(0, 1))
-			root:add_le(f_plen, buf(1, 2))
+		[0xF7] = function (state)
+			state.bnet_node:add(f_pid, state:read(1))
+			local len = state:peek(2):le_uint()
+			state.bnet_node:add_le(f_plen, state:read(2))
+			state.bnet_node:add(f_data, state:read(len - 4))
 		end,
-		[0xFF] = function (buf, pkt, root) 
-			local pidnode = root:add(f_pid, buf(0, 1))
-			local pid = buf(0,1):uint()
+		[0xFF] = function (state) 
+			local pid = state:peek(1):uint()
 			local type_pid = ((0xFF * 256) + pid)
+			local pidnode = state.bnet_node:add(f_pid, state:read(1))
 			pidnode:set_text(pid_label(pid,packet_names[type_pid]))
-			root:add_le(f_plen, buf(1, 2))
+			-- The size found in the packet includes headers, so consumed bytes
+			-- are substracted when requesting more data.
+			local len = state:peek(2):le_uint() -2
+			-- Record used bytes before dissecting.
+			local start = state.used
+			-- Request at least len extra bytes at once.
+			state:request(len)
+
+			state.bnet_node:add_le(f_plen, state:read(2))
 
 			local pdesc
-			if pkt.src_port == 6112 then
+			if state.pkt.src_port == 6112 then
 				-- process server packet
 				pdesc = SPacketDescription[type_pid]
 			else
@@ -84,20 +171,24 @@ do
 			end
 
 			if pdesc then
-				dissect_packet(buf(3):tvb(), root, pdesc)
+				dissect_packet(state, pdesc)
 			else
-				error("Unssuported packet: " .. packet_names[type_pid])
+				state:error("Unssuported packet: " .. packet_names[type_pid])
+			end
+
+			-- Check if any data remains unhandled.
+			local remaining = len - (state.used - start)
+			if remaining > 0 then
+				state.bnet_node:add(f_data, state:read(remaining))
 			end
 		end,
 	}
 
 	-- Packet dissector
-	function dissect_packet(buf, root, pdesc)
-		local cursor = 0
+	function dissect_packet(state, pdesc)
 		for k,v in pairs(pdesc) do
-			local size = v.size(buf(cursor):tvb())
-			root:add_le(v.pf, buf(cursor, size))
-			cursor = cursor + size
+			local size = v.size(state:tvb())
+			state.bnet_node:add_le(v.pf, state:read(size))
 		end
 	end
 
