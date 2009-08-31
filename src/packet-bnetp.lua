@@ -133,7 +133,7 @@ do
 	noop_handler = function (state) return end
 
 	pid_label = function (pid, name)
-		return string.format("Packet ID: %s (0x%x)", name, pid)
+		return string.format("Packet ID: %s (0x%02x)", name, pid)
 	end
 
 	handlers_by_type = {
@@ -522,12 +522,28 @@ do
 			WProtoField.stringz("","[TODO: array] Channel names"),
 		},
 		[SID_CHATEVENT] = {
-			WProtoField.uint32("","Event ID"),
+			WProtoField.uint32("","Event ID", base.HEX, {
+				[0x01] = "EID_USERSHOW",
+				[0x02] = "EID_USERJOIN",
+				[0x03] = "EID_USERLEAVE",
+				[0x04] = "EID_WHISPERRECEIVED",
+				[0x06] = "EID_BROADCAST",
+				[0x05] = "EID_USERTALK",
+				[0x07] = "EID_CHANNEL",
+				[0x09] = "EID_USERUPDATE",
+				[0x0A] = "EID_WHISPERSENT",
+				[0x0D] = "EID_CHANNELFULL",
+				[0x0E] = "EID_CHANNELDOESNOTEXIST",
+				[0x0F] = "EID_CHANNELRESTRICTED",
+				[0x12] = "EID_INFO",
+				[0x13] = "EID_ERROR",
+				[0x17] = "EID_EMOTE",
+			}),
 			WProtoField.uint32("","User's Flags"),
 			WProtoField.uint32("","Ping"),
 			WProtoField.uint32("","IP Address (Defunct)"),
-			WProtoField.uint32("","Account number (Defunct)"),
-			WProtoField.uint32("","Registration Authority (Defunct)"),
+			WProtoField.uint32("","Account number (Defunct)", base.HEX),
+			WProtoField.uint32("","Registration Authority (Defunct)", base.HEX),
 			WProtoField.stringz("","Username"),
 			WProtoField.stringz("","Text"),
 		},
@@ -558,7 +574,7 @@ do
 			WProtoField.uint32("","Server Token"),
 		},
 		[SID_PING] = {
-			WProtoField.uint32("","Ping Value"),
+			WProtoField.uint32("","Ping Value", base.HEX),
 		},
 		[SID_READUSERDATA] = {
 			WProtoField.uint32("","Number of accounts"),
@@ -601,7 +617,12 @@ do
 			WProtoField.stringz("","Key owner"),
 		},
 		[SID_LOGONRESPONSE2] = {
-			WProtoField.uint32("","Result"),
+			WProtoField.uint32("","Result", base.HEX, {
+				[0x00] = "Login successful",
+				[0x01] = "Account does not exist",
+				[0x02] = "Invalid password",
+				-- [0x06] = "Account closed"	-- TODO
+			}),
 			WProtoField.stringz("","Reason"),
 		},
 		[SID_CHECKDATAFILE2] = {
@@ -633,7 +654,18 @@ do
 			WProtoField.uint32("","(TODO [5]) Unknown"),
 		},
 		[SID_AUTH_CHECK] = {
-			WProtoField.uint32("","Result"),
+			WProtoField.uint32("","Result", base.HEX, { -- TODO -xpeh
+				[0x000] = "Passed challenge",
+				[0x100] = "Old game version (Additional info field supplies patch MPQ filename)",
+				[0x101] = "Invalid version",
+				[0x102] = "Game version must be downgraded (Additional info field supplies patch MPQ filename)",
+				-- 0x0NN: (where NN is the version code supplied in SID_AUTH_INFO): Invalid version code (note that 0x100 is not set in this case).
+				[0x200] = "Invalid CD key ",
+				[0x201] = "CD key in use (Additional info field supplies name of user)",
+				[0x202] = "Banned key",
+				[0x203] = "Wrong product",
+				-- The last 4 codes also apply to the second cdkey, as indicated by a bitwise combination with 0x010.  
+			}),
 			WProtoField.stringz("","Additional Information"),
 		},
 		[SID_AUTH_ACCOUNTCREATE] = {
@@ -963,10 +995,10 @@ do
 			WProtoField.uint32("","Protocol ID",base.DEC),
 			WProtoField.uint32("","Platform ID",base.HEX),
 			WProtoField.uint32("","Product ID",base.HEX),
-			WProtoField.uint32("","Version Byte",base.DEC),
+			WProtoField.uint32("","Version Byte",base.HEX),
 			WProtoField.uint32("","Product Laguage",base.HEX),
 			WProtoField.ipv4("","Local IP"),
-			WProtoField.uint32("","Timezone Bias", base.HEX),
+			WProtoField.int32("","Timezone Bias"),
 			WProtoField.uint32("","Locale ID", base.HEX),
 			WProtoField.uint32("","Language ID", base.HEX),
 			WProtoField.stringz("","Country Abbreviation"),
@@ -1019,8 +1051,8 @@ do
 			WProtoField.stringz("","Game stats"),
 		},
 		[SID_ENTERCHAT] = {
-			WProtoField.stringz("","Username *"),
-			WProtoField.stringz("","Statstring **"),
+			WProtoField.stringz("","Username"),
+			WProtoField.stringz("","Statstring"),
 		},
 		[SID_GETCHANNELLIST] = {
 			WProtoField.uint32("","Product ID"),
@@ -1106,7 +1138,7 @@ do
 			WProtoField.stringz("","Game Password"),
 		},
 		[SID_PING] = {
-			WProtoField.uint32("","Ping Value"),
+			WProtoField.uint32("","Ping Value", base.HEX),
 		},
 		[SID_READUSERDATA] = {
 			WProtoField.uint32("","Number of Accounts"),
@@ -1123,9 +1155,9 @@ do
 			WProtoField.stringz("","[] New values"),
 		},
 		[SID_LOGONRESPONSE] = {
-			WProtoField.uint32("","Client Token"),
-			WProtoField.uint32("","Server Token"),
-			WProtoField.uint32("","[5] Password Hash"),
+			WProtoField.uint32("","Client Token", base.HEX),
+			WProtoField.uint32("","Server Token", base.HEX),
+			WProtoField.uint32("","[5] Password Hash", base.HEX),
 			WProtoField.stringz("","Username"),
 		},
 		[SID_CREATEACCOUNT] = {
@@ -1179,8 +1211,8 @@ do
 			WProtoField.stringz("","Key owner"),
 		},
 		[SID_LOGONRESPONSE2] = {
-			WProtoField.uint32("","Client Token"),
-			WProtoField.uint32("","Server Token"),
+			WProtoField.uint32("","Client Token", base.HEX),
+			WProtoField.uint32("","Server Token", base.HEX),
 			WProtoField.uint32("","[5] Password Hash"),
 			WProtoField.stringz("","Username"),
 		},
@@ -1204,11 +1236,15 @@ do
 			WProtoField.stringz("","Work returned data"),
 		},
 		[SID_AUTH_CHECK] = {
-			WProtoField.uint32("","Client Token"),
-			WProtoField.uint32("","EXE Version"),
-			WProtoField.uint32("","EXE Hash"),
+			WProtoField.uint32("","Client Token", base.HEX),
+			WProtoField.uint32("","EXE Version", base.HEX),  -- TODO: game version
+			WProtoField.uint32("","EXE Hash", base.HEX),
 			WProtoField.uint32("","Number of CD-keys in this packet"),
 			WProtoField.uint32("","Spawn CD-key"),
+			-- EDIT
+			WProtoField.uint32("","CD-key length"),
+			WProtoField.uint32("","Product ID"),
+			WProtoField.uint32("","Public value", base.HEX),
 		},
 		[SID_AUTH_ACCOUNTCREATE] = {
 			WProtoField.uint8("","[32] Salt (s)"),
@@ -1230,7 +1266,7 @@ do
 		},
 		[SID_AUTH_ACCOUNTUPGRADE] = {},
 		[SID_AUTH_ACCOUNTUPGRADEPROOF] = {
-			WProtoField.uint32("","Client Token"),
+			WProtoField.uint32("","Client Token", base.HEX),
 			WProtoField.uint32("","[5] Old Password Hash"),
 			WProtoField.uint8("","[32] New Password Salt"),
 			WProtoField.uint8("","[32] New Password Verifier"),
