@@ -1,0 +1,14 @@
+#summary Todo list
+
+data types:
+
+  * ip (network byte order, opposite to intel). For some reason lua's built-in ipv4 uses inter order (lol?)
+  * windows (?) file time, used in sid_getfiletime
+  * unips file time
+  * string-dword (swap dword and output as string)
+  * statstring decoder
+  * user flag decoder
+  * array of any basic type
+  * iterator (cdkey/gamelist)
+  * exe version decoder
+  * sid_checkad: extension: string[4]
