@@ -9,6 +9,12 @@ do
 		SPacketDescription,
 		dissect_packet
 
+	-- Constants for TCP reassembly and packet rejecting
+	local ENOUGH    = false
+	local NEED_MORE = true
+	local ACCEPTED  = true
+	local REJECTED  = false
+
 	local p_bnetp = Proto("bnetp","Battle.net Protocol");
 
 	local f_type = ProtoField.uint8("bnetp.type","Header Type",base.HEX, {
@@ -56,7 +62,7 @@ do
 					.. count .. " "
 					.. missing)
 				if (missing > 0) then
-					coroutine.yield(true, missing)
+					coroutine.yield(NEED_MORE, missing)
 				end
 			end,
 			["tvb"] = function(o) return o.buf(o.used):tvb() end,
@@ -67,11 +73,15 @@ do
 	end
 
 	function do_dissection(state)
-		state.bnet_node:add(f_type, state:peek(1))
-		local handler = handlers_by_type[state:read(1):uint()]
-		if handler then handler(state) end	
-		-- TODO: reject packet when no handler can be found.
-		return false
+		local handler = handlers_by_type[state:peek(1):uint()]
+		if handler then
+			state.bnet_node:add(f_type, state:read(1))
+			handler(state)
+			return ENOUGH, ACCEPTED
+		else
+			-- If no handler is found the packet is rejected.
+			return ENOUGH, REJECTED
+		end
 	end
 
 	function p_bnetp.dissector(buf,pkt,root)
@@ -98,7 +108,7 @@ do
 
 				local thread = coroutine.create(do_dissection)
 				local r, need_more, missing = coroutine.resume(thread, state)
-				if (r and need_more) then
+				if (r and (need_more == NEED_MORE)) then
 					if missing then
 						pkt.desegment_len = missing
 					else
@@ -111,6 +121,9 @@ do
 							.. " missing: " .. tostring(missing)
 							.. " deseg_len: " .. tostring(pkt.desegment_len))
 					return
+				elseif r and (need_more==ENOUGH) and (missing==REJECTED) then
+					-- Packet was rejected. Make the loop end.
+					available = state.used
 				elseif not r then
 					error(need_more)
 				end
@@ -119,7 +132,7 @@ do
 				error("Used more data than available.")
 			end
 			info ("dissector: finished processing pdus")
-			-- return state.used
+			return state.used
 		end
 	end
 
