@@ -2,7 +2,7 @@
 
 data types:
 
-  * ip (network byte order, opposite to intel). For some reason lua's built-in ipv4 uses inter order (lol?)
+  * ~~ip (network byte order, opposite to intel). For some reason lua's built-in ipv4 uses inter order (lol?)~~
   * windows (?) file time, used in sid_getfiletime
   * unips file time
   * string-dword (swap dword and output as string)
