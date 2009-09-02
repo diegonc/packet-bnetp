@@ -9,6 +9,8 @@ do
 		SPacketDescription,
 		dissect_packet
 
+	--local info = function(...) end
+
 	-- Constants for TCP reassembly and packet rejecting
 	local ENOUGH    = false
 	local NEED_MORE = true
@@ -200,8 +202,12 @@ do
 	-- Packet dissector
 	function dissect_packet(state, pdesc)
 		for k,v in pairs(pdesc) do
-			local size = v.size(state:tvb())
-			state.bnet_node:add_le(v.pf, state:read(size))
+			if not v.dissect then
+				local size = v.size(state:tvb())
+				state.bnet_node:add_le(v.pf, state:read(size))
+			else
+				v:dissect(state)
+			end
 		end
 	end
 
@@ -410,61 +416,55 @@ do
 	local SID_CLANMEMBERRANKCHANGE = 0xFF81
 	local SID_CLANMEMBERINFORMATION = 0xFF82
 
-	-- ProtoField wrapper
-	function readOnly (t)
-      local proxy = {}
-      local mt = {       -- create metatable
-        __index = t,
-        __newindex = function (t,k,v)
-          error("attempt to update a read-only table", 2)
-        end
-      }
-      setmetatable(proxy, mt)
-      return proxy
-    end
+	-- Supported data types
+	local typemap = {
+		["uint64"] = {
+			["size"] = function(...) return 8 end,
+		},
+		["uint32"] = {
+			["size"] = function(...) return 4 end,
+		},
+		["uint16"] = {
+			["size"] = function(...) return 2 end,
+		},
+		["uint8"]  = {
+			["size"] = function(...) return 1 end,
+		},
+		["int64"]  = {
+			["size"] = function(...) return 8 end,
+		},
+		["int32"]  = {
+			["size"] = function(...) return 4 end,
+		},
+		["int16"]  = {
+			["size"] = function(...) return 2 end,
+		},
+		["int8"]   = {
+			["size"] = function(...) return 1 end,
+		},
+		["ipv4"]   = {
+			["size"] = function(...) return 4 end,
+			dissect = function(self, state)
+				local size = self.size(state:tvb())
+				state.bnet_node:add(self.pf, state:read(size))
+			end,
+		},
+		["stringz"] = {
+			["size"] = function(...)
+				local buf = arg[1]
+				return string.format("%s", buf(0):string()):len() + 1
+			end,
+		},
+		["sockaddr"] = {
+			["size"] = function(...) return 16 end,
+			["alias"] = "bytes",
+		},
+	}
 
-	local WProtoField = readOnly(
-		(function ()
-			local typemap = {
-				["uint64"] = {
-					["size"] = function(...) return 8 end,
-				},
-				["uint32"] = {
-					["size"] = function(...) return 4 end,
-				},
-				["uint16"] = {
-					["size"] = function(...) return 2 end,
-				},
-				["uint8"]  = {
-					["size"] = function(...) return 1 end,
-				},
-				["int64"]  = {
-					["size"] = function(...) return 8 end,
-				},
-				["int32"]  = {
-					["size"] = function(...) return 4 end,
-				},
-				["int16"]  = {
-					["size"] = function(...) return 2 end,
-				},
-				["int8"]   = {
-					["size"] = function(...) return 1 end,
-				},
-				["ipv4"]   = {
-					["size"] = function(...) return 4 end,
-				},
-				["stringz"] = {
-					["size"] = function(...)
-						local buf = arg[1]
-						return string.format("%s", buf(0):string()):len() + 1
-					end,
-				},
-				["sockaddr"] = {
-					["size"] = function(...) return 16 end,
-					["alias"] = "bytes",
-				},
-			}
-			return function(t,k)
+	-- ProtoField wrapper
+	local WProtoField = {}
+	setmetatable(WProtoField, {
+		__index = function(t,k)
 				return function (...)
 					local typeinfo = typemap[k]
 					local field = (typeinfo and (
@@ -475,6 +475,7 @@ do
 						local tmp = {
 							["pf"] = field(unpack(arg)),
 							["size"]=typeinfo.size,
+							["dissect"]=typeinfo.dissect,
 						}
 						-- Add the field to the protocol field list
 						local n = table.getn(p_bnetp.fields) + 1
@@ -483,8 +484,11 @@ do
 					end
 					error("unsupported field type: " .. k)
 				end
-			end
-		end)())
+		end,
+		__newindex = function (t,k,v)
+          error("attempt to update a read-only table", 2)
+        end
+	})
 
 	-- Packets form server to client
 	SPacketDescription = {
