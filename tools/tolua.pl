@@ -25,7 +25,7 @@ $s =~ s/$blanks/{}/g;
   "BOOLEAN"   => "uint32",
   "BOOL"      => "uint32",
   "ULONGLONG" => "uint64",
-  "FILETIME"  => "uint64",
+  "FILETIME"  => "filetime",
   "SOCKADDR"  => "sockaddr",
   "STRING"    => "stringz",
 );

@@ -459,6 +459,24 @@ do
 			["size"] = function(...) return 16 end,
 			["alias"] = "bytes",
 		},
+		["filetime"] = {
+			["size"] = function(...) return 8 end,
+			["alias"] = "uint64",
+			dissect = function(self, state)
+				local size = self.size(state:tvb())
+				local node = state.bnet_node:add(self.pf, state:peek(8))
+				-- POSIX epoch filetime
+				local epoch = 0xd53e8000 + (0x100000000 * 0x019db1de)
+				-- Read filetime
+				local filetime = state:read(4):le_uint()
+					+ (0x100000000 * state:read(4):le_uint())
+				-- Convert to POSIX time if possible
+				if filetime > epoch then
+					-- Append text form of date to the node label.
+					node:append_text(os.date(" %c", (filetime - epoch) * 1E-7))
+				end
+			end,
+		},
 	}
 
 	-- ProtoField wrapper
@@ -500,7 +518,7 @@ do
 			}),
 			WProtoField.uint32("","Server Token",base.HEX),
 			WProtoField.uint32("","UDPValue",base.HEX),
-			WProtoField.uint64("","MPQ Filetime",base.HEX),
+			WProtoField.filetime("","MPQ Filetime",base.HEX),
 			WProtoField.stringz("","IX86 Filename"),
 			WProtoField.stringz("","Value String"),
 		},
@@ -516,7 +534,7 @@ do
 			WProtoField.uint32("","Registration Token"),
 		},
 		[SID_STARTVERSIONING] = {
-			WProtoField.uint64("","MPQ Filetime"),
+			WProtoField.filetime("","MPQ Filetime"),
 			WProtoField.stringz("","MPQ Filename"),
 			WProtoField.stringz("","ValueString"),
 		},
@@ -568,7 +586,7 @@ do
 		[SID_CHECKAD] = {
 			WProtoField.uint32("","Ad ID"),
 			WProtoField.uint32("","File extension"),
-			WProtoField.uint64("","Local file time"),
+			WProtoField.filetime("","Local file time"),
 			WProtoField.stringz("","Filename"),
 			WProtoField.stringz("","Link URL"),
 		},
@@ -609,13 +627,13 @@ do
 			WProtoField.uint32("","Result"),
 		},
 		[SID_GETICONDATA] = {
-			WProtoField.uint64("","Filetime"),
+			WProtoField.filetime("","Filetime"),
 			WProtoField.stringz("","Filename"),
 		},
 		[SID_GETFILETIME] = {
 			WProtoField.uint32("","Request ID"),
 			WProtoField.uint32("","Unknown"),
-			WProtoField.uint64("","Last update time"),
+			WProtoField.filetime("","Last update time"),
 			WProtoField.stringz("","Filename"),
 		},
 		[SID_QUERYREALMS] = {
@@ -829,7 +847,7 @@ do
 			WProtoField.uint8("","Status code"),
 			WProtoField.stringz("","Clan name"),
 			WProtoField.uint8("","User's rank"),
-			WProtoField.uint64("","Date joined"),
+			WProtoField.filetime("","Date joined"),
 		},
 --[[ TODO: unsupported packets follow.
 		[PKT_SERVERPING] = {
@@ -1083,8 +1101,8 @@ do
 		},
 		[SID_LEAVECHAT] = {},
 		[SID_LOCALEINFO] = {
-			WProtoField.uint64("","System time"),
-			WProtoField.uint64("","Local time"),
+			WProtoField.filetime("","System time"),
+			WProtoField.filetime("","Local time"),
 			WProtoField.uint32("","Timezone bias"),
 			WProtoField.uint32("","SystemDefaultLCID"),
 			WProtoField.uint32("","UserDefaultLCID"),
