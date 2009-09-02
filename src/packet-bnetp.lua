@@ -477,6 +477,16 @@ do
 				end
 			end,
 		},
+		["posixtime"] = {
+			["size"] = function(...) return 4 end,
+			["alias"] = "uint32",
+			dissect = function(self, state)
+				local node = state.bnet_node:add(self.pf, state:peek(4))
+				local unixtime = os.date(" %c", state:read(4):le_uint())
+				-- Append text form of date to the node label.
+				node:append_text(unixtime)
+			end,
+		},
 	}
 
 	-- ProtoField wrapper
@@ -1119,7 +1129,7 @@ do
 			WProtoField.uint32("","Platform ID"),
 			WProtoField.uint32("","Product ID"),
 			WProtoField.uint32("","ID of last displayed banner"),
-			WProtoField.uint32("","Current time"),
+			WProtoField.posixtime("","Current time"),
 		},
 		[SID_CLICKAD] = {
 			WProtoField.uint32("","Ad ID"),
