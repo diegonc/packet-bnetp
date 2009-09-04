@@ -2,13 +2,18 @@
 
 data types:
 
+===most important===
+  * array of any basic type (actually, uint32[5] may be enough)
+  * iterator (cdkey/gamelist)
+  * string-dword (swap dword and output as string)
+
+===less important===
   * ~~ip (network byte order, opposite to intel). For some reason lua's built-in ipv4 uses inter order (lol?)~~
   * ~~windows (?) file time, used in sid_getfiletime~~ 
+    * can be converted to posixtime 
+    * $unixtime = $wintime/1E7 - 11644473600
   * ~~unips file time~~
-  * string-dword (swap dword and output as string)
   * statstring decoder
-  * user flag decoder
-  * array of any basic type
-  * iterator (cdkey/gamelist)
+  * bitmap decoder (user flag)
   * exe version decoder
   * sid_checkad: extension: string[4]
