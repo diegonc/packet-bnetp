@@ -5,6 +5,7 @@ data types:
 ===most important===
   * array of any basic type (actually, uint32[5] may be enough)
   * iterator (cdkey/gamelist)
+  * conditions
   * string-dword (swap dword and output as string)
 
 ===less important===
@@ -15,5 +16,5 @@ data types:
   * ~~unips file time~~
   * statstring decoder
   * bitmap decoder (user flag)
-  * exe version decoder
+  * exe version decoder (like ip, but in intel order)
   * sid_checkad: extension: string[4]
