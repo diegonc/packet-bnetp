@@ -1,4 +1,4 @@
--- Packets form client to server
+-- Packets from client to server
 CPacketDescription = {
 	[SID_AUTH_INFO] = {
 		WProtoField.uint32("","Protocol ID",base.DEC),
@@ -222,7 +222,12 @@ CPacketDescription = {
 	[SID_LOGONRESPONSE2] = {
 		WProtoField.uint32("","Client Token", base.HEX),
 		WProtoField.uint32("","Server Token", base.HEX),
-		WProtoField.uint32("","[5] Password Hash"),
+		-- TODO: array
+		WProtoField.uint32("","[0] Password Hash", base.HEX),
+		WProtoField.uint32("","[1] Password Hash", base.HEX),
+		WProtoField.uint32("","[2] Password Hash", base.HEX),
+		WProtoField.uint32("","[3] Password Hash", base.HEX),
+		WProtoField.uint32("","[4] Password Hash", base.HEX),
 		WProtoField.stringz("","Username"),
 	},
 	[SID_CHECKDATAFILE2] = {
@@ -250,10 +255,32 @@ CPacketDescription = {
 		WProtoField.uint32("","EXE Hash", base.HEX),
 		WProtoField.uint32("","Number of CD-keys in this packet"),
 		WProtoField.uint32("","Spawn CD-key"),
-		-- EDIT
-		WProtoField.uint32("","CD-key length"),
-		WProtoField.uint32("","Product ID"),
-		WProtoField.uint32("","Public value", base.HEX),
+			-- TODO -for 0 to CD-Key count
+			WProtoField.uint32("","CD-key length"),
+			WProtoField.uint32("","Product ID", base.DEC, {
+				[0x01] = "STAR",
+				[0x02] = "STAR",
+				[0x17] = "STAR (26-character)",
+				[0x06] = "D2DV",
+				[0x18] = "D2DV (26-character)",
+				[0x0A] = "D2XP",
+				[0x19] = "D2XP (26-character)",
+				[0x04] = "W2BN",
+				[0x0E] = "WAR3",
+				[0x12] = "W3XP",
+			}),
+			WProtoField.uint32("","Public value", base.HEX),
+			WProtoField.uint32("","Unknown (0)"),
+			-- TODO: array
+			WProtoField.uint32("","Hashed data [0]", base.HEX),
+			WProtoField.uint32("","Hashed data [1]", base.HEX),
+			WProtoField.uint32("","Hashed data [2]", base.HEX),
+			WProtoField.uint32("","Hashed data [3]", base.HEX),
+			WProtoField.uint32("","Hashed data [4]", base.HEX),
+			-- foreach end
+		WProtoField.stringz("","Exe Information"),
+		WProtoField.stringz("","CD Key owner name"),
+
 	},
 	[SID_AUTH_ACCOUNTCREATE] = {
 		WProtoField.uint8("","[32] Salt (s)"),
