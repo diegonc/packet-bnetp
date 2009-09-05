@@ -141,7 +141,7 @@ do
 
 	local udp_encap_table = DissectorTable.get("udp.port")
 	local tcp_encap_table = DissectorTable.get("tcp.port")
-	udp_encap_table:add(6112,p_bnetp)
+	--udp_encap_table:add(6112,p_bnetp)
 	tcp_encap_table:add(6112,p_bnetp)
 
 	-- Protocol stuff
@@ -1203,7 +1203,7 @@ CPacketDescription = {
 		WProtoField.stringz("","Game name"),
 		WProtoField.stringz("","Game password"),
 		WProtoField.stringz("","Game stats - flags, creator, statstring"),
-		WProtoField.stringz("","Map name - 0x0d terminated"),
+		-- WProtoField.stringz("","Map name - 0x0d terminated"), -- TODO: 0xd
 	},
 	[SID_GETADVLISTEX] = {
 		WProtoField.uint16("","Product-specific condition 1"),
