@@ -46,6 +46,7 @@ do
 			["buf"] = nil,
 			["pkt"] = nil,
 			["used"] = 0,
+			["packet"] = {},
 
 			["peek"] = function(o, count)
 				o:request(count)
@@ -202,8 +203,11 @@ do
 	-- Packet dissector
 	function dissect_packet(state, pdesc)
 		for k,v in pairs(pdesc) do
+			if v.key and v.value then
+				state.packet[v.key] = v:value(state)
+			end
 			if not v.dissect then
-				local size = v.size(state:tvb())
+				local size = v:size(state)
 				state.bnet_node:add_le(v.pf, state:read(size))
 			else
 				v:dissect(state)
@@ -217,7 +221,11 @@ do
 			["size"] = function(...) return 8 end,
 		},
 		["uint32"] = {
-			["size"] = function(...) return 4 end,
+			size = function(...) return 4 end,
+			value = function (self, state)
+				local val = state:peek(self.size())
+				return val:le_uint()
+			end,
 		},
 		["uint16"] = {
 			["size"] = function(...) return 2 end,
@@ -240,13 +248,13 @@ do
 		["ipv4"]   = {
 			["size"] = function(...) return 4 end,
 			dissect = function(self, state)
-				local size = self.size(state:tvb())
+				local size = self:size(state)
 				state.bnet_node:add(self.pf, state:read(size))
 			end,
 		},
 		["stringz"] = {
-			["size"] = function(...)
-				local buf = arg[1]
+			["size"] = function(self, state)
+				local buf = state:tvb()
 				return string.format("%s", buf(0):string()):len() + 1
 			end,
 		},
@@ -282,24 +290,65 @@ do
 				node:append_text(unixtime)
 			end,
 		},
+		iterator = {
+			alias = "bytes",
+			dissect = function(self, state)
+				local count = state.packet[self.refkey]
+				local bn = state.bnet_node
+				while count > 0 do
+					state.bnet_node = bn:add(self.pf)
+					dissect_packet(state, self.repeated)
+					count = count - 1
+				end
+				state.bnet_node = bn
+			end,
+		},
 	}
 
 	-- ProtoField wrapper
 	local WProtoField = {}
 	setmetatable(WProtoField, {
 		__index = function(t,k)
-				return function (...)
+				return function (args, ...)
 					local typeinfo = typemap[k]
 					local field = (typeinfo and (
 						(typeinfo.alias and ProtoField[typeinfo.alias]) or	
 						(ProtoField[k])))
 
 					if typeinfo and field then
+						--[[ TODO: remove after changing packets syntax ]]
+						if type(args) ~= "table" then
+							args = {}
+							args.label = arg[1]
+							args.display = arg[2]
+							args.desc = arg[3]
+						end
+						-----------------
 						local tmp = {
-							["pf"] = field(unpack(arg)),
-							["size"]=typeinfo.size,
-							["dissect"]=typeinfo.dissect,
+							-- TODO: some fields do not expect display
+							-- and desc argument
+							pf = field("",
+								args.label,
+								args.display,
+								args.desc,
+								unpack(args.params or {})),
 						}
+						-- Remove ProtoField arguments
+						args.label = nil
+						args.desc = nil
+						args.display = nil
+						args.params = nil
+						-- Copy other fields to the returned value
+						for k,v in pairs(args) do
+							tmp[k] = v
+						end
+						-- Grant access to the type methods
+						-- through the return value
+						for k,v in pairs(typeinfo) do
+							if not tmp[k] then
+								tmp[k] = v
+							end
+						end
 						-- Add the field to the protocol field list
 						local n = table.getn(p_bnetp.fields) + 1
 						p_bnetp.fields[n] = tmp.pf
