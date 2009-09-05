@@ -141,7 +141,7 @@ do
 
 	local udp_encap_table = DissectorTable.get("udp.port")
 	local tcp_encap_table = DissectorTable.get("tcp.port")
-	udp_encap_table:add(6112,p_bnetp)
+	--udp_encap_table:add(6112,p_bnetp)
 	tcp_encap_table:add(6112,p_bnetp)
 
 	-- Protocol stuff
