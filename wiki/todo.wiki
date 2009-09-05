@@ -4,8 +4,9 @@ data types:
 
 ===most important===
   * array of any basic type (actually, uint32[5] may be enough)
-  * iterator (cdkey/gamelist)
-  * conditions
+  * iterator from 0 to x (cdkey/gamelist)
+  * iteration until empty string (S>0x0b getchannellist)
+  * conditions (if..)
   * string-dword (swap dword and output as string)
 
 ===less important===
