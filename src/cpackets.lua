@@ -47,7 +47,7 @@ CPacketDescription = {
 		WProtoField.stringz("","Game name"),
 		WProtoField.stringz("","Game password"),
 		WProtoField.stringz("","Game stats - flags, creator, statstring"),
-		-- WProtoField.stringz("","Map name - 0x0d terminated"), -- TODO: 0xd
+		WProtoField.stringz{label="Map name", eos=0xd},
 	},
 	[SID_GETADVLISTEX] = {
 		WProtoField.uint16("","Product-specific condition 1"),
