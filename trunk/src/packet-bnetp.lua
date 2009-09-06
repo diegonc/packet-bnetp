@@ -254,10 +254,21 @@ do
 			big_endian = true,
 		},
 		["stringz"] = {
+			["alias"] = "string",
 			["size"] = function(self, state)
-				local buf = state:tvb()
-				return string.format("%s", buf(0):string()):len() + 1
+				if (self.length == nil) or (self.length < 0) then
+					local eos = self.eos or 0 -- end of string
+					local buf = state:tvb()
+					local n = 0
+					while (buf:len() > 0) and (buf(n,1):uint() ~= eos) do
+						n = n + 1
+					end
+					return n + 1
+				else
+					return self.length
+				end
 			end,
+			["length"] = -1,
 		},
 		["sockaddr"] = {
 			["size"] = function(...) return 16 end,
@@ -1204,7 +1215,7 @@ CPacketDescription = {
 		WProtoField.stringz("","Game name"),
 		WProtoField.stringz("","Game password"),
 		WProtoField.stringz("","Game stats - flags, creator, statstring"),
-		-- WProtoField.stringz("","Map name - 0x0d terminated"), -- TODO: 0xd
+		WProtoField.stringz{label="Map name", eos=0xd},
 	},
 	[SID_GETADVLISTEX] = {
 		WProtoField.uint16("","Product-specific condition 1"),
