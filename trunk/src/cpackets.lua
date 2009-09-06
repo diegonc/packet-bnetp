@@ -33,7 +33,7 @@ CPacketDescription = {
 		WProtoField.uint32("","Platform ID"),
 		WProtoField.uint32("","Product ID"),
 		WProtoField.uint32("","Version Byte"),
-		WProtoField.uint32("","EXE Version"),
+		WProtoField.ipv4{label="EXE Version"},
 		WProtoField.uint32("","EXE Hash"),
 		WProtoField.stringz("","EXE Information"),
 	},
@@ -251,7 +251,7 @@ CPacketDescription = {
 	},
 	[SID_AUTH_CHECK] = {
 		WProtoField.uint32("","Client Token", base.HEX),
-		WProtoField.uint32("","EXE Version", base.HEX),  -- TODO: game version
+		WProtoField.ipv4{label="EXE Version", display=base.HEX, big_endian=false},
 		WProtoField.uint32("","EXE Hash", base.HEX),
 		WProtoField.uint32("","Number of CD-keys in this packet"),
 		WProtoField.uint32("","Spawn CD-key"),
