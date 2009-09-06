@@ -208,7 +208,11 @@ do
 			end
 			if not v.dissect then
 				local size = v:size(state)
-				state.bnet_node:add_le(v.pf, state:read(size))
+				if v.big_endian then
+					state.bnet_node:add(v.pf, state:read(size))
+				else
+					state.bnet_node:add_le(v.pf, state:read(size))
+				end
 			else
 				v:dissect(state)
 			end
@@ -247,10 +251,7 @@ do
 		},
 		["ipv4"]   = {
 			["size"] = function(...) return 4 end,
-			dissect = function(self, state)
-				local size = self:size(state)
-				state.bnet_node:add(self.pf, state:read(size))
-			end,
+			big_endian = true,
 		},
 		["stringz"] = {
 			["size"] = function(self, state)
@@ -345,7 +346,7 @@ do
 						-- Grant access to the type methods
 						-- through the return value
 						for k,v in pairs(typeinfo) do
-							if not tmp[k] then
+							if tmp[k] == nil then
 								tmp[k] = v
 							end
 						end
@@ -582,7 +583,7 @@ SPacketDescription = {
 	},
 	[SID_NULL] = {},
 	[SID_SERVERLIST] = {
-		WProtoField.uint32("","Server version"),
+		WProtoField.ipv4{label="Server version", big_endian=false},
 		WProtoField.stringz("","[] Server list"),
 	},
 	[SID_CLIENTID] = {
@@ -646,7 +647,7 @@ SPacketDescription = {
 				WProtoField.uint16("","Address Family (Always AF_INET)", base.DEC, {
 					[2] = "AF_INET",
 				}),
-				WProtoField.uint16("","Port"),
+				WProtoField.uint16{label="Port", big_endian=true},
 				WProtoField.ipv4("","Host's IP"),
 				WProtoField.uint32("","sin_zero (0)"),
 				WProtoField.uint32("","sin_zero (0)"),
@@ -1189,7 +1190,7 @@ CPacketDescription = {
 		WProtoField.uint32("","Platform ID"),
 		WProtoField.uint32("","Product ID"),
 		WProtoField.uint32("","Version Byte"),
-		WProtoField.uint32("","EXE Version"),
+		WProtoField.ipv4{label="EXE Version"},
 		WProtoField.uint32("","EXE Hash"),
 		WProtoField.stringz("","EXE Information"),
 	},
@@ -1407,7 +1408,7 @@ CPacketDescription = {
 	},
 	[SID_AUTH_CHECK] = {
 		WProtoField.uint32("","Client Token", base.HEX),
-		WProtoField.uint32("","EXE Version", base.HEX),  -- TODO: game version
+		WProtoField.ipv4{label="EXE Version", display=base.HEX, big_endian=false},
 		WProtoField.uint32("","EXE Hash", base.HEX),
 		WProtoField.uint32("","Number of CD-keys in this packet"),
 		WProtoField.uint32("","Spawn CD-key"),

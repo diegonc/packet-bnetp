@@ -208,7 +208,11 @@ do
 			end
 			if not v.dissect then
 				local size = v:size(state)
-				state.bnet_node:add_le(v.pf, state:read(size))
+				if v.big_endian then
+					state.bnet_node:add(v.pf, state:read(size))
+				else
+					state.bnet_node:add_le(v.pf, state:read(size))
+				end
 			else
 				v:dissect(state)
 			end
@@ -247,10 +251,7 @@ do
 		},
 		["ipv4"]   = {
 			["size"] = function(...) return 4 end,
-			dissect = function(self, state)
-				local size = self:size(state)
-				state.bnet_node:add(self.pf, state:read(size))
-			end,
+			big_endian = true,
 		},
 		["stringz"] = {
 			["size"] = function(self, state)
@@ -345,7 +346,7 @@ do
 						-- Grant access to the type methods
 						-- through the return value
 						for k,v in pairs(typeinfo) do
-							if not tmp[k] then
+							if tmp[k] == nil then
 								tmp[k] = v
 							end
 						end

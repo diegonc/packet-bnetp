@@ -14,7 +14,7 @@ SPacketDescription = {
 	},
 	[SID_NULL] = {},
 	[SID_SERVERLIST] = {
-		WProtoField.uint32("","Server version"),
+		WProtoField.ipv4{label="Server version", big_endian=false},
 		WProtoField.stringz("","[] Server list"),
 	},
 	[SID_CLIENTID] = {
@@ -78,7 +78,7 @@ SPacketDescription = {
 				WProtoField.uint16("","Address Family (Always AF_INET)", base.DEC, {
 					[2] = "AF_INET",
 				}),
-				WProtoField.uint16("","Port"),
+				WProtoField.uint16{label="Port", big_endian=true},
 				WProtoField.ipv4("","Host's IP"),
 				WProtoField.uint32("","sin_zero (0)"),
 				WProtoField.uint32("","sin_zero (0)"),
