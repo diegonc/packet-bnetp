@@ -2,7 +2,7 @@
 CPacketDescription = {
 	[SID_AUTH_INFO] = {
 		WProtoField.uint32("","Protocol ID",base.DEC),
-		WProtoField.uint32("","Platform ID",base.HEX),
+		WProtoField.stringz{label="Platform ID", reversed=true, length=4},
 		WProtoField.uint32("","Product ID",base.HEX),
 		WProtoField.uint32("","Version Byte",base.HEX),
 		WProtoField.uint32("","Product Laguage",base.HEX),
