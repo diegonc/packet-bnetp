@@ -269,6 +269,22 @@ do
 				end
 			end,
 			["length"] = -1,
+			dissect = function(self, state)
+				local size = self:size(state)
+				local buf = state:read(size):tvb()
+
+				if self.reversed then
+					local tmp = ByteArray.new()
+					tmp:set_size(size)
+					for i=size - 1, 0, -1 do
+						tmp:set_index(size - i - 1,
+							buf(i, 1):uint())
+					end
+					buf = tmp:tvb("Reversed String")
+				end
+
+				state.bnet_node:add(self.pf, buf())
+			end,
 		},
 		["sockaddr"] = {
 			["size"] = function(...) return 16 end,
@@ -1170,7 +1186,7 @@ SPacketDescription = {
 CPacketDescription = {
 	[SID_AUTH_INFO] = {
 		WProtoField.uint32("","Protocol ID",base.DEC),
-		WProtoField.uint32("","Platform ID",base.HEX),
+		WProtoField.stringz{label="Platform ID", reversed=true, length=4},
 		WProtoField.uint32("","Product ID",base.HEX),
 		WProtoField.uint32("","Version Byte",base.HEX),
 		WProtoField.uint32("","Product Laguage",base.HEX),
