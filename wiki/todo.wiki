@@ -8,7 +8,7 @@ data types:
     * Wireshark needs a patch for being able to correctly highlight each element in the hexdump. 
   * iteration until empty string (S>0x0b getchannellist)
   * conditions (if..)
-  * string-dword (swap dword and output as string)
+  * ~~string-dword (swap dword and output as string)~~
 
 ===less important===
   * ~~ip (network byte order, opposite to intel). For some reason lua's built-in ipv4 uses inter order (lol?)~~
@@ -18,5 +18,5 @@ data types:
   * ~~unips file time~~
   * statstring decoder
   * bitmap decoder (user flag)
-  * exe version decoder (like ip, but in intel order)
+  * ~~exe version decoder (like ip, but in intel order)~~
   * sid_checkad: extension: string[4]
