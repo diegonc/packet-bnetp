@@ -250,14 +250,14 @@ CPacketDescription = {
 		WProtoField.stringz("","Work returned data"),
 	},
 	[SID_AUTH_CHECK] = {
-		WProtoField.uint32("","Client Token", base.HEX),
-		WProtoField.ipv4{label="EXE Version", display=base.HEX, big_endian=false},
-		WProtoField.uint32("","EXE Hash", base.HEX),
-		WProtoField.uint32("","Number of CD-keys in this packet"),
-		WProtoField.uint32("","Spawn CD-key"),
-			-- TODO -for 0 to CD-Key count
-			WProtoField.uint32("","CD-key length"),
-			WProtoField.uint32("","Product ID", base.DEC, {
+		uint32("","Client Token", base.HEX),
+		version{label="EXE Version", display=base.HEX},
+		uint32("","EXE Hash", base.HEX),
+		uint32{label="Number of CD-keys in this packet", key="cdkeys"},
+		uint32("","Spawn CD-key"),
+		iterator{label="CD-Key", refkey="cdkeys", repeated={
+			uint32("","CD-key length"),
+			uint32("","Product ID", base.DEC, {
 				[0x01] = "STAR",
 				[0x02] = "STAR",
 				[0x17] = "STAR (26-character)",
@@ -269,18 +269,17 @@ CPacketDescription = {
 				[0x0E] = "WAR3",
 				[0x12] = "W3XP",
 			}),
-			WProtoField.uint32("","Public value", base.HEX),
-			WProtoField.uint32("","Unknown (0)"),
+			uint32("","Public value", base.HEX),
+			uint32("","Unknown (0)"),
 			-- TODO: array
-			WProtoField.uint32("","Hashed data [0]", base.HEX),
-			WProtoField.uint32("","Hashed data [1]", base.HEX),
-			WProtoField.uint32("","Hashed data [2]", base.HEX),
-			WProtoField.uint32("","Hashed data [3]", base.HEX),
-			WProtoField.uint32("","Hashed data [4]", base.HEX),
-			-- foreach end
-		WProtoField.stringz("","Exe Information"),
-		WProtoField.stringz("","CD Key owner name"),
-
+			uint32("","Hashed data [0]", base.HEX),
+			uint32("","Hashed data [1]", base.HEX),
+			uint32("","Hashed data [2]", base.HEX),
+			uint32("","Hashed data [3]", base.HEX),
+			uint32("","Hashed data [4]", base.HEX),
+		}},
+		stringz("","Exe Information"),
+		stringz("","CD Key owner name"),
 	},
 	[SID_AUTH_ACCOUNTCREATE] = {
 		WProtoField.uint8("","[32] Salt (s)"),
