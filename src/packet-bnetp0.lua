@@ -391,6 +391,33 @@ do
 	})
 
 	%include "constants.lua"
-	%include "spackets.lua"
-	%include "cpackets.lua"
+
+	do
+		local uint64 = WProtoField.uint64
+		local uint32 = WProtoField.uint32
+		local uint16 = WProtoField.uint16
+		local uint8 = WProtoField.uint8
+		local int64 = WProtoField.int64
+		local int32 = WProtoField.int32
+		local int16 = WProtoField.int16
+		local int8 = WProtoField.int8
+		local ipv4 = WProtoField.ipv4
+		local stringz = WProtoField.stringz
+		local sockaddr = WProtoField.sockaddr
+		local filetime = WProtoField.filetime
+		local posixtime = WProtoField.posixtime
+		local iterator = WProtoField.iterator
+		local version = function(arg)
+			arg.big_endian = false
+			return ipv4(arg)
+		end
+		local strdw = function(arg)
+			arg.reversed = true
+			arg.length = 4
+			return stringz(arg)
+		end
+
+		%include "spackets.lua"
+		%include "cpackets.lua"
+	end
 end
