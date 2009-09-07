@@ -40,7 +40,7 @@ do
 		f_data, -- Generic packet data field
 	}
 
-	function State()
+	local function State()
 		return {
 			["bnet_node"] = nil,
 			["buf"] = nil,
@@ -75,7 +75,7 @@ do
 		}
 	end
 
-	function do_dissection(state)
+	local function do_dissection(state)
 		local handler = handlers_by_type[state:peek(1):uint()]
 		if handler then
 			state.bnet_node:add(f_type, state:read(1))
