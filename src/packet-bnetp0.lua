@@ -28,7 +28,7 @@ do
 	})
 	local f_pid  = ProtoField.uint8("bnetp.pid")
 	local f_plen = ProtoField.uint16("bnetp.plen","Packet Length",base.DEC)
-	local f_data = ProtoField.bytes("bnetp.plen","Unhandled Packet Data")
+	local f_data = ProtoField.bytes("","Unhandled Packet Data")
 	
 	p_bnetp.fields = {
 		-- Header fields
