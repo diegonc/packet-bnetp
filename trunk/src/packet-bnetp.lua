@@ -28,7 +28,7 @@ do
 	})
 	local f_pid  = ProtoField.uint8("bnetp.pid")
 	local f_plen = ProtoField.uint16("bnetp.plen","Packet Length",base.DEC)
-	local f_data = ProtoField.bytes("bnetp.plen","Unhandled Packet Data")
+	local f_data = ProtoField.bytes("","Unhandled Packet Data")
 	
 	p_bnetp.fields = {
 		-- Header fields
@@ -40,7 +40,7 @@ do
 		f_data, -- Generic packet data field
 	}
 
-	function State()
+	local function State()
 		return {
 			["bnet_node"] = nil,
 			["buf"] = nil,
@@ -75,7 +75,7 @@ do
 		}
 	end
 
-	function do_dissection(state)
+	local function do_dissection(state)
 		local handler = handlers_by_type[state:peek(1):uint()]
 		if handler then
 			state.bnet_node:add(f_type, state:read(1))
@@ -169,11 +169,11 @@ do
 			pidnode:set_text(pid_label(pid,packet_names[type_pid]))
 			-- The size found in the packet includes headers, so consumed bytes
 			-- are substracted when requesting more data.
-			local len = state:peek(2):le_uint() -2
+			state.packet.length = state:peek(2):le_uint() -2
 			-- Record used bytes before dissecting.
-			local start = state.used
+			state.packet.start = state.used
 			-- Request at least len extra bytes at once.
-			state:request(len)
+			state:request(state.packet.length)
 
 			state.bnet_node:add_le(f_plen, state:read(2))
 
@@ -193,7 +193,8 @@ do
 			end
 
 			-- Check if any data remains unhandled.
-			local remaining = len - (state.used - start)
+			local remaining = state.packet.length -
+				(state.used - state.packet.start)
 			if remaining > 0 then
 				state.bnet_node:add(f_data, state:read(remaining))
 			end
@@ -321,15 +322,32 @@ do
 		iterator = {
 			alias = "bytes",
 			dissect = function(self, state)
-				local count = state.packet[self.refkey]
-				local bn = state.bnet_node
-				while count > 0 do
-					state.bnet_node = bn:add(self.pf)
-					dissect_packet(state, self.repeated)
-					count = count - 1
+				self:initialize(state)
+				while self:condition(state) do
+					self:iteration(state)
 				end
-				state.bnet_node = bn
+				self:finalize(state)
 			end,
+			initialize = function (self, state)
+				self.priv.count = state.packet[self.refkey]
+				self.priv.bn = state.bnet_node
+			end,
+			condition = function (self, state)
+				return (self.priv.count > 0)
+			end,
+			iteration = function (self, state)
+				local start = state.used
+				state.bnet_node = self.priv.bn:add(self.pf, state:peek(1))
+				dissect_packet(state, self.repeated)
+				if state.bnet_node.set_len then
+					state.bnet_node:set_len(state.used - start)
+				end
+				self.priv.count = self.priv.count - 1
+			end,
+			finalize = function (self, state)
+				state.bnet_node = self.priv.bn
+			end,
+			priv = {}, -- iterator state
 		},
 	}
 
@@ -618,6 +636,32 @@ local SID_CLANMEMBERINFORMATION = 0xFF82
 			arg.reversed = true
 			arg.length = 4
 			return stringz(arg)
+		end
+		local array = function(arg)
+			arg.repeated = arg.of
+			arg.of = nil
+			arg.priv = {size = arg.size}
+			arg.size = nil
+			arg.initialize = function (self, state)
+				self.priv.index = 0
+				self.priv.bn = state.bnet_node
+				state.bnet_node = self.priv.bn:add(self.pf, state:peek(1))
+				self.priv.start = state.used
+			end
+			arg.condition = function (self, state)
+				return (self.priv.index < self.priv.size)
+			end
+			arg.iteration = function (self, state)
+				dissect_packet(state, self.repeated)
+				self.priv.index = self.priv.index + 1
+			end
+			arg.finalize = function (self, state)
+				if state.bnet_node.set_len then
+					state.bnet_node:set_len(state.used - self.priv.start)
+				end
+				state.bnet_node = self.priv.bn
+			end
+			return iterator(arg)
 		end
 
 -- Packets from server to client
@@ -1482,11 +1526,16 @@ CPacketDescription = {
 			uint32("","Public value", base.HEX),
 			uint32("","Unknown (0)"),
 			-- TODO: array
+			array{label="Hashed data", size=5, of={
+				uint32{label="???", display=base.HEX}
+			}},
+			--[[
 			uint32("","Hashed data [0]", base.HEX),
 			uint32("","Hashed data [1]", base.HEX),
 			uint32("","Hashed data [2]", base.HEX),
 			uint32("","Hashed data [3]", base.HEX),
 			uint32("","Hashed data [4]", base.HEX),
+			]]
 		}},
 		stringz("","Exe Information"),
 		stringz("","CD Key owner name"),

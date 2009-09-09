@@ -272,11 +272,16 @@ CPacketDescription = {
 			uint32("","Public value", base.HEX),
 			uint32("","Unknown (0)"),
 			-- TODO: array
+			array{label="Hashed data", size=5, of={
+				uint32{label="???", display=base.HEX}
+			}},
+			--[[
 			uint32("","Hashed data [0]", base.HEX),
 			uint32("","Hashed data [1]", base.HEX),
 			uint32("","Hashed data [2]", base.HEX),
 			uint32("","Hashed data [3]", base.HEX),
 			uint32("","Hashed data [4]", base.HEX),
+			]]
 		}},
 		stringz("","Exe Information"),
 		stringz("","CD Key owner name"),
