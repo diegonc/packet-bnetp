@@ -4,7 +4,7 @@ ZIP=zip
 
 PKGNAME=packet-bnetp
 DISTNAME=packet-bnetp-src
-VERSION=`date +%Y%m%d`
+VERSION=$(shell date +%Y%m%d)
 
 DIST = \
 	src/constants.lua \
@@ -26,13 +26,20 @@ SOURCES = \
 src/packet-bnetp.lua: $(SOURCES)
 	tools/preprocess.pl -i src/packet-bnetp0.lua -o src/packet-bnetp.lua
 
-.PHONY: pkg clean
+.PHONY: pkg upload clean
 
-pkg: $(PKG)
+$(PKGNAME)-$(VERSION).zip: $(PKG)
 	$(MKDIR) $(PKGNAME)-$(VERSION) && (\
 		( cp $(PKG) $(PKGNAME)-$(VERSION) && \
 		  $(ZIP) -9 -r $(PKGNAME)-$(VERSION).zip $(PKGNAME)-$(VERSION) ); \
 		$(RM) -r $(PKGNAME)-$(VERSION) )
+
+pkg: $(PKGNAME)-$(VERSION).zip
+upload: pkg
+	tools/googlecode_upload.py \
+		-p packet-bnetp \
+		-s "packet-bnetp plugin" \
+		$(PKGNAME)-$(VERSION).zip
 
 clean:
 	$(RM) src/packet-bnetp.lua
