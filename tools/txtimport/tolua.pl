@@ -34,7 +34,7 @@ while ($s =~ m/$fields/g ) {
 	($a, $b, $c) = ($1, $2, $3);
 
 	if (not $b) {
-		print "$a$c\n" if not $b;
+		print "$a$c\n";
 	} else {
 		print "$a\n";
 		while ($b =~ /\(([^\)]*)\)[ ]*(.*?)(?m:[ ]*$)/g) {
