@@ -261,7 +261,7 @@ do
 					local eos = self.eos or 0 -- end of string
 					local buf = state:tvb()
 					local n = 0
-					while (buf:len() > 0) and (buf(n,1):uint() ~= eos) do
+					while (n < buf:len()) and (buf(n,1):uint() ~= eos) do
 						n = n + 1
 					end
 					return n + 1
@@ -285,6 +285,10 @@ do
 				end
 
 				state.bnet_node:add(self.pf, buf())
+			end,
+			value = function (self, state)
+				local val = state:peek(self:size(state))
+				return val:string()
 			end,
 		},
 		["sockaddr"] = {
@@ -329,7 +333,9 @@ do
 				self:finalize(state)
 			end,
 			initialize = function (self, state)
-				self.priv.count = state.packet[self.refkey]
+				if self.refkey then
+					self.priv.count = state.packet[self.refkey]
+				end
 				self.priv.bn = state.bnet_node
 			end,
 			condition = function (self, state)
@@ -337,12 +343,16 @@ do
 			end,
 			iteration = function (self, state)
 				local start = state.used
-				state.bnet_node = self.priv.bn:add(self.pf, state:peek(1))
+				if self.pf then
+					state.bnet_node = self.priv.bn:add(self.pf, state:peek(1))
+				end
 				dissect_packet(state, self.repeated)
-				if state.bnet_node.set_len then
+				if self.pf and state.bnet_node.set_len then
 					state.bnet_node:set_len(state.used - start)
 				end
-				self.priv.count = self.priv.count - 1
+				if self.refkey then
+					self.priv.count = self.priv.count - 1
+				end
 			end,
 			finalize = function (self, state)
 				state.bnet_node = self.priv.bn
@@ -365,10 +375,7 @@ do
 		__index = function(t,k)
 				return function (args, ...)
 					local typeinfo = typemap[k]
-					local field = (typeinfo and (
-						(typeinfo.alias and ProtoField[typeinfo.alias]) or	
-						(ProtoField[k])))
-
+					
 					if typeinfo then
 						--[[ TODO: remove after changing packets syntax ]]
 						if type(args) ~= "table" then
@@ -379,6 +386,7 @@ do
 						end
 						-----------------
 						local tmp = {}
+						local field = ProtoField[args.alias or typeinfo.alias or k]
 						-- TODO: some fields do not expect display
 						-- and desc argument
 						if field then

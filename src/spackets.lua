@@ -111,7 +111,13 @@ SPacketDescription = {
 		WProtoField.stringz("","Account name"),
 	},
 	[SID_GETCHANNELLIST] = {
-		WProtoField.stringz("","[TODO: array] Channel names"),
+		WProtoField.iterator{
+			alias="none",
+			condition = function(self, state) return state.packet.chan ~="" end,
+			repeated = {
+				WProtoField.stringz{label="Channel name", key="chan"},
+			}
+		}
 	},
 	[SID_CHATEVENT] = {
 		WProtoField.uint32("","Event ID", base.HEX, {
