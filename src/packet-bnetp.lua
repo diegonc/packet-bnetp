@@ -261,7 +261,7 @@ do
 					local eos = self.eos or 0 -- end of string
 					local buf = state:tvb()
 					local n = 0
-					while (buf:len() > 0) and (buf(n,1):uint() ~= eos) do
+					while (n < buf:len()) and (buf(n,1):uint() ~= eos) do
 						n = n + 1
 					end
 					return n + 1
