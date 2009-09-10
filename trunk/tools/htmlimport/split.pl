@@ -36,6 +36,16 @@ my %typemap = (
   "STRING"    => "stringz",
 );
 
+my %prefixes = (
+	"SID"    => 0xFF,
+	"W3GS"   => 0xF7, # ???, prefix is not real
+	"BNLS"   => 0x70, # fake, theres no header id byte
+	"D2GS"   => 0x71, # fake, theres no header id byte
+	"MCP"    => 0x72, # fake, theres no header id byte
+	"PACKET" => 0x73, # fake, theres no header id byte (may be 0x01)
+	"PKT"    => 0x74, # fake, theres no header id byte
+);
+
 sub finish_current {
 	if ($current_name ne "") {
 		if ($current_source eq "S") {
@@ -58,7 +68,12 @@ sub do_label {
 	}
 	if ($label =~ /Message Name/) {
 		$current_name = $text;
-		print $CNST "local $current_name = $current_id;\n";
+		$current_name =~ /[[:space:]]*([A-Z0-9]+)_.*/;
+		
+		my $numid = $prefixes{$1};
+		print STDERR "Unknown prefix: $1\n" if ($numid == 0);
+		$numid = $numid * 0x100 + hex($current_id);
+		print $CNST sprintf("local $current_name = 0x%04X\n", $numid);
 	}
 	if ($label =~ /Direction/) {
 		if ($text =~ /Server[ ]*->[ ]*Client/) {
