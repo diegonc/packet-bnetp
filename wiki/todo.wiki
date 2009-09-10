@@ -6,8 +6,8 @@ data types:
   * array of any basic type (actually, uint32[5] may be enough)
   * ~~iterator from 0 to x (cdkey/gamelist)~~
     * ~~Wireshark needs a patch for being able to correctly highlight each element in the hexdump.~~
-  * iteration until empty string (S>0x0b getchannellist)
-  * conditions (if..)
+  * ~~iteration until empty string (S>0x0b getchannellist)~~
+  * ~~conditions (if..)~~
   * ~~string-dword (swap dword and output as string)~~
 
 ===less important===
