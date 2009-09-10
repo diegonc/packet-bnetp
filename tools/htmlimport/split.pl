@@ -39,10 +39,10 @@ my %typemap = (
 sub finish_current {
 	if ($current_name ne "") {
 		if ($current_source eq "S") {
-			print $SRVR "},";
+			print $SRVR "},\n";
 		}
 		else {
-			print $CLNT "},";
+			print $CLNT "},\n";
 		}
 	}
 }
