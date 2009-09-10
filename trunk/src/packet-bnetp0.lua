@@ -349,6 +349,14 @@ do
 			end,
 			priv = {}, -- iterator state
 		},
+		when = {
+			alias = "none",
+			dissect = function(self, state)
+				if self:condition(state) then
+					dissect_packet(state, self.block)
+				end
+			end,
+		},
 	}
 
 	-- ProtoField wrapper
@@ -361,7 +369,7 @@ do
 						(typeinfo.alias and ProtoField[typeinfo.alias]) or	
 						(ProtoField[k])))
 
-					if typeinfo and field then
+					if typeinfo then
 						--[[ TODO: remove after changing packets syntax ]]
 						if type(args) ~= "table" then
 							args = {}
@@ -370,15 +378,16 @@ do
 							args.desc = arg[3]
 						end
 						-----------------
-						local tmp = {
-							-- TODO: some fields do not expect display
-							-- and desc argument
-							pf = field("",
+						local tmp = {}
+						-- TODO: some fields do not expect display
+						-- and desc argument
+						if field then
+							tmp.pf = field("",
 								args.label,
 								args.display,
 								args.desc,
-								unpack(args.params or {})),
-						}
+								unpack(args.params or {}))
+						end
 						-- Remove ProtoField arguments
 						args.label = nil
 						args.desc = nil

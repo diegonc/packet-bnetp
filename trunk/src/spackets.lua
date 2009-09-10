@@ -43,45 +43,9 @@ SPacketDescription = {
 			display=base.DEC,
 		},
 		-- TODO: if count is 0
-		--[[ WProtoField.uint32("","Game Status", base.DEC, {
-				[0] = "OK",
-				[1] = "Game doesn't exist",
-				[2] = "Incorrect password",
-				[3] = "Game full",
-				[4] = "Game already started",
-				[6] = "Too many server requests",
-			}), --]]
-		-- else
-		-- TODO: iterator, for 0 to number
-		WProtoField.iterator{
-			label="Game Info",
-			refkey="games",
-			repeated={
-				WProtoField.uint16("","Game Type", base.HEX, {
-					[0x02] = "Melee",
-					[0x03] = "Free for all",
-					[0x04] = "one vs one",
-					[0x05] = "CTF",
-					[0x06] = "Greed",
-					[0x07] = "Slaughter",
-					[0x08] = "Sudden Death",
-					[0x09] = "Ladder",
-					[0x10] = "Iron man ladder",
-					[0x0A] = "Use Map Settings",
-					[0x0B] = "Team Melee",
-					[0x0C] = "Team FFA",
-					[0x0D] = "Team CTF",
-					[0x0F] = "Top vs Bottom",
-				}),
-				WProtoField.uint16("","Parameter"),
-				WProtoField.uint32("","Unknown", base.HEX),
-				WProtoField.uint16("","Address Family (Always AF_INET)", base.DEC, {
-					[2] = "AF_INET",
-				}),
-				WProtoField.uint16{label="Port", big_endian=true},
-				WProtoField.ipv4("","Host's IP"),
-				WProtoField.uint32("","sin_zero (0)"),
-				WProtoField.uint32("","sin_zero (0)"),
+		WProtoField.when{
+			condition=function(self, state) return state.packet.games == 0 end,
+			block = {
 				WProtoField.uint32("","Game Status", base.DEC, {
 					[0] = "OK",
 					[1] = "Game doesn't exist",
@@ -90,13 +54,56 @@ SPacketDescription = {
 					[4] = "Game already started",
 					[6] = "Too many server requests",
 				}),
-				WProtoField.uint32("","Elapsed time (in seconds)"),
-				WProtoField.stringz("","Game name"),
-				WProtoField.stringz("","Game password"),
-				WProtoField.stringz("","Game statstring"),
+			}
+		},
+		WProtoField.when{
+			condition=function(self, state) return state.packet.games > 0 end,
+			block = {
+				WProtoField.iterator{
+					label="Game Info",
+					refkey="games",
+					repeated={
+						WProtoField.uint16("","Game Type", base.HEX, {
+							[0x02] = "Melee",
+							[0x03] = "Free for all",
+							[0x04] = "one vs one",
+							[0x05] = "CTF",
+							[0x06] = "Greed",
+							[0x07] = "Slaughter",
+							[0x08] = "Sudden Death",
+							[0x09] = "Ladder",
+							[0x10] = "Iron man ladder",
+							[0x0A] = "Use Map Settings",
+							[0x0B] = "Team Melee",
+							[0x0C] = "Team FFA",
+							[0x0D] = "Team CTF",
+							[0x0F] = "Top vs Bottom",
+						}),
+						WProtoField.uint16("","Parameter"),
+						WProtoField.uint32("","Unknown", base.HEX),
+						WProtoField.uint16("","Address Family (Always AF_INET)", base.DEC, {
+							[2] = "AF_INET",
+						}),
+						WProtoField.uint16{label="Port", big_endian=true},
+						WProtoField.ipv4("","Host's IP"),
+						WProtoField.uint32("","sin_zero (0)"),
+						WProtoField.uint32("","sin_zero (0)"),
+						WProtoField.uint32("","Game Status", base.DEC, {
+							[0] = "OK",
+							[1] = "Game doesn't exist",
+							[2] = "Incorrect password",
+							[3] = "Game full",
+							[4] = "Game already started",
+							[6] = "Too many server requests",
+						}),
+						WProtoField.uint32("","Elapsed time (in seconds)"),
+						WProtoField.stringz("","Game name"),
+						WProtoField.stringz("","Game password"),
+						WProtoField.stringz("","Game statstring"),
+					},
+				},
 			},
 		},
-		-- /iterator
 	},
 	[SID_ENTERCHAT] = {
 		WProtoField.stringz("","Unique name"),
