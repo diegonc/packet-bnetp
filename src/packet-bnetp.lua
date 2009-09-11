@@ -372,9 +372,9 @@ do
 	local function make_args_table(args, ...)
 		if type(args) ~= "table" then
 			args = {}
-			args.label = args
-			args.display = arg[1]
-			args.desc = arg[2]
+			args.label = arg[1]
+			args.display = arg[2]
+			args.desc = arg[3]
 		end
 		return args
 	end
@@ -1292,7 +1292,7 @@ SPacketDescription = {
 CPacketDescription = {
 	[SID_AUTH_INFO] = {
 		WProtoField.uint32("","Protocol ID",base.DEC),
-		WProtoField.stringz{label="Platform ID", reversed=true, length=4},
+		strdw("", "Platform ID"),
 		WProtoField.uint32("","Product ID",base.HEX),
 		WProtoField.uint32("","Version Byte",base.HEX),
 		WProtoField.uint32("","Product Laguage",base.HEX),
