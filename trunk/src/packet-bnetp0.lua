@@ -372,9 +372,9 @@ do
 	local function make_args_table(args, ...)
 		if type(args) ~= "table" then
 			args = {}
-			args.label = args
-			args.display = arg[1]
-			args.desc = arg[2]
+			args.label = arg[1]
+			args.display = arg[2]
+			args.desc = arg[3]
 		end
 		return args
 	end
