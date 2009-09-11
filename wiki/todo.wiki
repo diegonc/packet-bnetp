@@ -20,6 +20,7 @@ data types:
   * ~~unips file time~~
   * ~~exe version decoder (like ip, but in intel order)~~
   * enclosed iterators (for s>0x26 readuserdata)
+  * make clienttag a type (so it's no need to write possible values every time)?
   * statstring decoder game and user statstrings
   * bitmap decoder (user flag)
   * sid_checkad: extension: string[4]
