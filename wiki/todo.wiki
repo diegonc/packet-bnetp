@@ -3,12 +3,14 @@
 data types:
 
 ===most important===
-  * ~~array of any basic type (actually, uint32[5] may be enough)~~
+  * array of any basic type (actually, uint32[5] may be enough)
+    * display it as one value (e.g. passhash uint32 [5] - 40 char string)
   * ~~iterator from 0 to x (cdkey/gamelist)~~
     * ~~Wireshark needs a patch for being able to correctly highlight each element in the hexdump.~~
   * ~~iteration until empty string (S>0x0b getchannellist)~~
   * ~~conditions (if..)~~
   * ~~string-dword (swap dword and output as string)~~
+  * supress raw values output on custom types (time, dwordstr)
 
 ===less important===
   * ~~ip (network byte order, opposite to intel). For some reason lua's built-in ipv4 uses inter order (lol?)~~
@@ -16,7 +18,8 @@ data types:
     * can be converted to posixtime 
     * $unixtime = $wintime/1E7 - 11644473600
   * ~~unips file time~~
-  * statstring decoder
-  * bitmap decoder (user flag)
   * ~~exe version decoder (like ip, but in intel order)~~
+  * enclosed iterators (for s>0x26 readuserdata)
+  * statstring decoder game and user statstrings
+  * bitmap decoder (user flag)
   * sid_checkad: extension: string[4]
