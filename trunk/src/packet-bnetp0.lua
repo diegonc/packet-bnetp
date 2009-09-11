@@ -369,6 +369,16 @@ do
 		},
 	}
 
+	local function make_args_table(args, ...)
+		if type(args) ~= "table" then
+			args = {}
+			args.label = args
+			args.display = arg[1]
+			args.desc = arg[2]
+		end
+		return args
+	end
+
 	-- ProtoField wrapper
 	local WProtoField = {}
 	setmetatable(WProtoField, {
@@ -378,12 +388,7 @@ do
 					
 					if typeinfo then
 						--[[ TODO: remove after changing packets syntax ]]
-						if type(args) ~= "table" then
-							args = {}
-							args.label = arg[1]
-							args.display = arg[2]
-							args.desc = arg[3]
-						end
+						args = make_args_table(args, unpack(arg))
 						-----------------
 						local tmp = {}
 						local field = ProtoField[args.alias or typeinfo.alias or k]
@@ -446,10 +451,11 @@ do
 			arg.big_endian = false
 			return ipv4(arg)
 		end
-		local strdw = function(arg)
-			arg.reversed = true
-			arg.length = 4
-			return stringz(arg)
+		local strdw = function(args,...)
+			args = make_args_table(args, unpack(arg))
+			args.reversed = true
+			args.length = 4
+			return stringz(args)
 		end
 		local array = function(arg)
 			arg.repeated = arg.of
