@@ -346,6 +346,8 @@ do
 			dissect = function(self, state)
 				if self:condition(state) then
 					dissect_packet(state, self.block)
+				elseif self.otherwise then
+					dissect_packet(state, self.otherwise)
 				end
 			end,
 		},
@@ -688,15 +690,28 @@ local Descs = {
 SPacketDescription = {
 [0xFF04] = {
 	uint32{label="Server version", },
-	stringz{label="[] Server list", },
+	iterator{
+		label="Server list"
+ 		alias="bytes",
+ 		condition = function(self, state) return state.packet.srvr ~="" end,
+ 		repeated = {
+ 			WProtoField.stringz{label="Server", key="srvr"},
+ 		} 
+ 	}
 },
 [0xFF46] = {
-	uint8{label="Number of entries", },
-	uint32{label="Last logon timestamp", },
-	uint32{label="Oldest news timestamp", },
-	uint32{label="Newest news timestamp", },
-	uint32{label="Timestamp", },
-	stringz{label="News", },
+	uint8{label="Number of entries", key="news" },
+	unixtime{label="Last logon timestamp", },
+	unixtime{label="Oldest news timestamp", },
+	unixtime{label="Newest news timestamp", },
+	iterator{alias="none", refkey="news", repeated={
+		unixtime{label="Timestamp", key="stamp"},
+		when{
+			condition=function(self, state) return state.packet.stamp == 0 end,
+			block = { stringz("MOTD") },
+			otherwise = {stringz("News")},
+		},
+	}
 },
 [0xFF4A] = {
 	stringz{label="MPQ Filename", },
