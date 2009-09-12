@@ -399,8 +399,10 @@ do
 								tmp[k] = v
 							end
 						end
-						local n = table.getn(p_bnetp.fields) + 1
-						p_bnetp.fields[n] = tmp.pf
+						if tmp.pf then
+							local n = table.getn(p_bnetp.fields) + 1
+							p_bnetp.fields[n] = tmp.pf
+						end
 						return tmp
 					end
 					error("unsupported field type: " .. k)
