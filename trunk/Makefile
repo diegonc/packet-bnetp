@@ -1,6 +1,10 @@
 MKDIR=mkdir
 RM=rm
 ZIP=zip
+FILEPP=tools/filepp/filepp
+FILEPP_FLAGS= \
+	-m lua-comment.pm \
+	-m literal.pm
 
 PKGNAME=packet-bnetp
 DISTNAME=packet-bnetp-src
@@ -24,7 +28,7 @@ SOURCES = \
 	src/spackets.lua
 
 src/packet-bnetp.lua: $(SOURCES)
-	tools/preprocess.pl -i src/packet-bnetp0.lua -o src/packet-bnetp.lua
+	$(FILEPP) $(FILEPP_FLAGS) src/packet-bnetp0.lua > src/packet-bnetp.lua
 
 .PHONY: pkg upload clean
 
