@@ -188,6 +188,9 @@ do
 		for k,v in pairs(pdesc) do
 			if v.key and v.value then
 				state.packet[v.key] = v:value(state)
+			elseif v.key then
+				state:error(v.key .. " key creation requested on a field type "
+					.. "without a value method.")
 			end
 			if not v.dissect then
 				local size = v:size(state)
@@ -224,6 +227,10 @@ do
 		},
 		["uint8"]  = {
 			["size"] = function(...) return 1 end,
+			value = function (self, state)
+				local val = state:peek(self.size())
+				return val:le_uint()
+			end,
 		},
 		["int64"]  = {
 			["size"] = function(...) return 8 end,
@@ -304,6 +311,7 @@ do
 				local unixtime = os.date(" %c", state:read(4):le_uint())
 				node:append_text(unixtime)
 			end,
+			value = function (self, state) return state:peek(4):uint() end,
 		},
 		iterator = {
 			alias = "bytes",
@@ -650,6 +658,7 @@ local Descs = {
 		local wintime = WProtoField.filetime
 		local posixtime = WProtoField.posixtime
 		local iterator = WProtoField.iterator
+		local when = WProtoField.when
 		local version = function(arg)
 			arg.big_endian = false
 			return ipv4(arg)
@@ -691,27 +700,27 @@ SPacketDescription = {
 [0xFF04] = {
 	uint32{label="Server version", },
 	iterator{
-		label="Server list"
+		label="Server list",
  		alias="bytes",
  		condition = function(self, state) return state.packet.srvr ~="" end,
  		repeated = {
  			WProtoField.stringz{label="Server", key="srvr"},
- 		} 
+ 		},
  	}
 },
 [0xFF46] = {
 	uint8{label="Number of entries", key="news" },
-	unixtime{label="Last logon timestamp", },
-	unixtime{label="Oldest news timestamp", },
-	unixtime{label="Newest news timestamp", },
+	posixtime{label="Last logon timestamp", },
+	posixtime{label="Oldest news timestamp", },
+	posixtime{label="Newest news timestamp", },
 	iterator{alias="none", refkey="news", repeated={
-		unixtime{label="Timestamp", key="stamp"},
+		posixtime{label="Timestamp", key="stamp"},
 		when{
 			condition=function(self, state) return state.packet.stamp == 0 end,
 			block = { stringz("MOTD") },
 			otherwise = {stringz("News")},
-		},
-	}
+		},},
+	},
 },
 [0xFF4A] = {
 	stringz{label="MPQ Filename", },

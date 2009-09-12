@@ -24,12 +24,12 @@ SPacketDescription = {
 [SID_SERVERLIST] = {
 	uint32{label="Server version", },
 	iterator{
-		label="Server list"
+		label="Server list",
  		alias="bytes",
  		condition = function(self, state) return state.packet.srvr ~="" end,
  		repeated = {
  			WProtoField.stringz{label="Server", key="srvr"},
- 		} 
+ 		},
  	}
 },
 --[[
@@ -66,17 +66,17 @@ SPacketDescription = {
 ]]
 [SID_NEWS_INFO] = {
 	uint8{label="Number of entries", key="news" },
-	unixtime{label="Last logon timestamp", },
-	unixtime{label="Oldest news timestamp", },
-	unixtime{label="Newest news timestamp", },
+	posixtime{label="Last logon timestamp", },
+	posixtime{label="Oldest news timestamp", },
+	posixtime{label="Newest news timestamp", },
 	iterator{alias="none", refkey="news", repeated={
-		unixtime{label="Timestamp", key="stamp"},
+		posixtime{label="Timestamp", key="stamp"},
 		when{
 			condition=function(self, state) return state.packet.stamp == 0 end,
 			block = { stringz("MOTD") },
 			otherwise = {stringz("News")},
-		},
-	}
+		},},
+	},
 },
 --[[
     Message ID:    0x4A
