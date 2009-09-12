@@ -729,14 +729,38 @@ SPacketDescription = {
 	uint32{label="Success", desc=Descs.YesNo},
 },
 [0xFF51] = {
-	uint32{label="Result", },
-	stringz{label="Additional Information", },
+	uint32{label="Result", key="res", display = base.HEX, desc={
+		[0x000] = "Passed challenge",
+		[0x100] = "Old game version",
+		[0x101] = "Invalid version",
+		[0x102] = "Game version must be downgraded",
+		[0x200] = "Invalid CD key",
+		[0x201] = "CD key in use",
+		[0x202] = "Banned key",
+		[0x203] = "Wrong product",
+		[0x210] = "Invalid CD key",
+		[0x211] = "CD key in use",
+		[0x212] = "Banned key",
+		[0x213] = "Wrong product",
+	}},
+	when{
+		condition=function(self, state)
+			return (state.packet.res == 0x100) or (state.packet.res == 0x102)
+		end,
+		block = { stringz{label="MPQ Filename", } },
+	},
+	when{
+		condition=function(self, state)
+			return bit.band(state.packet.res, 0x201) == 0x201
+		end,
+		block = { stringz{label="Username", } },
+	},
 },
 [0x7204] = {
 	uint16{label="Request ID", },
 	uint16{label="Game token", },
 	uint16{label="Unknown", },
-	uint32{label="IP of D2GS Server", },
+	ipv4{label="IP of D2GS Server", },
 	uint32{label="Game hash", },
 	uint32{label="Result", },
 },
