@@ -16,7 +16,7 @@ CPacketDescription = {
 
 ]]
 [MCP_CHARUPGRADE] = {
-	stringz{label="Character Name", },
+	stringz("Character Name"),
 },
 --[[
     Message ID:    0x5B
@@ -41,9 +41,9 @@ CPacketDescription = {
 
 ]]
 [SID_CHANGEEMAIL] = {
-	stringz{label="Account Name", },
-	stringz{label="Old Email Address", },
-	stringz{label="New Email Address", },
+	stringz("Account Name"),
+	stringz("Old Email Address"),
+	stringz("New Email Address"),
 },
 --[[
     Message ID:    0x55
@@ -63,8 +63,8 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCHANGE] = {
-	uint8{label="[32] Client key", },
-	stringz{label="Username", },
+	uint8("[32] Client key"),
+	stringz("Username"),
 },
 --[[
     Message ID:      0x18
@@ -86,8 +86,8 @@ CPacketDescription = {
 
 ]]
 [SID_REGISTRY] = {
-	uint32{label="Cookie", },
-	stringz{label="Key Value", },
+	uint32("Cookie"),
+	stringz("Key Value"),
 },
 --[[
     Message ID:    0x07
@@ -111,8 +111,8 @@ CPacketDescription = {
 
 ]]
 [PACKET_BROADCASTMESSAGE] = {
-	stringz{label="User", },
-	stringz{label="Command", },
+	stringz("User"),
+	stringz("Command"),
 },
 --[[
     Message ID:    0x0F
@@ -138,8 +138,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_RIGHTSKILLONLOCATIONEX] = {
-	uint16{label="X coordinate", },
-	uint16{label="Y coordinate", },
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
 },
 --[[
     Message ID:      0x0A
@@ -184,8 +184,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_SWITCHBELTITEM] = {
-	uint32{label="Item ID - Cursor buffer", },
-	uint32{label="Item ID - Item to be replaced", },
+	uint32("Item ID - Cursor buffer"),
+	uint32("Item ID - Item to be replaced"),
 },
 --[[
     Message ID:    0x17
@@ -204,7 +204,7 @@ CPacketDescription = {
 
 ]]
 [MCP_CHARLIST] = {
-	uint32{label="Number of characters to list", },
+	uint32("Number of characters to list"),
 },
 --[[
     Message ID:    0x2D
@@ -256,11 +256,11 @@ CPacketDescription = {
 
 ]]
 [SID_WRITEUSERDATA] = {
-	uint32{label="Number of accounts", },
-	uint32{label="Number of keys", },
-	stringz{label="[] Accounts to update", },
-	stringz{label="[] Keys to update", },
-	stringz{label="[] New values", },
+	uint32("Number of accounts"),
+	uint32("Number of keys"),
+	stringz("[] Accounts to update"),
+	stringz("[] Keys to update"),
+	stringz("[] New values"),
 },
 --[[
     Message ID:    0x1D
@@ -295,8 +295,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_SWITCHBODYITEM] = {
-	uint32{label="Item ID", },
-	uint32{label="Body Location", },
+	uint32("Item ID"),
+	uint32("Body Location"),
 },
 --[[
     Message ID:    0x01
@@ -316,8 +316,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_WALKTOLOCATION] = {
-	uint16{label="X coordinate", },
-	uint16{label="Y coordinate", },
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
 },
 --[[
     Message ID:    0x73
@@ -337,7 +337,7 @@ CPacketDescription = {
 
 ]]
 [SID_CLANDISBAND] = {
-	uint32{label="Cookie", },
+	uint32("Cookie"),
 },
 --[[
     Message ID:    0x02
@@ -377,9 +377,9 @@ CPacketDescription = {
 
 ]]
 [MCP_CHARCREATE] = {
-	uint32{label="Character class", },
-	uint16{label="Character flags", },
-	stringz{label="Character name", },
+	uint32("Character class"),
+	uint16("Character flags"),
+	stringz("Character name"),
 },
 --[[
     Message ID:      0x68
@@ -424,15 +424,15 @@ CPacketDescription = {
 
 ]]
 [D2GS_GAMELOGON] = {
-	uint32{label="D2GS Server Hash", },
-	uint16{label="D2GS Server Token", },
-	uint8{label="Character ID", },
-	uint32{label="Version byte", },
-	uint32{label="Unknown - Suggested Const", },
-	uint32{label="Unknown - Suggested Const", },
-	uint8{label="Unknown - Suggested", },
-	stringz{label="Character name", },
-	bytes{label="*See user-comment below", },
+	uint32("D2GS Server Hash"),
+	uint16("D2GS Server Token"),
+	uint8("Character ID"),
+	uint32("Version byte"),
+	uint32("Unknown - Suggested Const"),
+	uint32("Unknown - Suggested Const"),
+	uint8("Unknown - Suggested"),
+	stringz("Character name"),
+	bytes("*See user-comment below"),
 },
 --[[
     Message ID:      0x05
@@ -457,9 +457,9 @@ CPacketDescription = {
 
 ]]
 [BNLS_CHANGECHALLENGE] = {
-	stringz{label="Account name.", },
-	stringz{label="Account old password.", },
-	stringz{label="Account", },
+	stringz("Account name."),
+	stringz("Account old password."),
+	stringz("Account"),
 },
 --[[
     Message ID:    0x1F
@@ -481,10 +481,10 @@ CPacketDescription = {
 
 ]]
 [D2GS_SWITCHINVENTORYITEM] = {
-	uint32{label="Item ID - Item to place in inventory", },
-	uint32{label="Item ID - Item to be replaced", },
-	uint32{label="X coordinate for replace", },
-	uint32{label="Y coordinate for replace", },
+	uint32("Item ID - Item to place in inventory"),
+	uint32("Item ID - Item to be replaced"),
+	uint32("X coordinate for replace"),
+	uint32("Y coordinate for replace"),
 },
 --[[
     Message ID:    0x16
@@ -509,8 +509,8 @@ CPacketDescription = {
 
 ]]
 [SID_CLICKAD] = {
-	uint32{label="Ad ID", },
-	uint32{label="Request type", },
+	uint32("Ad ID"),
+	uint32("Request type"),
 },
 --[[
     Message ID:    0x16
@@ -538,9 +538,9 @@ CPacketDescription = {
 
 ]]
 [D2GS_PICKUPITEM] = {
-	uint32{label="Unit Type", },
-	uint32{label="Unit ID", },
-	uint32{label="Action ID", },
+	uint32("Unit Type"),
+	uint32("Unit ID"),
+	uint32("Action ID"),
 },
 --[[
     Message ID:    0x50
@@ -561,8 +561,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_DROPGOLD] = {
-	uint32{label="PlayerID", },
-	uint32{label="GoldAmount", },
+	uint32("PlayerID"),
+	uint32("GoldAmount"),
 },
 --[[
     Message ID:    0x78
@@ -584,8 +584,8 @@ CPacketDescription = {
 
 ]]
 [SID_CLANREMOVEMEMBER] = {
-	uint32{label="Cookie", },
-	stringz{label="Username", },
+	uint32("Cookie"),
+	stringz("Username"),
 },
 --[[
     Message ID:    0x41
@@ -604,7 +604,7 @@ CPacketDescription = {
 
 ]]
 [SID_QUERYADURL] = {
-	uint32{label="Ad ID", },
+	uint32("Ad ID"),
 },
 --[[
     Message ID:    0x21
@@ -628,11 +628,11 @@ CPacketDescription = {
 
 ]]
 [SID_DISPLAYAD] = {
-	uint32{label="Platform ID", },
-	uint32{label="Product ID", },
-	uint32{label="Ad ID", },
-	stringz{label="Filename", },
-	stringz{label="URL", },
+	uint32("Platform ID"),
+	uint32("Product ID"),
+	uint32("Ad ID"),
+	stringz("Filename"),
+	stringz("URL"),
 },
 --[[
     Message ID:    0x3E
@@ -654,9 +654,9 @@ CPacketDescription = {
 
 ]]
 [SID_LOGONREALMEX] = {
-	uint32{label="Client Token", },
-	uint32{label="[5] Hashed realm password", },
-	stringz{label="Realm title", },
+	uint32("Client Token"),
+	uint32("[5] Hashed realm password"),
+	stringz("Realm title"),
 },
 --[[
     Message ID:    0x0A
@@ -683,8 +683,8 @@ CPacketDescription = {
 
 ]]
 [SID_ENTERCHAT] = {
-	stringz{label="Username *", },
-	stringz{label="Statstring **", },
+	stringz("Username *"),
+	stringz("Statstring **"),
 },
 --[[
     Message ID:    0x10
@@ -719,8 +719,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_RIGHTSKILLONENTITYEX2] = {
-	uint32{label="Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:    0x70
@@ -744,8 +744,8 @@ CPacketDescription = {
 
 ]]
 [SID_CLANFINDCANDIDATES] = {
-	uint32{label="Cookie", },
-	uint32{label="Clan Tag", },
+	uint32("Cookie"),
+	uint32("Clan Tag"),
 },
 --[[
     Message ID:    0x03
@@ -768,7 +768,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_LOGONPROOF] = {
-	uint32{label="[16] Data from SID_AUTH_ACCOUNTLOGON", },
+	uint32("[16] Data from SID_AUTH_ACCOUNTLOGON"),
 },
 --[[
     Message ID:    0x07
@@ -790,7 +790,7 @@ CPacketDescription = {
 
 ]]
 [MCP_CHARLOGON] = {
-	stringz{label="Character name", },
+	stringz("Character name"),
 },
 --[[
     Message ID:      0x18
@@ -829,11 +829,11 @@ CPacketDescription = {
 
 ]]
 [BNLS_VERSIONCHECKEX] = {
-	uint32{label="Product ID.*", },
-	uint32{label="Version DLL digit", },
-	uint32{label="Flags.**", },
-	uint32{label="Cookie.", },
-	stringz{label="Checksum formula.", },
+	uint32("Product ID.*"),
+	uint32("Version DLL digit"),
+	uint32("Flags.**"),
+	uint32("Cookie."),
+	stringz("Checksum formula."),
 },
 --[[
     Message ID:    0x09
@@ -870,8 +870,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_LEFTSKILLONENTITYEX2] = {
-	uint32{label="*Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("*Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:    0x19
@@ -899,7 +899,7 @@ CPacketDescription = {
 
 ]]
 [D2GS_PICKUPBUFFERITEM] = {
-	uint32{label="Item ID", },
+	uint32("Item ID"),
 },
 --[[
     Message ID:    0x82
@@ -923,9 +923,9 @@ CPacketDescription = {
 
 ]]
 [SID_CLANMEMBERINFORMATION] = {
-	uint32{label="Cookie", },
-	uint32{label="User's clan tag", },
-	stringz{label="Username", },
+	uint32("Cookie"),
+	uint32("User's clan tag"),
+	stringz("Username"),
 },
 --[[
     Message ID:      0x1A
@@ -955,16 +955,16 @@ CPacketDescription = {
 
 ]]
 [SID_STARTADVEX2] = {
-	uint32{label="Password Protected", },
-	uint32{label="Unknown", },
-	uint32{label="Unknown", },
-	uint32{label="Unknown", },
-	uint32{label="Unknown", },
-	uint32{label="Port", },
-	stringz{label="Game name", },
-	stringz{label="Game password", },
-	stringz{label="Unknown", },
-	stringz{label="Game stats - Flags, Creator, Statstring", },
+	uint32("Password Protected"),
+	uint32("Unknown"),
+	uint32("Unknown"),
+	uint32("Unknown"),
+	uint32("Unknown"),
+	uint32("Port"),
+	stringz("Game name"),
+	stringz("Game password"),
+	stringz("Unknown"),
+	stringz("Game stats - Flags, Creator, Statstring"),
 },
 --[[
     Message ID:    0x2B
@@ -991,13 +991,13 @@ CPacketDescription = {
 
 ]]
 [SID_SYSTEMINFO] = {
-	uint32{label="Number of processors", },
-	uint32{label="Processor architecture", },
-	uint32{label="Processor level", },
-	uint32{label="Processor timing", },
-	uint32{label="Total physical memory", },
-	uint32{label="Total page file", },
-	uint32{label="Free disk space", },
+	uint32("Number of processors"),
+	uint32("Processor architecture"),
+	uint32("Processor level"),
+	uint32("Processor timing"),
+	uint32("Total physical memory"),
+	uint32("Total page file"),
+	uint32("Free disk space"),
 },
 --[[
     Message ID:    0x7B
@@ -1015,8 +1015,8 @@ CPacketDescription = {
 
 ]]
 [SID_CLANSETMOTD] = {
-	uint32{label="Cookie", },
-	stringz{label="MOTD", },
+	uint32("Cookie"),
+	stringz("MOTD"),
 },
 --[[
     Message ID:    0x30
@@ -1040,8 +1040,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_NPCCANCEL] = {
-	uint32{label="Entity Type", },
-	uint32{label="NPC ID", },
+	uint32("Entity Type"),
+	uint32("NPC ID"),
 },
 --[[
     Message ID:    0x29
@@ -1062,8 +1062,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_SCROLLTOTOME] = {
-	uint32{label="Item ID - Scroll", },
-	uint32{label="Item ID - Tome", },
+	uint32("Item ID - Scroll"),
+	uint32("Item ID - Tome"),
 },
 --[[
     Message ID:    0x30
@@ -1084,9 +1084,9 @@ CPacketDescription = {
 
 ]]
 [SID_CDKEY] = {
-	uint32{label="Spawn", },
-	stringz{label="CDKey", },
-	stringz{label="Key Owner", },
+	uint32("Spawn"),
+	stringz("CDKey"),
+	stringz("Key Owner"),
 },
 --[[
     Message ID:    0x02
@@ -1126,11 +1126,11 @@ CPacketDescription = {
 
 ]]
 [PACKET_STATSUPDATE] = {
-	stringz{label="Unique username on Battle.net", },
-	stringz{label="Current channel on Battle.net", },
-	uint32{label="Battle.net server IP address", },
-	stringz{label="DatabaseID", },
-	uint32{label="Cycle status", },
+	stringz("Unique username on Battle.net"),
+	stringz("Current channel on Battle.net"),
+	uint32("Battle.net server IP address"),
+	stringz("DatabaseID"),
+	uint32("Cycle status"),
 },
 --[[
     Message ID:    0x12
@@ -1171,8 +1171,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_PARTY] = {
-	uint16{label="Action ID", },
-	uint32{label="Player ID", },
+	uint16("Action ID"),
+	uint32("Player ID"),
 },
 --[[
     Message ID:    0x00
@@ -1213,8 +1213,8 @@ CPacketDescription = {
 
 ]]
 [MCP_GAMEINFO] = {
-	uint16{label="Request ID", },
-	stringz{label="Game name", },
+	uint16("Request ID"),
+	stringz("Game name"),
 },
 --[[
     Message ID:    0x03
@@ -1255,14 +1255,14 @@ CPacketDescription = {
 
 ]]
 [MCP_CREATEGAME] = {
-	uint16{label="Request Id *", },
-	uint32{label="Difficulty", },
-	uint8{label="Unknown - 1", },
-	uint8{label="Player difference **", },
-	uint8{label="Maximum players", },
-	stringz{label="Game name", },
-	stringz{label="Game password", },
-	stringz{label="Game description", },
+	uint16("Request Id *"),
+	uint32("Difficulty"),
+	uint8("Unknown - 1"),
+	uint8("Player difference **"),
+	uint8("Maximum players"),
+	stringz("Game name"),
+	stringz("Game password"),
+	stringz("Game description"),
 },
 --[[
     Message ID:    0x01
@@ -1288,8 +1288,8 @@ CPacketDescription = {
 
 ]]
 [BNLS_CDKEY] = {
-	uint32{label="Server Token", },
-	stringz{label="CD key", },
+	uint32("Server Token"),
+	stringz("CD key"),
 },
 --[[
     Message ID:      0x10
@@ -1324,7 +1324,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_REQUESTVERSIONBYTE] = {
-	uint32{label="ProductID", },
+	uint32("ProductID"),
 },
 --[[
     Message ID:      0x10
@@ -1359,7 +1359,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_REQUESTVERSIONBYTE] = {
-	uint32{label="ProductID", },
+	uint32("ProductID"),
 },
 --[[
     Message ID:      0x0F
@@ -1385,7 +1385,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_AUTHORIZEPROOF] = {
-	uint32{label="Checksum.", },
+	uint32("Checksum."),
 },
 --[[
     Message ID:    0x2C
@@ -1428,12 +1428,12 @@ CPacketDescription = {
 
 ]]
 [SID_GAMERESULT] = {
-	uint32{label="Game type", },
-	uint32{label="Number of results - always 8", },
-	uint32{label="[8] Results", },
-	stringz{label="[8] Game players - always 8", },
-	stringz{label="Map name", },
-	stringz{label="Player score", },
+	uint32("Game type"),
+	uint32("Number of results - always 8"),
+	uint32("[8] Results"),
+	stringz("[8] Game players - always 8"),
+	stringz("Map name"),
+	stringz("Player score"),
 },
 --[[
     Message ID:    0x0D
@@ -1465,8 +1465,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_RIGHTSKILLONENTITY] = {
-	uint32{label="Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:    0x65
@@ -1519,8 +1519,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_LEFTSKILLONENTITY] = {
-	uint32{label="*Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("*Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:    0x7A
@@ -1546,9 +1546,9 @@ CPacketDescription = {
 
 ]]
 [SID_CLANRANKCHANGE] = {
-	uint32{label="Cookie", },
-	stringz{label="Username", },
-	uint8{label="New rank", },
+	uint32("Cookie"),
+	stringz("Username"),
+	uint8("New rank"),
 },
 --[[
     Message ID:    0x22
@@ -1577,10 +1577,10 @@ CPacketDescription = {
 
 ]]
 [SID_NOTIFYJOIN] = {
-	uint32{label="Product ID *", },
-	uint32{label="Product version", },
-	stringz{label="Game Name", },
-	stringz{label="Game Password", },
+	uint32("Product ID *"),
+	uint32("Product version"),
+	stringz("Game Name"),
+	stringz("Game Password"),
 },
 --[[
     Message ID:    0x09
@@ -1609,8 +1609,8 @@ CPacketDescription = {
 
 ]]
 [PKT_CONNTEST2] = {
-	uint32{label="Server Token", },
-	uint32{label="UDP Token*", },
+	uint32("Server Token"),
+	uint32("UDP Token*"),
 },
 --[[
     Message ID:      0x57
@@ -1654,7 +1654,7 @@ CPacketDescription = {
 
 ]]
 [SID_GAMEDATAADDRESS] = {
-	sockaddr{label="Address", },
+	sockaddr("Address"),
 },
 --[[
     Message ID:      0x08
@@ -1677,7 +1677,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_UPGRADEPROOF] = {
-	uint32{label="Session key from SID_AUTH_ACCOUNTUPGRADE", },
+	uint32("Session key from SID_AUTH_ACCOUNTUPGRADE"),
 },
 --[[
     Message ID:    0x2F
@@ -1715,8 +1715,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_NPCINIT] = {
-	uint32{label="Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:      0x0D
@@ -1744,14 +1744,14 @@ CPacketDescription = {
 
 ]]
 [PACKET_ACCOUNT] = {
-	uint32{label="CommandFor Command 0x00", },
-	stringz{label="Account name", },
-	stringz{label="Account passwordFor Command 0x01", },
-	stringz{label="Account", },
-	stringz{label="Old password", },
-	stringz{label="New passwordFor Command 0x02", },
-	stringz{label="Account name", },
-	stringz{label="Account password", },
+	uint32("CommandFor Command 0x00"),
+	stringz("Account name"),
+	stringz("Account passwordFor Command 0x01"),
+	stringz("Account"),
+	stringz("Old password"),
+	stringz("New passwordFor Command 0x02"),
+	stringz("Account name"),
+	stringz("Account password"),
 },
 --[[
     Message ID:    0x3F
@@ -1781,7 +1781,7 @@ CPacketDescription = {
 
 ]]
 [D2GS_CHARACTERPHRASE] = {
-	uint16{label="Phrase ID", },
+	uint16("Phrase ID"),
 },
 --[[
     Message ID:      0x04
@@ -1802,8 +1802,8 @@ CPacketDescription = {
 
 ]]
 [BNLS_CREATEACCOUNT] = {
-	stringz{label="Account name.", },
-	stringz{label="Account password.", },
+	stringz("Account name."),
+	stringz("Account password."),
 },
 --[[
     Message ID:    0x32
@@ -1833,10 +1833,10 @@ CPacketDescription = {
 
 ]]
 [D2GS_NPCBUY] = {
-	uint32{label="NPC ID - Unconfirmed", },
-	uint32{label="Item ID - Unconfirmed", },
-	uint32{label="Buffer Type - Unconfirmed", },
-	uint32{label="Cost", },
+	uint32("NPC ID - Unconfirmed"),
+	uint32("Item ID - Unconfirmed"),
+	uint32("Buffer Type - Unconfirmed"),
+	uint32("Cost"),
 },
 --[[
     Message ID:    0x79
@@ -1863,10 +1863,10 @@ CPacketDescription = {
 
 ]]
 [SID_CLANINVITATIONRESPONSE] = {
-	uint32{label="Cookie", },
-	uint32{label="Clan tag", },
-	stringz{label="Inviter", },
-	uint8{label="Response", },
+	uint32("Cookie"),
+	uint32("Clan tag"),
+	stringz("Inviter"),
+	uint8("Response"),
 },
 --[[
     Message ID:    0x04
@@ -1887,9 +1887,9 @@ CPacketDescription = {
 
 ]]
 [MCP_JOINGAME] = {
-	uint16{label="Request ID", },
-	stringz{label="Game name", },
-	stringz{label="Game Password", },
+	uint16("Request ID"),
+	stringz("Game name"),
+	stringz("Game Password"),
 },
 --[[
     Message ID:    0x3A
@@ -1912,10 +1912,10 @@ CPacketDescription = {
 
 ]]
 [SID_LOGONRESPONSE2] = {
-	uint32{label="Client Token", },
-	uint32{label="Server Token", },
-	uint32{label="[5] Password Hash", },
-	stringz{label="Username", },
+	uint32("Client Token"),
+	uint32("Server Token"),
+	uint32("[5] Password Hash"),
+	stringz("Username"),
 },
 --[[
     Message ID:    0x3D
@@ -1940,8 +1940,8 @@ CPacketDescription = {
 
 ]]
 [SID_CREATEACCOUNT2] = {
-	uint32{label="[5] Password hash", },
-	stringz{label="Username", },
+	uint32("[5] Password hash"),
+	stringz("Username"),
 },
 --[[
     Message ID:    0x0C
@@ -1992,8 +1992,8 @@ CPacketDescription = {
 
 ]]
 [SID_JOINCHANNEL] = {
-	uint32{label="Flags", },
-	stringz{label="Channel", },
+	uint32("Flags"),
+	stringz("Channel"),
 },
 --[[
     Message ID:    0x01
@@ -2015,8 +2015,8 @@ CPacketDescription = {
 
 ]]
 [PACKET_LOGON] = {
-	stringz{label="BotID", },
-	stringz{label="Bot Password", },
+	stringz("BotID"),
+	stringz("Bot Password"),
 },
 --[[
     Message ID:    0x03
@@ -2036,8 +2036,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_RUNTOLOCATION] = {
-	uint16{label="X coordinate", },
-	uint16{label="Y coordinate", },
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
 },
 --[[
     Message ID:    0x2F
@@ -2067,9 +2067,9 @@ CPacketDescription = {
 
 ]]
 [SID_FINDLADDERUSER] = {
-	uint32{label="League", },
-	uint32{label="Sort method", },
-	stringz{label="Username", },
+	uint32("League"),
+	uint32("Sort method"),
+	stringz("Username"),
 },
 --[[
     Message ID:    0x08
@@ -2093,7 +2093,7 @@ CPacketDescription = {
 
 ]]
 [PKT_CONNTEST] = {
-	uint32{label="Server Token", },
+	uint32("Server Token"),
 },
 --[[
     Message ID:      0x12
@@ -2118,7 +2118,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_RESERVESERVERSLOTS] = {
-	uint32{label="Number of slots to reserve", },
+	uint32("Number of slots to reserve"),
 },
 --[[
     Message ID:    0x4B
@@ -2162,9 +2162,9 @@ CPacketDescription = {
 
 ]]
 [SID_EXTRAWORK] = {
-	uint16{label="Game type", },
-	uint16{label="Length", },
-	stringz{label="Work returned data", },
+	uint16("Game type"),
+	uint16("Length"),
+	stringz("Work returned data"),
 },
 --[[
     Message ID:    0x05
@@ -2208,12 +2208,12 @@ CPacketDescription = {
 
 ]]
 [SID_CLIENTID] = {
-	uint32{label="Registration Version", },
-	uint32{label="Registration Authority", },
-	uint32{label="Account Number", },
-	uint32{label="Registration Token", },
-	stringz{label="LAN Computer Name", },
-	stringz{label="LAN Username", },
+	uint32("Registration Version"),
+	uint32("Registration Authority"),
+	uint32("Account Number"),
+	uint32("Registration Token"),
+	stringz("LAN Computer Name"),
+	stringz("LAN Username"),
 },
 --[[
     Message ID:    0x46
@@ -2246,7 +2246,7 @@ CPacketDescription = {
 
 ]]
 [SID_NEWS_INFO] = {
-	uint32{label="News timestamp", },
+	uint32("News timestamp"),
 },
 --[[
     Message ID:    0x15
@@ -2270,10 +2270,10 @@ CPacketDescription = {
 
 ]]
 [SID_CHECKAD] = {
-	uint32{label="Platform ID", },
-	uint32{label="Product ID", },
-	uint32{label="ID of last displayed banner", },
-	uint32{label="Current time", },
+	uint32("Platform ID"),
+	uint32("Product ID"),
+	uint32("ID of last displayed banner"),
+	uint32("Current time"),
 },
 --[[
     Message ID:    0x11
@@ -2295,7 +2295,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_VERIFYSERVER] = {
-	uint32{label="Server IP", },
+	uint32("Server IP"),
 	uint8{label="Signature", num=128},
 },
 --[[
@@ -2321,9 +2321,9 @@ CPacketDescription = {
 
 ]]
 [BNLS_SERVERLOGONPROOF] = {
-	uint32{label="Slot index.", },
+	uint32("Slot index."),
 	uint32{label="Data from client's", num=5},
-	stringz{label="Client's account name.", },
+	stringz("Client's account name."),
 },
 --[[
     Message ID:    0x66
@@ -2346,7 +2346,7 @@ CPacketDescription = {
 
 ]]
 [SID_FRIENDSUPDATE] = {
-	uint8{label="Friends list index", },
+	uint8("Friends list index"),
 },
 --[[
     Message ID:    0x74
@@ -2366,8 +2366,8 @@ CPacketDescription = {
 
 ]]
 [SID_CLANMAKECHIEFTAIN] = {
-	uint32{label="Cookie", },
-	stringz{label="New Cheiftain", },
+	uint32("Cookie"),
+	stringz("New Cheiftain"),
 },
 --[[
     Message ID:    0x1B
@@ -2395,8 +2395,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_SWAP2HANDEDITEM] = {
-	uint32{label="Item ID", },
-	uint32{label="Body Location", },
+	uint32("Item ID"),
+	uint32("Body Location"),
 },
 --[[
     Message ID:    0x71
@@ -2421,11 +2421,11 @@ CPacketDescription = {
 
 ]]
 [SID_CLANINVITEMULTIPLE] = {
-	uint32{label="Cookie", },
-	stringz{label="Clan name", },
-	uint32{label="Clan tag", },
-	uint8{label="Number of users to invite", },
-	stringz{label="[] Usernames to invite", },
+	uint32("Cookie"),
+	stringz("Clan name"),
+	uint32("Clan tag"),
+	uint8("Number of users to invite"),
+	stringz("[] Usernames to invite"),
 },
 --[[
     Message ID:    0x1A
@@ -2468,12 +2468,12 @@ CPacketDescription = {
 
 ]]
 [BNLS_VERSIONCHECKEX2] = {
-	uint32{label="Product ID.*", },
-	uint32{label="Flags.**", },
-	uint32{label="Cookie.", },
-	uint64{label="Timestamp for version check archive.", },
-	stringz{label="Version check archive filename.", },
-	stringz{label="Checksum formula.", },
+	uint32("Product ID.*"),
+	uint32("Flags.**"),
+	uint32("Cookie."),
+	uint64("Timestamp for version check archive."),
+	stringz("Version check archive filename."),
+	stringz("Checksum formula."),
 },
 --[[
     Message ID:    0x19
@@ -2494,7 +2494,7 @@ CPacketDescription = {
 
 ]]
 [MCP_CHARLIST2] = {
-	uint32{label="Number of characters to list.", },
+	uint32("Number of characters to list."),
 },
 --[[
     Message ID:    0x29
@@ -2527,10 +2527,10 @@ CPacketDescription = {
 
 ]]
 [SID_LOGONRESPONSE] = {
-	uint32{label="Client Token", },
-	uint32{label="Server Token", },
-	uint32{label="[5] Password Hash", },
-	stringz{label="Username", },
+	uint32("Client Token"),
+	uint32("Server Token"),
+	uint32("[5] Password Hash"),
+	stringz("Username"),
 },
 --[[
     Message ID:    0x04
@@ -2550,8 +2550,8 @@ CPacketDescription = {
 
 ]]
 [PACKET_MESSAGE] = {
-	stringz{label="User", },
-	stringz{label="Command", },
+	stringz("User"),
+	stringz("Command"),
 },
 --[[
     Message ID:      0x1C
@@ -2622,15 +2622,15 @@ CPacketDescription = {
 
 ]]
 [SID_STARTADVEX3] = {
-	uint32{label="State", },
-	uint32{label="Time since creation", },
-	uint16{label="Game Type", },
-	uint16{label="Parameter", },
-	uint32{label="Unknown", },
-	uint32{label="Ladder", },
-	stringz{label="Game name", },
-	stringz{label="Game password", },
-	stringz{label="Game Statstring", },
+	uint32("State"),
+	uint32("Time since creation"),
+	uint16("Game Type"),
+	uint16("Parameter"),
+	uint32("Unknown"),
+	uint32("Ladder"),
+	stringz("Game name"),
+	stringz("Game password"),
+	stringz("Game Statstring"),
 },
 --[[
     Message ID:      0x2D
@@ -2673,7 +2673,7 @@ CPacketDescription = {
 
 ]]
 [SID_PING] = {
-	uint32{label="Ping Value", },
+	uint32("Ping Value"),
 },
 --[[
     Message ID:    0x56
@@ -2699,9 +2699,9 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCHANGEPROOF] = {
-	uint8{label="[20] Old password proof", },
-	uint8{label="[32] New password's salt", },
-	uint8{label="[32] New password's verifier", },
+	uint8("[20] Old password proof"),
+	uint8("[32] New password's salt"),
+	uint8("[32] New password's verifier"),
 },
 --[[
     Message ID:    0x02
@@ -2749,9 +2749,9 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCREATE] = {
-	uint8{label="[32] Salt", },
-	uint8{label="[32] Verifier", },
-	stringz{label="Username", },
+	uint8("[32] Salt"),
+	uint8("[32] Verifier"),
+	stringz("Username"),
 },
 --[[
     Message ID:    0x17
@@ -2771,7 +2771,7 @@ CPacketDescription = {
 
 ]]
 [D2GS_DROPITEM] = {
-	uint32{label="Item ID", },
+	uint32("Item ID"),
 },
 --[[
     Message ID:    0x24
@@ -2791,7 +2791,7 @@ CPacketDescription = {
 
 ]]
 [D2GS_REMOVEBELTITEM] = {
-	uint32{label="Item ID", },
+	uint32("Item ID"),
 },
 --[[
     Message ID:    0x50
@@ -2874,17 +2874,17 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_INFO] = {
-	uint32{label="Protocol ID", },
-	uint32{label="Platform ID", },
-	uint32{label="Product ID", },
-	uint32{label="Version Byte", },
-	uint32{label="Product language", },
-	uint32{label="Local IP for NAT compatibility*", },
-	uint32{label="Time zone bias*", },
-	uint32{label="Locale ID*", },
-	uint32{label="Language ID*", },
-	stringz{label="Country abreviation", },
-	stringz{label="Country", },
+	uint32("Protocol ID"),
+	uint32("Platform ID"),
+	uint32("Product ID"),
+	uint32("Version Byte"),
+	uint32("Product language"),
+	uint32("Local IP for NAT compatibility*"),
+	uint32("Time zone bias*"),
+	uint32("Locale ID*"),
+	uint32("Language ID*"),
+	stringz("Country abreviation"),
+	stringz("Country"),
 },
 --[[
     Message ID:    0x3C
@@ -2912,9 +2912,9 @@ CPacketDescription = {
 
 ]]
 [SID_CHECKDATAFILE2] = {
-	uint32{label="File size in bytes", },
-	uint32{label="File hash [5]", },
-	stringz{label="Filename", },
+	uint32("File size in bytes"),
+	uint32("File hash [5]"),
+	stringz("Filename"),
 },
 --[[
     Message ID:      0x49
@@ -2940,11 +2940,11 @@ CPacketDescription = {
 
 ]]
 [D2GS_WAYPOINT] = {
-	uint8{label="Waypoint ID", },
-	uint8{label="Unknown - Appears to be random", },
-	uint16{label="Unknown - 0x00", },
-	uint8{label="Level number", },
-	uint16{label="Unknown - 0x00", },
+	uint8("Waypoint ID"),
+	uint8("Unknown - Appears to be random"),
+	uint16("Unknown - 0x00"),
+	uint8("Level number"),
+	uint16("Unknown - 0x00"),
 },
 --[[
     Message ID:    0x0C
@@ -2969,8 +2969,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_RIGHTSKILLONLOCATION] = {
-	uint16{label="X coordinate", },
-	uint16{label="Y coordinate", },
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
 },
 --[[
     Message ID:      0x0D
@@ -2994,7 +2994,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_CHOOSENLSREVISION] = {
-	uint32{label="NLS revision number.", },
+	uint32("NLS revision number."),
 },
 --[[
     Message ID:    0x23
@@ -3022,8 +3022,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_ITEMTOBELT] = {
-	uint32{label="Item ID", },
-	uint32{label="Belt Location", },
+	uint32("Item ID"),
+	uint32("Belt Location"),
 },
 --[[
     Message ID:    0x12
@@ -3053,16 +3053,16 @@ CPacketDescription = {
 
 ]]
 [SID_LOCALEINFO] = {
-	wintime{label="System time", },
-	wintime{label="Local time", },
-	uint32{label="Timezone bias", },
-	uint32{label="SystemDefaultLCID", },
-	uint32{label="UserDefaultLCID", },
-	uint32{label="UserDefaultLangID", },
-	stringz{label="Abbreviated language name", },
-	stringz{label="Country name", },
-	stringz{label="Abbreviated country name", },
-	stringz{label="Country", },
+	wintime("System time"),
+	wintime("Local time"),
+	uint32("Timezone bias"),
+	uint32("SystemDefaultLCID"),
+	uint32("UserDefaultLCID"),
+	uint32("UserDefaultLangID"),
+	stringz("Abbreviated language name"),
+	stringz("Country name"),
+	stringz("Abbreviated country name"),
+	stringz("Country"),
 },
 --[[
     Message ID:    0x77
@@ -3083,8 +3083,8 @@ CPacketDescription = {
 
 ]]
 [SID_CLANINVITATION] = {
-	uint32{label="Cookie", },
-	stringz{label="Target User", },
+	uint32("Cookie"),
+	stringz("Target User"),
 },
 --[[
     Message ID:    0x7D
@@ -3103,7 +3103,7 @@ CPacketDescription = {
 
 ]]
 [SID_CLANMEMBERLIST] = {
-	uint32{label="Cookie", },
+	uint32("Cookie"),
 },
 --[[
     Message ID:    0x08
@@ -3134,15 +3134,15 @@ CPacketDescription = {
 ]]
 [SID_STARTADVEX] = {
 	uint32{label="Password protected", desc=Descs.YesNo},
-	uint32{label="Unknown", },
-	uint32{label="Unknown", },
-	uint32{label="Unknown", },
-	uint32{label="Unknown", },
-	uint32{label="Port", },
-	stringz{label="Game name", },
-	stringz{label="Game password", },
-	stringz{label="Game stats - flags, creator, statstring", },
-	stringz{label="Map name - 0x0d terminated", },
+	uint32("Unknown"),
+	uint32("Unknown"),
+	uint32("Unknown"),
+	uint32("Unknown"),
+	uint32("Port"),
+	stringz("Game name"),
+	stringz("Game password"),
+	stringz("Game stats - flags, creator, statstring"),
+	stringz("Map name - 0x0d terminated"),
 },
 --[[
     Message ID:      0x0B
@@ -3192,12 +3192,12 @@ CPacketDescription = {
 
 ]]
 [BNLS_HASHDATA] = {
-	uint32{label="Size of Data", },
-	uint32{label="Flags", },
-	bytes{label="Data to be hashed.", },
-	uint32{label="Client Key", },
-	uint32{label="Server Key", },
-	uint32{label="Cookie", },
+	uint32("Size of Data"),
+	uint32("Flags"),
+	bytes("Data to be hashed."),
+	uint32("Client Key"),
+	uint32("Server Key"),
+	uint32("Cookie"),
 },
 --[[
     Message ID:    0x00
@@ -3241,9 +3241,9 @@ CPacketDescription = {
 
 ]]
 [MCP_GAMELIST] = {
-	uint16{label="Request ID", },
-	uint32{label="Unknown", },
-	stringz{label="Search String *", },
+	uint16("Request ID"),
+	uint32("Unknown"),
+	stringz("Search String *"),
 },
 --[[
     Message ID:    0x08
@@ -3269,8 +3269,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_LEFTSKILLONLOCATIONEX] = {
-	uint16{label="X coordinate", },
-	uint16{label="Y coordinate", },
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
 },
 --[[
     Message ID:    0x2E
@@ -3302,11 +3302,11 @@ CPacketDescription = {
 
 ]]
 [SID_GETLADDERDATA] = {
-	uint32{label="Product ID", },
-	uint32{label="League", },
-	uint32{label="Sort method", },
-	uint32{label="Starting rank", },
-	uint32{label="Number of ranks to list", },
+	uint32("Product ID"),
+	uint32("League"),
+	uint32("Sort method"),
+	uint32("Starting rank"),
+	uint32("Number of ranks to list"),
 },
 --[[
     Message ID:      0x6A
@@ -3361,10 +3361,10 @@ CPacketDescription = {
 
 ]]
 [D2GS_OVERHEADMESSAGE] = {
-	uint16{label="Unknown - 0x00, 0x00", },
-	stringz{label="Message", },
-	uint8{label="Unused - 0x00", },
-	uint16{label="Unknown - 0x00, 0x00", },
+	uint16("Unknown - 0x00, 0x00"),
+	stringz("Message"),
+	uint8("Unused - 0x00"),
+	uint16("Unknown - 0x00, 0x00"),
 },
 --[[
     Message ID:    0x2A
@@ -3397,8 +3397,8 @@ CPacketDescription = {
 
 ]]
 [SID_CREATEACCOUNT] = {
-	uint32{label="[5] Hashed password", },
-	stringz{label="Username", },
+	uint32("[5] Hashed password"),
+	stringz("Username"),
 },
 --[[
     Message ID:    0x02
@@ -3421,8 +3421,8 @@ CPacketDescription = {
 
 ]]
 [BNLS_LOGONCHALLENGE] = {
-	stringz{label="Account name", },
-	stringz{label="Password", },
+	stringz("Account name"),
+	stringz("Password"),
 },
 --[[
     Message ID:      0x0B
@@ -3452,10 +3452,10 @@ CPacketDescription = {
 
 ]]
 [PACKET_BOTNETCHAT] = {
-	uint32{label="Command", },
-	uint32{label="Action", },
-	uint32{label="For Command 2, ID of destination", },
-	stringz{label="Message", },
+	uint32("Command"),
+	uint32("Action"),
+	uint32("For Command 2, ID of destination"),
+	stringz("Message"),
 },
 --[[
     Message ID:    0x60
@@ -3514,8 +3514,8 @@ CPacketDescription = {
 
 ]]
 [BNLS_SERVERLOGONCHALLENGE] = {
-	uint32{label="Slot index.", },
-	uint32{label="NLS revision number.", },
+	uint32("Slot index."),
+	uint32("NLS revision number."),
 	uint32{label="Data from", num=16},
 	uint32{label="Data client's SID_AUTH_ACCOUNTLOGON", num=8},
 },
@@ -3578,8 +3578,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_ITEMTOBODY] = {
-	uint32{label="Item ID", },
-	uint32{label="Body Location", },
+	uint32("Item ID"),
+	uint32("Body Location"),
 },
 --[[
     Message ID:    0x72
@@ -3601,10 +3601,10 @@ CPacketDescription = {
 
 ]]
 [SID_CLANCREATIONINVITATION] = {
-	uint32{label="Cookie", },
-	uint32{label="Clan tag", },
-	stringz{label="Inviter name", },
-	uint8{label="Status", },
+	uint32("Cookie"),
+	uint32("Clan tag"),
+	stringz("Inviter name"),
+	uint8("Status"),
 },
 --[[
     Message ID:      0x01
@@ -3676,11 +3676,11 @@ CPacketDescription = {
 
 ]]
 [MCP_STARTUP] = {
-	uint32{label="MCP Cookie", },
-	uint32{label="MCP Status", },
-	uint32{label="[2] MCP Chunk 1", },
-	uint32{label="[12] MCP Chunk 2", },
-	stringz{label="Battle.net Unique Name", },
+	uint32("MCP Cookie"),
+	uint32("MCP Status"),
+	uint32("[2] MCP Chunk 1"),
+	uint32("[12] MCP Chunk 2"),
+	stringz("Battle.net Unique Name"),
 },
 --[[
     Message ID:    0x40
@@ -3722,8 +3722,8 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTLOGON] = {
-	uint8{label="[32] Client Key", },
-	stringz{label="Username", },
+	uint8("[32] Client Key"),
+	stringz("Username"),
 },
 --[[
     Message ID:      0x06
@@ -3782,8 +3782,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_INTERACTWITHENTITY] = {
-	uint32{label="Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:    0x03
@@ -3811,7 +3811,7 @@ CPacketDescription = {
 
 ]]
 [PKT_CLIENTREQ] = {
-	uint32{label="Code", },
+	uint32("Code"),
 },
 --[[
     Message ID:    0x59
@@ -3839,7 +3839,7 @@ CPacketDescription = {
 
 ]]
 [SID_SETEMAIL] = {
-	stringz{label="Email Address", },
+	stringz("Email Address"),
 },
 --[[
     Message ID:    0x0A
@@ -3859,8 +3859,8 @@ CPacketDescription = {
 
 ]]
 [MCP_CHARDELETE] = {
-	uint16{label="Unknown", },
-	stringz{label="Character name", },
+	uint16("Unknown"),
+	stringz("Character name"),
 },
 --[[
     Message ID:      0x34
@@ -3885,9 +3885,9 @@ CPacketDescription = {
 
 ]]
 [SID_QUERYREALMS] = {
-	uint32{label="Unused", },
-	uint32{label="Unused", },
-	stringz{label="Unknown", },
+	uint32("Unused"),
+	uint32("Unused"),
+	stringz("Unknown"),
 },
 --[[
     Message ID:      0x10
@@ -3915,11 +3915,11 @@ CPacketDescription = {
 
 ]]
 [PACKET_CHATDROPOPTIONS] = {
-	uint8{label="SubcommandFor subcommand 0:", },
-	uint8{label="Setting for broadcast", },
-	uint8{label="Setting for database", },
-	uint8{label="Setting for whispers", },
-	uint8{label="Refuse all", },
+	uint8("SubcommandFor subcommand 0:"),
+	uint8("Setting for broadcast"),
+	uint8("Setting for database"),
+	uint8("Setting for whispers"),
+	uint8("Refuse all"),
 },
 --[[
     Message ID:    0x20
@@ -3941,9 +3941,9 @@ CPacketDescription = {
 
 ]]
 [D2GS_USEITEM] = {
-	uint32{label="Item ID", },
-	uint32{label="X coordinate", },
-	uint32{label="Y coordinate", },
+	uint32("Item ID"),
+	uint32("X coordinate"),
+	uint32("Y coordinate"),
 },
 --[[
     Message ID:    0x31
@@ -3970,11 +3970,11 @@ CPacketDescription = {
 
 ]]
 [SID_CHANGEPASSWORD] = {
-	uint32{label="Client Token", },
-	uint32{label="Server Token", },
-	uint32{label="[5] Old password hash", },
-	uint32{label="[5] New password hash", },
-	stringz{label="Account name", },
+	uint32("Client Token"),
+	uint32("Server Token"),
+	uint32("[5] Old password hash"),
+	uint32("[5] New password hash"),
+	stringz("Account name"),
 },
 --[[
     Message ID:    0x10
@@ -4042,8 +4042,8 @@ CPacketDescription = {
 
 ]]
 [SID_CHECKDATAFILE] = {
-	uint32{label="[5] File checksum", },
-	stringz{label="File name", },
+	uint32("[5] File checksum"),
+	stringz("File name"),
 },
 --[[
     Message ID:      0x0C
@@ -4121,9 +4121,9 @@ CPacketDescription = {
 
 ]]
 [BNLS_CDKEY_EX] = {
-	uint32{label="Cookie.", },
-	uint8{label="Number of CD-keys to encrypt.", },
-	uint32{label="Flags.", },
+	uint32("Cookie."),
+	uint8("Number of CD-keys to encrypt."),
+	uint32("Flags."),
 	uint32{label="Server session key", todo="verify array length"},
 	uint32{label="Client session key", todo="verify array length"},
 	stringz{label="CD-keys. No", todo="verify array length"},
@@ -4144,8 +4144,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_INSERTSOCKETITEM] = {
-	uint32{label="Item ID - Item to place in socket", },
-	uint32{label="Item ID - Socketed item", },
+	uint32("Item ID - Item to place in socket"),
+	uint32("Item ID - Socketed item"),
 },
 --[[
     Message ID:    0x07
@@ -4170,12 +4170,12 @@ CPacketDescription = {
 
 ]]
 [SID_REPORTVERSION] = {
-	uint32{label="Platform ID", },
-	uint32{label="Product ID", },
-	uint32{label="Version Byte", },
-	uint32{label="EXE Version", },
-	uint32{label="EXE Hash", },
-	stringz{label="EXE Information", },
+	uint32("Platform ID"),
+	uint32("Product ID"),
+	uint32("Version Byte"),
+	uint32("EXE Version"),
+	uint32("EXE Hash"),
+	stringz("EXE Information"),
 },
 --[[
     Message ID:    0x45
@@ -4194,7 +4194,7 @@ CPacketDescription = {
 
 ]]
 [SID_NETGAMEPORT] = {
-	uint16{label="Port", },
+	uint16("Port"),
 },
 --[[
     Message ID:    0x6D
@@ -4217,9 +4217,9 @@ CPacketDescription = {
 
 ]]
 [D2GS_PING] = {
-	uint32{label="Tick Count", },
-	uint32{label="Null", },
-	uint32{label="Null", },
+	uint32("Tick Count"),
+	uint32("Null"),
+	uint32("Null"),
 },
 --[[
     Message ID:    0x18
@@ -4253,10 +4253,10 @@ CPacketDescription = {
 
 ]]
 [D2GS_ITEMTOBUFFER] = {
-	uint32{label="Item ID", },
-	uint32{label="X coordinate", },
-	uint32{label="Y coordinate", },
-	uint32{label="Buffer Type", },
+	uint32("Item ID"),
+	uint32("X coordinate"),
+	uint32("Y coordinate"),
+	uint32("Buffer Type"),
 },
 --[[
     Message ID:    0x00
@@ -4303,9 +4303,9 @@ CPacketDescription = {
 
 ]]
 [PACKET_COMMAND] = {
-	uint32{label="Target BotID", },
-	stringz{label="Sending User", },
-	stringz{label="Command", },
+	uint32("Target BotID"),
+	stringz("Sending User"),
+	stringz("Command"),
 },
 --[[
     Message ID:      0x26
@@ -4405,11 +4405,11 @@ CPacketDescription = {
 
 ]]
 [SID_READUSERDATA] = {
-	uint32{label="Number of Accounts", },
-	uint32{label="Number of Keys", },
-	uint32{label="Request ID", },
-	stringz{label="[] Requested Accounts", },
-	stringz{label="[] Requested Keys", },
+	uint32("Number of Accounts"),
+	uint32("Number of Keys"),
+	uint32("Request ID"),
+	stringz("[] Requested Accounts"),
+	stringz("[] Requested Keys"),
 },
 --[[
     Message ID:    0x36
@@ -4449,14 +4449,14 @@ CPacketDescription = {
 
 ]]
 [SID_CDKEY2] = {
-	uint32{label="Spawn", },
-	uint32{label="Key Length", },
-	uint32{label="CDKey Product", },
-	uint32{label="CDKey Value1", },
-	uint32{label="Server Token", },
-	uint32{label="Client Token", },
-	uint32{label="[5] Hashed Data", },
-	stringz{label="Key owner", },
+	uint32("Spawn"),
+	uint32("Key Length"),
+	uint32("CDKey Product"),
+	uint32("CDKey Value1"),
+	uint32("Server Token"),
+	uint32("Client Token"),
+	uint32("[5] Hashed Data"),
+	stringz("Key owner"),
 },
 --[[
     Message ID:    0x0E
@@ -4483,7 +4483,7 @@ CPacketDescription = {
 
 ]]
 [SID_CHATCOMMAND] = {
-	stringz{label="Text", },
+	stringz("Text"),
 },
 --[[
     Message ID:      0x09
@@ -4528,9 +4528,9 @@ CPacketDescription = {
 
 ]]
 [BNLS_VERSIONCHECK] = {
-	uint32{label="Product ID.", },
-	uint32{label="Version DLL digit", },
-	stringz{label="Checksum formula.", },
+	uint32("Product ID."),
+	uint32("Version DLL digit"),
+	stringz("Checksum formula."),
 },
 --[[
     Message ID:    0x21
@@ -4551,8 +4551,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_STACKITEM] = {
-	uint32{label="Item ID - Stack item", },
-	uint32{label="Item ID - Target item", },
+	uint32("Item ID - Stack item"),
+	uint32("Item ID - Target item"),
 },
 --[[
     Message ID:    0x02
@@ -4584,8 +4584,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_WALKTOENTITY] = {
-	uint32{label="*Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("*Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:    0x06
@@ -4625,7 +4625,7 @@ CPacketDescription = {
 
 ]]
 [D2GS_POTIONTOMERCENARY] = {
-	uint16{label="Unknown - 0x00", },
+	uint16("Unknown - 0x00"),
 },
 --[[
     Message ID:    0x06
@@ -4650,10 +4650,10 @@ CPacketDescription = {
 
 ]]
 [SID_STARTVERSIONING] = {
-	uint32{label="Platform ID", },
-	uint32{label="Product ID", },
-	uint32{label="Version Byte", },
-	uint32{label="Unknown", },
+	uint32("Platform ID"),
+	uint32("Product ID"),
+	uint32("Version Byte"),
+	uint32("Unknown"),
 },
 --[[
     Message ID:    0x33
@@ -4680,10 +4680,10 @@ CPacketDescription = {
 
 ]]
 [D2GS_NPCSELL] = {
-	uint32{label="NPC ID - Unconfirmed", },
-	uint32{label="Item ID - Unconfirmed", },
-	uint32{label="Buffer ID - Unconfirmed - Possible value 0x04", },
-	uint32{label="Cost", },
+	uint32("NPC ID - Unconfirmed"),
+	uint32("Item ID - Unconfirmed"),
+	uint32("Buffer ID - Unconfirmed - Possible value 0x04"),
+	uint32("Cost"),
 },
 --[[
     Message ID:    0x0B
@@ -4710,7 +4710,7 @@ CPacketDescription = {
 
 ]]
 [SID_GETCHANNELLIST] = {
-	uint32{label="Product ID", },
+	uint32("Product ID"),
 },
 --[[
     Message ID:    0x54
@@ -4732,7 +4732,7 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTLOGONPROOF] = {
-	uint8{label="[20] Client Password Proof", },
+	uint8("[20] Client Password Proof"),
 },
 --[[
     Message ID:    0x05
@@ -4752,8 +4752,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_LEFTSKILLONLOCATION] = {
-	uint16{label="X coordinate", },
-	uint16{label="Y coordinate", },
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
 },
 --[[
     Message ID:    0x1E
@@ -4787,15 +4787,15 @@ CPacketDescription = {
 
 ]]
 [SID_CLIENTID2] = {
-	uint32{label="Server Version", },
-	uint32{label="Registration Version", },
-	uint32{label="Registration Authority", },
-	uint32{label="Registration Authority", },
-	uint32{label="Registration Version", },
-	uint32{label="Account Number", },
-	uint32{label="Registration Token", },
-	stringz{label="LAN computer name", },
-	stringz{label="LAN username", },
+	uint32("Server Version"),
+	uint32("Registration Version"),
+	uint32("Registration Authority"),
+	uint32("Registration Authority"),
+	uint32("Registration Version"),
+	uint32("Account Number"),
+	uint32("Registration Token"),
+	stringz("LAN computer name"),
+	stringz("LAN username"),
 },
 --[[
     Message ID:    0x33
@@ -4834,9 +4834,9 @@ CPacketDescription = {
 
 ]]
 [SID_GETFILETIME] = {
-	uint32{label="Request ID", },
-	uint32{label="Unknown", },
-	stringz{label="Filename", },
+	uint32("Request ID"),
+	uint32("Unknown"),
+	stringz("Filename"),
 },
 --[[
     Message ID:      0x09
@@ -4955,14 +4955,14 @@ CPacketDescription = {
 
 ]]
 [SID_GETADVLISTEX] = {
-	uint16{label="Product-specific condition 1", },
-	uint16{label="Product-specific condition 2", },
-	uint32{label="Product-specific condition 3", },
-	uint32{label="Product-specific condition 4", },
-	uint32{label="List count", },
-	stringz{label="Game name", },
-	stringz{label="Game password", },
-	stringz{label="Game stats", },
+	uint16("Product-specific condition 1"),
+	uint16("Product-specific condition 2"),
+	uint32("Product-specific condition 3"),
+	uint32("Product-specific condition 4"),
+	uint32("List count"),
+	stringz("Game name"),
+	stringz("Game password"),
+	stringz("Game stats"),
 },
 --[[
     Message ID:    0x07
@@ -4980,7 +4980,7 @@ CPacketDescription = {
 
 ]]
 [PKT_KEEPALIVE] = {
-	uint32{label="Tick count", },
+	uint32("Tick count"),
 },
 --[[
     Message ID:      0x26
@@ -5004,9 +5004,9 @@ CPacketDescription = {
 
 ]]
 [D2GS_USEBELTITEM] = {
-	uint32{label="Item ID", },
-	uint32{label="Unknown - Possibly unused", },
-	uint32{label="Unknown - Possibly unused", },
+	uint32("Item ID"),
+	uint32("Unknown - Possibly unused"),
+	uint32("Unknown - Possibly unused"),
 },
 --[[
     Message ID:      0x22
@@ -5028,7 +5028,7 @@ CPacketDescription = {
 
 ]]
 [D2GS_REMOVESTACKITEM] = {
-	uint32{label="Item ID", },
+	uint32("Item ID"),
 },
 --[[
     Message ID:      0x44
@@ -5082,18 +5082,18 @@ CPacketDescription = {
 
 ]]
 [SID_WARCRAFTGENERAL] = {
-	uint8{label="Subcommand ID", },
-	uint32{label="Cookie", },
-	uint8{label="Number of types requested", },
-	uint32{label="[] Request data *", },
-	uint32{label="Cookie", },
-	stringz{label="Account name", },
-	uint32{label="Product ID", },
-	uint32{label="Cookie", },
-	uint32{label="Clan Tag", },
-	uint32{label="Product ID", },
-	uint32{label="Cookie", },
-	uint32{label="Icon", },
+	uint8("Subcommand ID"),
+	uint32("Cookie"),
+	uint8("Number of types requested"),
+	uint32("[] Request data *"),
+	uint32("Cookie"),
+	stringz("Account name"),
+	uint32("Product ID"),
+	uint32("Cookie"),
+	uint32("Clan Tag"),
+	uint32("Product ID"),
+	uint32("Cookie"),
+	uint32("Icon"),
 },
 --[[
     Message ID:      0x38
@@ -5121,9 +5121,9 @@ CPacketDescription = {
 
 ]]
 [D2GS_NPCTRADE] = {
-	uint32{label="Trade Type - Unconfirmed", },
-	uint32{label="NPC ID - Unconfirmed", },
-	uint32{label="Unknown - Unconfirmed - Possible value 0x00", },
+	uint32("Trade Type - Unconfirmed"),
+	uint32("NPC ID - Unconfirmed"),
+	uint32("Unknown - Unconfirmed - Possible value 0x00"),
 },
 --[[
     Message ID:      0x07
@@ -5160,9 +5160,9 @@ CPacketDescription = {
 
 ]]
 [BNLS_UPGRADECHALLENGE] = {
-	stringz{label="Account name.", },
-	stringz{label="Account old password.", },
-	stringz{label="Account", },
+	stringz("Account name."),
+	stringz("Account old password."),
+	stringz("Account"),
 },
 --[[
     Message ID:    0x7C
@@ -5181,7 +5181,7 @@ CPacketDescription = {
 
 ]]
 [SID_CLANMOTD] = {
-	uint32{label="Cookie", },
+	uint32("Cookie"),
 },
 --[[
     Message ID:    0x04
@@ -5213,8 +5213,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_RUNTOENTITY] = {
-	uint32{label="*Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("*Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:    0x03
@@ -5243,10 +5243,10 @@ CPacketDescription = {
 
 ]]
 [PACKET_DATABASE] = {
-	uint32{label="Command", },
-	stringz{label="Usermask", },
-	stringz{label="Flags", },
-	stringz{label="Usermask", },
+	uint32("Command"),
+	stringz("Usermask"),
+	stringz("Flags"),
+	stringz("Usermask"),
 },
 --[[
     Message ID:    0x05
@@ -5269,7 +5269,7 @@ CPacketDescription = {
 
 ]]
 [PACKET_CYCLE] = {
-	uint32{label="Count", },
+	uint32("Count"),
 	stringz{label="Usernames to cycle", todo="maybe iterator"},
 },
 --[[
@@ -5290,8 +5290,8 @@ CPacketDescription = {
 
 ]]
 [PACKET_CHANGEDBPASSWORD] = {
-	uint32{label="Password to change", },
-	stringz{label="New password", },
+	uint32("Password to change"),
+	stringz("New password"),
 },
 --[[
     Message ID:    0x5A
@@ -5324,8 +5324,8 @@ CPacketDescription = {
 
 ]]
 [SID_RESETPASSWORD] = {
-	stringz{label="Account Name", },
-	stringz{label="Email Address", },
+	stringz("Account Name"),
+	stringz("Email Address"),
 },
 --[[
     Message ID:    0x14
@@ -5350,7 +5350,7 @@ CPacketDescription = {
 
 ]]
 [SID_UDPPINGRESPONSE] = {
-	uint32{label="UDPCode", },
+	uint32("UDPCode"),
 },
 --[[
     Message ID:    0x51
@@ -5403,18 +5403,18 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_CHECK] = {
-	uint32{label="Client Token", },
-	uint32{label="EXE Version", },
-	uint32{label="EXE Hash", },
-	uint32{label="Number of CD-keys in this packet", },
+	uint32("Client Token"),
+	uint32("EXE Version"),
+	uint32("EXE Hash"),
+	uint32("Number of CD-keys in this packet"),
 	uint32{label="Spawn CD-key", desc=Descs.YesNo},
-	uint32{label="Key Length", },
-	uint32{label="CD-key's product value", },
-	uint32{label="CD-key's public value", },
-	uint32{label="Unknown", },
-	uint32{label="[5] Hashed Key Data", },
-	stringz{label="Exe Information", },
-	stringz{label="CD-Key owner name", },
+	uint32("Key Length"),
+	uint32("CD-key's product value"),
+	uint32("CD-key's public value"),
+	uint32("Unknown"),
+	uint32("[5] Hashed Key Data"),
+	stringz("Exe Information"),
+	stringz("CD-Key owner name"),
 },
 --[[
     Message ID:    0x35
@@ -5437,8 +5437,8 @@ CPacketDescription = {
 
 ]]
 [SID_PROFILE] = {
-	uint32{label="Cookie", },
-	stringz{label="Username", },
+	uint32("Cookie"),
+	stringz("Username"),
 },
 --[[
     Message ID:    0x2A
@@ -5456,8 +5456,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_ITEMTOCUBE] = {
-	uint32{label="Item ID", },
-	uint32{label="Cube ID", },
+	uint32("Item ID"),
+	uint32("Cube ID"),
 },
 --[[
     Message ID:      0x0E
@@ -5500,7 +5500,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_AUTHORIZE] = {
-	stringz{label="Bot ID.", },
+	stringz("Bot ID."),
 },
 --[[
     Message ID:    0x15
@@ -5530,13 +5530,13 @@ CPacketDescription = {
 
 ]]
 [D2GS_CHATMESSAGE] = {
-	uint8{label="Message Type", },
-	uint8{label="Unknown", },
-	stringz{label="Message", },
-	uint8{label="Unknown", },
-	uint16{label="Unknown - Only if normal chat", },
-	stringz{label="Player to whisper to - Only if whispering", },
-	uint8{label="Unknown - Only if whispering", },
+	uint8("Message Type"),
+	uint8("Unknown"),
+	stringz("Message"),
+	uint8("Unknown"),
+	uint16("Unknown - Only if normal chat"),
+	stringz("Player to whisper to - Only if whispering"),
+	uint8("Unknown - Only if whispering"),
 },
 --[[
     Message ID:    0x5C
@@ -5557,7 +5557,7 @@ CPacketDescription = {
 
 ]]
 [SID_SWITCHPRODUCT] = {
-	uint32{label="Product ID", },
+	uint32("Product ID"),
 },
 --[[
     Message ID:    0x07
@@ -5592,8 +5592,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_LEFTSKILLONENTITYEX] = {
-	uint32{label="Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:    0x0A
@@ -5630,8 +5630,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_LEFTSKILLONENTITYEX3] = {
-	uint32{label="*Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("*Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:    0x11
@@ -5665,8 +5665,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_RIGHTSKILLONENTITYEX3] = {
-	uint32{label="Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:    0x0E
@@ -5701,8 +5701,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_RIGHTSKILLONENTITYEX] = {
-	uint32{label="Entity Type", },
-	uint32{label="Entity ID", },
+	uint32("Entity Type"),
+	uint32("Entity ID"),
 },
 --[[
     Message ID:    0x1C
@@ -5731,7 +5731,7 @@ CPacketDescription = {
 
 ]]
 [D2GS_PICKUPBODYITEM] = {
-	uint16{label="Body Location", },
+	uint16("Body Location"),
 },
 --[[
     Message ID:    0x5E
@@ -5788,18 +5788,18 @@ CPacketDescription = {
 
 ]]
 [SID_WARDEN] = {
-	bytes{label="Encrypted Packet", },
-	uint8{label="Packet Code", },
-	uint8{label="Success", },
-	uint8{label="Success", },
-	uint16{label="String Length", },
-	uint32{label="String Checksum", },
-	bytes{label="String Data", },
-	uint8{label="Success", },
-	bytes{label="Data", },
-	uint8{label="Success", },
-	uint8{label="IDXor", },
-	uint32{label="[4] Unknown", },
+	bytes("Encrypted Packet"),
+	uint8("Packet Code"),
+	uint8("Success"),
+	uint8("Success"),
+	uint16("String Length"),
+	uint32("String Checksum"),
+	bytes("String Data"),
+	uint8("Success"),
+	bytes("Data"),
+	uint8("Success"),
+	uint8("IDXor"),
+	uint32("[4] Unknown"),
 },
 --[[
     Message ID:      0x58
@@ -5841,10 +5841,10 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTUPGRADEPROOF] = {
-	uint32{label="Client Token", },
-	uint32{label="[5] Old Password Hash", },
-	uint8{label="[32] New Password Salt", },
-	uint8{label="[32] New Password Verifier", },
+	uint32("Client Token"),
+	uint32("[5] Old Password Hash"),
+	uint8("[32] New Password Salt"),
+	uint8("[32] New Password Verifier"),
 },
 --[[
     Message ID:      0x5D
@@ -5875,10 +5875,10 @@ CPacketDescription = {
 
 ]]
 [SID_REPORTCRASH] = {
-	uint32{label="0x10A0027", },
-	uint32{label="Exception code", },
-	uint32{label="Unknown", },
-	uint32{label="Unknown", },
+	uint32("0x10A0027"),
+	uint32("Exception code"),
+	uint32("Unknown"),
+	uint32("Unknown"),
 },
 --[[
     Message ID:    0x4F
@@ -5918,8 +5918,8 @@ CPacketDescription = {
 
 ]]
 [D2GS_TRADE] = {
-	uint32{label="Request ID", },
-	uint16{label="Gold Amount", },
+	uint32("Request ID"),
+	uint16("Gold Amount"),
 },
 --[[
     Message ID:    0x11
@@ -6000,7 +6000,7 @@ CPacketDescription = {
 
 ]]
 [MCP_REQUESTLADDERDATA] = {
-	uint8{label="Ladder type", },
-	uint16{label="Starting position", },
+	uint8("Ladder type"),
+	uint16("Starting position"),
 },
 }
