@@ -177,8 +177,36 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_CHECK] = {
-	uint32{label="Result", },
-	stringz{label="Additional Information", },
+	uint32{label="Result", key="res", display = base.HEX, desc={
+		[0x000] = "Passed challenge",
+		[0x100] = "Old game version",
+		[0x101] = "Invalid version",
+		[0x102] = "Game version must be downgraded",
+		-- ?? [0x0NN] = "(where NN is the version code supplied in SID_AUTH_INFO):
+		-- Invalid version code (note that 0x100 is not set in this case)",
+		[0x200] = "Invalid CD key",
+		[0x201] = "CD key in use",
+		[0x202] = "Banned key",
+		[0x203] = "Wrong product",
+		-- The last 4 codes also apply to the second CDKey, as indicated by a
+		-- bitwise combination with 0x010.
+		[0x210] = "Invalid CD key",
+		[0x211] = "CD key in use",
+		[0x212] = "Banned key",
+		[0x213] = "Wrong product",
+	}},
+	when{
+		condition=function(self, state)
+			return (state.packet.res == 0x100) or (state.packet.res == 0x102)
+		end,
+		block = { stringz{label="MPQ Filename", } },
+	},
+	when{
+		condition=function(self, state)
+			return bit.band(state.packet.res, 0x201) == 0x201
+		end,
+		block = { stringz{label="Username", } },
+	},
 },
 --[[
     Message ID:    0x04
@@ -234,7 +262,7 @@ SPacketDescription = {
 	uint16{label="Request ID", },
 	uint16{label="Game token", },
 	uint16{label="Unknown", },
-	uint32{label="IP of D2GS Server", },
+	ipv4{label="IP of D2GS Server", },
 	uint32{label="Game hash", },
 	uint32{label="Result", },
 },
