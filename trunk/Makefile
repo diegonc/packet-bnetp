@@ -11,11 +11,39 @@ DISTNAME=packet-bnetp-src
 VERSION=$(shell date +%Y%m%d)
 
 DIST = \
+	src \
 	src/constants.lua \
 	src/cpackets.lua \
 	src/packet-bnetp0.lua \
 	src/spackets.lua \
-	tools/preprocess.pl \
+	tools \
+	tools/filepp \
+	tools/filepp/filepp \
+	tools/filepp/modules \
+	tools/filepp/modules/bigdef.pm \
+	tools/filepp/modules/bigfunc.pm \
+	tools/filepp/modules/blc.pm \
+	tools/filepp/modules/c-comment.pm \
+	tools/filepp/modules/cmacros.pm \
+	tools/filepp/modules/comment.pm \
+	tools/filepp/modules/cpp.pm \
+	tools/filepp/modules/defplus.pm \
+	tools/filepp/modules/for.pm \
+	tools/filepp/modules/foreach.pm \
+	tools/filepp/modules/format.pm \
+	tools/filepp/modules/function.pm \
+	tools/filepp/modules/grab.pm \
+	tools/filepp/modules/hash-comment.pm \
+	tools/filepp/modules/literal.pm \
+	tools/filepp/modules/lua-comment.pm \
+	tools/filepp/modules/maths.pm \
+	tools/filepp/modules/regexp.pm \
+	tools/filepp/modules/tolower.pm \
+	tools/filepp/modules/toupper.pm \
+	tools/filepp/share \
+	tools/filepp/share/man \
+	tools/filepp/share/man/man1 \
+	tools/filepp/share/man/man1/filepp.1 \
 	Makefile
 
 PKG = \
