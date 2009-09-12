@@ -370,6 +370,8 @@ do
 			dissect = function(self, state)
 				if self:condition(state) then
 					dissect_packet(state, self.block)
+				elseif self.otherwise then
+					dissect_packet(state, self.otherwise)
 				end
 			end,
 		},
