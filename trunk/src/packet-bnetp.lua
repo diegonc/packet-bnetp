@@ -661,9 +661,10 @@ local Descs = {
 		local posixtime = WProtoField.posixtime
 		local iterator = WProtoField.iterator
 		local when = WProtoField.when
-		local version = function(arg)
-			arg.big_endian = false
-			return ipv4(arg)
+		local version = function(args, ...)
+			args = make_args_table(args, unpack(arg))
+			args.big_endian = false
+			return ipv4(args)
 		end
 		local strdw = function(args,...)
 			args = make_args_table(args, unpack(arg))
@@ -715,7 +716,9 @@ SPacketDescription = {
 	posixtime("Last logon timestamp"),
 	posixtime("Oldest news timestamp"),
 	posixtime("Newest news timestamp"),
-	iterator{alias="none", refkey="news", repeated={
+	iterator{
+		label="News",
+		refkey="news", repeated={
 		posixtime{label="Timestamp", key="stamp"},
 		when{
 			condition=function(self, state) return state.packet.stamp == 0 end,
@@ -764,21 +767,50 @@ SPacketDescription = {
 	uint16("Unknown"),
 	ipv4("IP of D2GS Server"),
 	uint32("Game hash"),
-	uint32("Result"),
+	uint32("Result", base.HEX, {
+		[0x00] = "Game joining succeeded.",
+		[0x29] = "Password incorrect.",
+		[0x2A] = "Game does not exist.",
+		[0x2B] = "Game is full.",
+		[0x2C] = "You do not meet the level requirements for this game.",
+		[0x6E] = "A dead hardcore character cannot join a game.",
+		[0x71] = "A non-hardcore character cannot join a game created by a Hardcore character.",
+		[0x73] = "Unable to join a Nightmare game.",
+		[0x74] = "Unable to join a Hell game.",
+		[0x78] = "A non-expansion character cannot join a game created by an Expansion character.",
+		[0x79] = "A Expansion character cannot join a game created by a non-expansion character.",
+		[0x7D] = "A non-ladder character cannot join a game created by a Ladder character.",
+	}),
 },
 [0xFF26] = {
 	uint32("Number of accounts"),
-	uint32("Number of keys"),
+	uint32{label="Number of keys", key="numkeys"},
 	uint32("Request ID"),
-	stringz("[] Requested Key Values"),
+	iterator{
+		refkey="numkeys",
+		repeated={stringz("Requested Key Value")},
+		label="Key Values",
+	},
 },
 [0x7005] = {
-	uint32{label="Data for SID_AUTH_ACCOUNTCHANGE", num=8},
+	uint32{label="Data for SID_AUTH_ACCOUNTCHANGE", display=base.HEX, num=8},
 },
 [0xFF7F] = {
 	stringz("Username"),
-	uint8("Rank"),
-	uint8("Status"),
+	uint8("Rank", base.DEC, {
+		[0x00] = "Initiate that has been in the clan for less than one week",
+		[0x01] = "Initiate that has been in the clan for over one week",
+		[0x02] = "Member",
+		[0x03] = "Officer",
+		[0x04] = "Leader",
+	}),
+	uint8("Status", base.DEC, {
+		[0x00] = "Offline",
+		[0x01] = "Online (not in either channel or game)",
+		[0x02] = "In a channel",
+		[0x03] = "In a public game",
+		[0x05] = "In a private game)",
+	}),
 	stringz("Location"),
 },
 [0xFF69] = {
@@ -787,9 +819,21 @@ SPacketDescription = {
 },
 [0xFF67] = {
 	stringz("Account"),
-	uint8("Friend Type"),
-	uint8("Friend Status"),
-	uint32("ProductID"),
+	uint8("Friend Type", base.DEC, {
+		[0x00] = "Non-mutual",
+		[0x01] = "Mutual",
+		[0x02] = "Nonmutual, DND",
+		[0x03] = "Mutual, DND",
+		[0x04] = "Nonmutual, Away",
+		[0x05] = "Mutual, Away",
+	}),
+	uint8("Friend Status", base.DEC, {
+		[0x00] = "Offline",
+		[0x02] = "In chat",
+		[0x03] = "In public game",
+		[0x05] = "In private game",
+	}),
+	uint32("ProductID", base.HEX),
 	stringz("Location"),
 },
 [0xFF2D] = {
@@ -798,7 +842,7 @@ SPacketDescription = {
 },
 [0x7001] = {
 	uint32{label="Result", desc=Descs.YesNo},
-	uint32("Client Token"),
+	uint32("Client Token", base.HEX),
 	uint32{label="CD key data for SID_AUTH_CHECK", num=9},
 },
 [0x7305] = {
@@ -806,11 +850,11 @@ SPacketDescription = {
 },
 [0x701A] = {
 	uint32{label="Success*", desc=Descs.YesNo},
-	uint32("Version."),
-	uint32("Checksum."),
+	version("Version."),
+	uint32("Checksum.", base.HEX),
 	stringz("Version check stat string."),
-	uint32("Cookie."),
-	uint32("The latest version code for this product."),
+	uint32("Cookie.", base.HEX),
+	uint32("The latest version code for this product.", base.HEX),
 },
 [0xFF06] = {
 	wintime("MPQ Filetime"),
@@ -818,8 +862,11 @@ SPacketDescription = {
 	stringz("ValueString"),
 },
 [0x7010] = {
-	uint32("Productif Product is nonzero:"),
-	uint32("Version byte"),
+	uint32{label="Product", key="prod"},
+	when{
+		condition=function(...) return arg[2].packet.prod ~= 0 end,
+		block = {uint32("Version byte", base.HEX)},
+	}
 },
 [0xFF52] = {
 	uint32("Status"),

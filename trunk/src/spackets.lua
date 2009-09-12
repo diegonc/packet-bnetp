@@ -69,7 +69,9 @@ SPacketDescription = {
 	posixtime("Last logon timestamp"),
 	posixtime("Oldest news timestamp"),
 	posixtime("Newest news timestamp"),
-	iterator{alias="none", refkey="news", repeated={
+	iterator{
+		label="News",
+		refkey="news", repeated={
 		posixtime{label="Timestamp", key="stamp"},
 		when{
 			condition=function(self, state) return state.packet.stamp == 0 end,
@@ -264,7 +266,20 @@ SPacketDescription = {
 	uint16("Unknown"),
 	ipv4("IP of D2GS Server"),
 	uint32("Game hash"),
-	uint32("Result"),
+	uint32("Result", base.HEX, {
+		[0x00] = "Game joining succeeded.",
+		[0x29] = "Password incorrect.",
+		[0x2A] = "Game does not exist.",
+		[0x2B] = "Game is full.",
+		[0x2C] = "You do not meet the level requirements for this game.",
+		[0x6E] = "A dead hardcore character cannot join a game.",
+		[0x71] = "A non-hardcore character cannot join a game created by a Hardcore character.",
+		[0x73] = "Unable to join a Nightmare game.",
+		[0x74] = "Unable to join a Hell game.",
+		[0x78] = "A non-expansion character cannot join a game created by an Expansion character.",
+		[0x79] = "A Expansion character cannot join a game created by a non-expansion character.",
+		[0x7D] = "A non-ladder character cannot join a game created by a Ladder character.",
+	}),
 },
 --[[
     Message ID:    0x26
@@ -288,9 +303,13 @@ SPacketDescription = {
 ]]
 [SID_READUSERDATA] = {
 	uint32("Number of accounts"),
-	uint32("Number of keys"),
+	uint32{label="Number of keys", key="numkeys"},
 	uint32("Request ID"),
-	stringz("[] Requested Key Values"),
+	iterator{
+		refkey="numkeys",
+		repeated={stringz("Requested Key Value")},
+		label="Key Values",
+	},
 },
 --[[
     Message ID:      0x05
@@ -311,7 +330,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_CHANGECHALLENGE] = {
-	uint32{label="Data for SID_AUTH_ACCOUNTCHANGE", num=8},
+	uint32{label="Data for SID_AUTH_ACCOUNTCHANGE", display=base.HEX, num=8},
 },
 --[[
     Message ID:    0x7F
@@ -355,8 +374,20 @@ SPacketDescription = {
 ]]
 [SID_CLANMEMBERSTATUSCHANGE] = {
 	stringz("Username"),
-	uint8("Rank"),
-	uint8("Status"),
+	uint8("Rank", base.DEC, {
+		[0x00] = "Initiate that has been in the clan for less than one week",
+		[0x01] = "Initiate that has been in the clan for over one week",
+		[0x02] = "Member",
+		[0x03] = "Officer",
+		[0x04] = "Leader",
+	}),
+	uint8("Status", base.DEC, {
+		[0x00] = "Offline",
+		[0x01] = "Online (not in either channel or game)",
+		[0x02] = "In a channel",
+		[0x03] = "In a public game",
+		[0x05] = "In a private game)",
+	}),
 	stringz("Location"),
 },
 --[[
@@ -426,9 +457,21 @@ SPacketDescription = {
 ]]
 [SID_FRIENDSADD] = {
 	stringz("Account"),
-	uint8("Friend Type"),
-	uint8("Friend Status"),
-	uint32("ProductID"),
+	uint8("Friend Type", base.DEC, {
+		[0x00] = "Non-mutual",
+		[0x01] = "Mutual",
+		[0x02] = "Nonmutual, DND",
+		[0x03] = "Mutual, DND",
+		[0x04] = "Nonmutual, Away",
+		[0x05] = "Mutual, Away",
+	}),
+	uint8("Friend Status", base.DEC, {
+		[0x00] = "Offline",
+		[0x02] = "In chat",
+		[0x03] = "In public game",
+		[0x05] = "In private game",
+	}),
+	uint32("ProductID", base.HEX),
 	stringz("Location"),
 },
 --[[
@@ -476,7 +519,7 @@ SPacketDescription = {
 ]]
 [BNLS_CDKEY] = {
 	uint32{label="Result", desc=Descs.YesNo},
-	uint32("Client Token"),
+	uint32("Client Token", base.HEX),
 	uint32{label="CD key data for SID_AUTH_CHECK", num=9},
 },
 --[[
@@ -523,11 +566,11 @@ SPacketDescription = {
 ]]
 [BNLS_VERSIONCHECKEX2] = {
 	uint32{label="Success*", desc=Descs.YesNo},
-	uint32("Version."),
-	uint32("Checksum."),
+	version("Version."),
+	uint32("Checksum.", base.HEX),
 	stringz("Version check stat string."),
-	uint32("Cookie."),
-	uint32("The latest version code for this product."),
+	uint32("Cookie.", base.HEX),
+	uint32("The latest version code for this product.", base.HEX),
 },
 --[[
     Message ID:    0x06
@@ -577,8 +620,11 @@ SPacketDescription = {
 
 ]]
 [BNLS_REQUESTVERSIONBYTE] = {
-	uint32("Productif Product is nonzero:"),
-	uint32("Version byte"),
+	uint32{label="Product", key="prod"},
+	when{
+		condition=function(...) return arg[2].packet.prod ~= 0 end,
+		block = {uint32("Version byte", base.HEX)},
+	}
 },
 --[[
     Message ID:    0x52

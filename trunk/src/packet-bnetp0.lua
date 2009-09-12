@@ -467,9 +467,10 @@ do
 		local posixtime = WProtoField.posixtime
 		local iterator = WProtoField.iterator
 		local when = WProtoField.when
-		local version = function(arg)
-			arg.big_endian = false
-			return ipv4(arg)
+		local version = function(args, ...)
+			args = make_args_table(args, unpack(arg))
+			args.big_endian = false
+			return ipv4(args)
 		end
 		local strdw = function(args,...)
 			args = make_args_table(args, unpack(arg))
