@@ -206,6 +206,9 @@ do
 		for k,v in pairs(pdesc) do
 			if v.key and v.value then
 				state.packet[v.key] = v:value(state)
+			elseif v.key then
+				state:error(v.key .. " key creation requested on a field type "
+					.. "without a value method.")
 			end
 			if not v.dissect then
 				local size = v:size(state)
@@ -243,6 +246,10 @@ do
 		},
 		["uint8"]  = {
 			["size"] = function(...) return 1 end,
+			value = function (self, state)
+				local val = state:peek(self.size())
+				return val:le_uint()
+			end,
 		},
 		["int64"]  = {
 			["size"] = function(...) return 8 end,
@@ -328,6 +335,7 @@ do
 				-- Append text form of date to the node label.
 				node:append_text(unixtime)
 			end,
+			value = function (self, state) return state:peek(4):uint() end,
 		},
 		iterator = {
 			alias = "bytes",
@@ -456,6 +464,7 @@ do
 		local wintime = WProtoField.filetime
 		local posixtime = WProtoField.posixtime
 		local iterator = WProtoField.iterator
+		local when = WProtoField.when
 		local version = function(arg)
 			arg.big_endian = false
 			return ipv4(arg)
