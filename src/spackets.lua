@@ -22,7 +22,7 @@ SPacketDescription = {
 
 ]]
 [SID_SERVERLIST] = {
-	uint32{label="Server version", },
+	uint32("Server version"),
 	iterator{
 		label="Server list",
  		alias="bytes",
@@ -66,9 +66,9 @@ SPacketDescription = {
 ]]
 [SID_NEWS_INFO] = {
 	uint8{label="Number of entries", key="news" },
-	posixtime{label="Last logon timestamp", },
-	posixtime{label="Oldest news timestamp", },
-	posixtime{label="Newest news timestamp", },
+	posixtime("Last logon timestamp"),
+	posixtime("Oldest news timestamp"),
+	posixtime("Newest news timestamp"),
 	iterator{alias="none", refkey="news", repeated={
 		posixtime{label="Timestamp", key="stamp"},
 		when{
@@ -102,7 +102,7 @@ SPacketDescription = {
 
 ]]
 [SID_OPTIONALWORK] = {
-	stringz{label="MPQ Filename", },
+	stringz("MPQ Filename"),
 },
 --[[
     Message ID:      0x0A
@@ -199,13 +199,13 @@ SPacketDescription = {
 		condition=function(self, state)
 			return (state.packet.res == 0x100) or (state.packet.res == 0x102)
 		end,
-		block = { stringz{label="MPQ Filename", } },
+		block = { stringz("MPQ Filename") },
 	},
 	when{
 		condition=function(self, state)
 			return bit.band(state.packet.res, 0x201) == 0x201
 		end,
-		block = { stringz{label="Username", } },
+		block = { stringz("Username") },
 	},
 },
 --[[
@@ -259,12 +259,12 @@ SPacketDescription = {
 
 ]]
 [MCP_JOINGAME] = {
-	uint16{label="Request ID", },
-	uint16{label="Game token", },
-	uint16{label="Unknown", },
-	ipv4{label="IP of D2GS Server", },
-	uint32{label="Game hash", },
-	uint32{label="Result", },
+	uint16("Request ID"),
+	uint16("Game token"),
+	uint16("Unknown"),
+	ipv4("IP of D2GS Server"),
+	uint32("Game hash"),
+	uint32("Result"),
 },
 --[[
     Message ID:    0x26
@@ -287,10 +287,10 @@ SPacketDescription = {
 
 ]]
 [SID_READUSERDATA] = {
-	uint32{label="Number of accounts", },
-	uint32{label="Number of keys", },
-	uint32{label="Request ID", },
-	stringz{label="[] Requested Key Values", },
+	uint32("Number of accounts"),
+	uint32("Number of keys"),
+	uint32("Request ID"),
+	stringz("[] Requested Key Values"),
 },
 --[[
     Message ID:      0x05
@@ -354,10 +354,10 @@ SPacketDescription = {
 
 ]]
 [SID_CLANMEMBERSTATUSCHANGE] = {
-	stringz{label="Username", },
-	uint8{label="Rank", },
-	uint8{label="Status", },
-	stringz{label="Location", },
+	stringz("Username"),
+	uint8("Rank"),
+	uint8("Status"),
+	stringz("Location"),
 },
 --[[
     Message ID:    0x69
@@ -381,8 +381,8 @@ SPacketDescription = {
 
 ]]
 [SID_FRIENDSPOSITION] = {
-	uint8{label="Old Position", },
-	uint8{label="New Position", },
+	uint8("Old Position"),
+	uint8("New Position"),
 },
 --[[
     Message ID:    0x67
@@ -425,11 +425,11 @@ SPacketDescription = {
 
 ]]
 [SID_FRIENDSADD] = {
-	stringz{label="Account", },
-	uint8{label="Friend Type", },
-	uint8{label="Friend Status", },
-	uint32{label="ProductID", },
-	stringz{label="Location", },
+	stringz("Account"),
+	uint8("Friend Type"),
+	uint8("Friend Status"),
+	uint32("ProductID"),
+	stringz("Location"),
 },
 --[[
     Message ID:    0x2D
@@ -451,8 +451,8 @@ SPacketDescription = {
 
 ]]
 [SID_GETICONDATA] = {
-	wintime{label="Filetime", },
-	stringz{label="Filename", },
+	wintime("Filetime"),
+	stringz("Filename"),
 },
 --[[
     Message ID:    0x01
@@ -476,7 +476,7 @@ SPacketDescription = {
 ]]
 [BNLS_CDKEY] = {
 	uint32{label="Result", desc=Descs.YesNo},
-	uint32{label="Client Token", },
+	uint32("Client Token"),
 	uint32{label="CD key data for SID_AUTH_CHECK", num=9},
 },
 --[[
@@ -496,7 +496,7 @@ SPacketDescription = {
 
 ]]
 [PACKET_CYCLE] = {
-	stringz{label="Channel", },
+	stringz("Channel"),
 },
 --[[
     Message ID:    0x1A
@@ -523,11 +523,11 @@ SPacketDescription = {
 ]]
 [BNLS_VERSIONCHECKEX2] = {
 	uint32{label="Success*", desc=Descs.YesNo},
-	uint32{label="Version.", },
-	uint32{label="Checksum.", },
-	stringz{label="Version check stat string.", },
-	uint32{label="Cookie.", },
-	uint32{label="The latest version code for this product.", },
+	uint32("Version."),
+	uint32("Checksum."),
+	stringz("Version check stat string."),
+	uint32("Cookie."),
+	uint32("The latest version code for this product."),
 },
 --[[
     Message ID:    0x06
@@ -549,9 +549,9 @@ SPacketDescription = {
 
 ]]
 [SID_STARTVERSIONING] = {
-	wintime{label="MPQ Filetime", },
-	stringz{label="MPQ Filename", },
-	stringz{label="ValueString", },
+	wintime("MPQ Filetime"),
+	stringz("MPQ Filename"),
+	stringz("ValueString"),
 },
 --[[
     Message ID:      0x10
@@ -577,8 +577,8 @@ SPacketDescription = {
 
 ]]
 [BNLS_REQUESTVERSIONBYTE] = {
-	uint32{label="Productif Product is nonzero:", },
-	uint32{label="Version byte", },
+	uint32("Productif Product is nonzero:"),
+	uint32("Version byte"),
 },
 --[[
     Message ID:    0x52
@@ -618,7 +618,7 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCREATE] = {
-	uint32{label="Status", },
+	uint32("Status"),
 },
 --[[
     Message ID:    0x04
@@ -638,8 +638,8 @@ SPacketDescription = {
 
 ]]
 [PACKET_MESSAGE] = {
-	stringz{label="User", },
-	stringz{label="Command", },
+	stringz("User"),
+	stringz("Command"),
 },
 --[[
     Message ID:    0x77
@@ -667,7 +667,7 @@ SPacketDescription = {
 
 ]]
 [D2GS_TRADEACTION] = {
-	uint8{label="Request Type", },
+	uint8("Request Type"),
 },
 --[[
     Message ID:    0x50
@@ -708,13 +708,13 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_INFO] = {
-	uint32{label="Logon Type", },
-	uint32{label="Server Token", },
-	uint32{label="UDPValue *", },
-	wintime{label="MPQ filetime", },
-	stringz{label="IX86ver filename", },
-	stringz{label="ValueString", },
-	bytes{label="128-byte Server signature", },
+	uint32("Logon Type"),
+	uint32("Server Token"),
+	uint32("UDPValue *"),
+	wintime("MPQ filetime"),
+	stringz("IX86ver filename"),
+	stringz("ValueString"),
+	bytes("128-byte Server signature"),
 },
 --[[
     Message ID:      0x51
@@ -763,13 +763,13 @@ SPacketDescription = {
 
 ]]
 [D2GS_WORLDOBJECT] = {
-	uint8{label="Object Type - Any information appreciated", },
-	uint32{label="Object ID", },
-	uint16{label="Object unique code", },
-	uint16{label="X Coordinate", },
-	uint16{label="Y Coordinate", },
-	uint8{label="State *", },
-	uint8{label="Interaction Condition", },
+	uint8("Object Type - Any information appreciated"),
+	uint32("Object ID"),
+	uint16("Object unique code"),
+	uint16("X Coordinate"),
+	uint16("Y Coordinate"),
+	uint8("State *"),
+	uint8("Interaction Condition"),
 },
 --[[
     Message ID:    0x08
@@ -792,7 +792,7 @@ SPacketDescription = {
 
 ]]
 [SID_STARTADVEX] = {
-	uint32{label="Status", },
+	uint32("Status"),
 },
 --[[
     Message ID:    0x75
@@ -820,9 +820,9 @@ SPacketDescription = {
 
 ]]
 [SID_CLANINFO] = {
-	uint8{label="Unknown", },
-	uint32{label="Clan tag", },
-	uint8{label="Rank", },
+	uint8("Unknown"),
+	uint32("Clan tag"),
+	uint8("Rank"),
 },
 --[[
     Message ID:    0x65
@@ -883,12 +883,12 @@ SPacketDescription = {
 
 ]]
 [SID_FRIENDSLIST] = {
-	uint8{label="Number of Entries", },
-	stringz{label="Account", },
-	uint8{label="Status", },
-	uint8{label="Location", },
-	uint32{label="ProductID", },
-	stringz{label="Location name", },
+	uint8("Number of Entries"),
+	stringz("Account"),
+	uint8("Status"),
+	uint8("Location"),
+	uint32("ProductID"),
+	stringz("Location name"),
 },
 --[[
     Message ID:    0x72
@@ -913,12 +913,12 @@ SPacketDescription = {
 
 ]]
 [SID_CLANCREATIONINVITATION] = {
-	uint32{label="Cookie", },
-	uint32{label="Clan Tag", },
-	stringz{label="Clan Name", },
-	stringz{label="Inviter's username", },
-	uint8{label="Number of users being invited", },
-	stringz{label="[] List of users being invited", },
+	uint32("Cookie"),
+	uint32("Clan Tag"),
+	stringz("Clan Name"),
+	stringz("Inviter's username"),
+	uint8("Number of users being invited"),
+	stringz("[] List of users being invited"),
 },
 --[[
     Message ID:    0x82
@@ -947,11 +947,11 @@ SPacketDescription = {
 
 ]]
 [SID_CLANMEMBERINFORMATION] = {
-	uint32{label="Cookie", },
-	uint8{label="Status code", },
-	stringz{label="Clan name", },
-	uint8{label="User's rank", },
-	wintime{label="Date joined", },
+	uint32("Cookie"),
+	uint8("Status code"),
+	stringz("Clan name"),
+	uint8("User's rank"),
+	wintime("Date joined"),
 },
 --[[
     Message ID:    0x28
@@ -969,7 +969,7 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONCHALLENGE] = {
-	uint32{label="Server Token", },
+	uint32("Server Token"),
 },
 --[[
     Message ID:    0x06
@@ -1008,16 +1008,16 @@ SPacketDescription = {
 
 ]]
 [MCP_GAMEINFO] = {
-	uint16{label="Request ID", },
-	uint32{label="Status *", },
-	uint32{label="Game Uptime", },
-	uint16{label="Unknown", },
-	uint8{label="Maximum players allowed", },
-	uint8{label="Number of characters in the game", },
-	uint8{label="[16] Classes of ingame characters **", },
-	uint8{label="[16] Levels of ingame characters **", },
-	uint8{label="Unused", },
-	stringz{label="[16] Character names **", },
+	uint16("Request ID"),
+	uint32("Status *"),
+	uint32("Game Uptime"),
+	uint16("Unknown"),
+	uint8("Maximum players allowed"),
+	uint8("Number of characters in the game"),
+	uint8("[16] Classes of ingame characters **"),
+	uint8("[16] Levels of ingame characters **"),
+	uint8("Unused"),
+	stringz("[16] Character names **"),
 },
 --[[
     Message ID:    0x25
@@ -1049,7 +1049,7 @@ SPacketDescription = {
 
 ]]
 [SID_PING] = {
-	uint32{label="Ping Value", },
+	uint32("Ping Value"),
 },
 --[[
     Message ID:    0x05
@@ -1069,7 +1069,7 @@ SPacketDescription = {
 
 ]]
 [PKT_SERVERPING] = {
-	uint32{label="UDP Code", },
+	uint32("UDP Code"),
 },
 --[[
     Message ID:      0x14
@@ -1100,7 +1100,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_SERVERLOGONPROOF] = {
-	uint32{label="Slot index.", },
+	uint32("Slot index."),
 	uint32{label="Success.", desc=Descs.YesNo},
 	uint32{label="Data server's", num=5},
 },
@@ -1125,7 +1125,7 @@ SPacketDescription = {
 
 ]]
 [SID_STARTADVEX3] = {
-	uint32{label="Status", },
+	uint32("Status"),
 },
 --[[
     Message ID:    0x4C
@@ -1148,7 +1148,7 @@ SPacketDescription = {
 
 ]]
 [SID_REQUIREDWORK] = {
-	stringz{label="ExtraWork MPQ FileName", },
+	stringz("ExtraWork MPQ FileName"),
 },
 --[[
     Message ID:      0x04
@@ -1206,8 +1206,8 @@ SPacketDescription = {
 
 ]]
 [SID_CDKEY2] = {
-	uint32{label="Result", },
-	stringz{label="Key owner", },
+	uint32("Result"),
+	stringz("Key owner"),
 },
 --[[
     Message ID:    0x0A
@@ -1234,9 +1234,9 @@ SPacketDescription = {
 
 ]]
 [SID_ENTERCHAT] = {
-	stringz{label="Unique name", },
-	stringz{label="Statstring", },
-	stringz{label="Account name", },
+	stringz("Unique name"),
+	stringz("Statstring"),
+	stringz("Account name"),
 },
 --[[
     Message ID:    0x30
@@ -1272,8 +1272,8 @@ SPacketDescription = {
 
 ]]
 [SID_CDKEY] = {
-	uint32{label="Result", },
-	stringz{label="Key owner", },
+	uint32("Result"),
+	stringz("Key owner"),
 },
 --[[
     Message ID:    0x19
@@ -1309,12 +1309,12 @@ SPacketDescription = {
 
 ]]
 [MCP_CHARLIST2] = {
-	uint16{label="Number of characters requested", },
-	uint32{label="Number of characters that exist on this account", },
-	uint16{label="Number of characters returned", },
-	uint32{label="Expiration Date", },
-	stringz{label="Character name", },
-	stringz{label="Character statstring", },
+	uint16("Number of characters requested"),
+	uint32("Number of characters that exist on this account"),
+	uint16("Number of characters returned"),
+	uint32("Expiration Date"),
+	stringz("Character name"),
+	stringz("Character statstring"),
 },
 --[[
     Message ID:    0x33
@@ -1339,10 +1339,10 @@ SPacketDescription = {
 
 ]]
 [SID_GETFILETIME] = {
-	uint32{label="Request ID", },
-	uint32{label="Unknown", },
-	wintime{label="Last update time", },
-	stringz{label="Filename", },
+	uint32("Request ID"),
+	uint32("Unknown"),
+	wintime("Last update time"),
+	stringz("Filename"),
 },
 --[[
     Message ID:      0x0F
@@ -1376,7 +1376,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_AUTHORIZEPROOF] = {
-	uint32{label="Status code.", },
+	uint32("Status code."),
 },
 --[[
     Message ID:      0x10
@@ -1402,11 +1402,11 @@ SPacketDescription = {
 
 ]]
 [PACKET_CHATDROPOPTIONS] = {
-	uint8{label="SubcommandFor subcommand 0:", },
-	uint8{label="Setting for broadcast", },
-	uint8{label="Setting for database", },
-	uint8{label="Setting for whispers", },
-	uint8{label="Refuse all", },
+	uint8("SubcommandFor subcommand 0:"),
+	uint8("Setting for broadcast"),
+	uint8("Setting for database"),
+	uint8("Setting for whispers"),
+	uint8("Refuse all"),
 },
 --[[
     Message ID:    0x06
@@ -1435,12 +1435,12 @@ SPacketDescription = {
 
 ]]
 [PACKET_USERINFO] = {
-	uint32{label="Bot number", },
-	stringz{label="Bot name", },
-	stringz{label="Bot channel", },
-	uint32{label="Bot server", },
-	stringz{label="Unique account name", },
-	stringz{label="Current database", },
+	uint32("Bot number"),
+	stringz("Bot name"),
+	stringz("Bot channel"),
+	uint32("Bot server"),
+	stringz("Unique account name"),
+	stringz("Current database"),
 },
 --[[
     Message ID:      0x08
@@ -1502,7 +1502,7 @@ SPacketDescription = {
 
 ]]
 [PACKET_LOGON] = {
-	uint32{label="Result", },
+	uint32("Result"),
 },
 --[[
     Message ID:      0x0B
@@ -1528,10 +1528,10 @@ SPacketDescription = {
 
 ]]
 [PACKET_BOTNETCHAT] = {
-	uint32{label="Command", },
-	uint32{label="Action", },
-	uint32{label="ID of source bot", },
-	stringz{label="Message", },
+	uint32("Command"),
+	uint32("Action"),
+	uint32("ID of source bot"),
+	stringz("Message"),
 },
 --[[
     Message ID:      0x0D
@@ -1588,9 +1588,9 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTLOGON] = {
-	uint32{label="Status", },
-	uint8{label="[32] Salt", },
-	uint8{label="[32] Server Key", },
+	uint32("Status"),
+	uint8("[32] Salt"),
+	uint8("[32] Server Key"),
 },
 --[[
     Message ID:    0x77
@@ -1616,8 +1616,8 @@ SPacketDescription = {
 
 ]]
 [SID_CLANINVITATION] = {
-	uint32{label="Cookie", },
-	uint8{label="Result", },
+	uint32("Cookie"),
+	uint8("Result"),
 },
 --[[
     Message ID:      0x09
@@ -1643,9 +1643,9 @@ SPacketDescription = {
 ]]
 [BNLS_VERSIONCHECK] = {
 	uint32{label="Success If Success is TRUE:", desc=Descs.YesNo},
-	uint32{label="Version.", },
-	uint32{label="Checksum.", },
-	stringz{label="Version check stat string.", },
+	uint32("Version."),
+	uint32("Checksum."),
+	stringz("Version check stat string."),
 },
 --[[
     Message ID:    0x7D
@@ -1684,12 +1684,12 @@ SPacketDescription = {
 
 ]]
 [SID_CLANMEMBERLIST] = {
-	uint32{label="Cookie", },
-	uint8{label="Number of Members", },
-	stringz{label="Username", },
-	uint8{label="Rank", },
-	uint8{label="Online Status", },
-	stringz{label="Location", },
+	uint32("Cookie"),
+	uint8("Number of Members"),
+	stringz("Username"),
+	uint8("Rank"),
+	uint8("Online Status"),
+	stringz("Location"),
 },
 --[[
     Message ID:      0x58
@@ -1717,8 +1717,8 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTUPGRADEPROOF] = {
-	uint32{label="Status", },
-	uint32{label="[5] Password proof", },
+	uint32("Status"),
+	uint32("[5] Password proof"),
 },
 --[[
     Message ID:    0x31
@@ -1804,8 +1804,8 @@ SPacketDescription = {
 
 ]]
 [D2GS_SETBYTEATTR] = {
-	uint8{label="Attribute", },
-	uint8{label="Amount", },
+	uint8("Attribute"),
+	uint8("Amount"),
 },
 --[[
     Message ID:    0x1E
@@ -1834,8 +1834,8 @@ SPacketDescription = {
 
 ]]
 [D2GS_SETWORDATTR] = {
-	uint8{label="Attribute", },
-	uint16{label="Amount", },
+	uint8("Attribute"),
+	uint16("Amount"),
 },
 --[[
     Message ID:    0x59
@@ -1882,7 +1882,7 @@ SPacketDescription = {
 
 ]]
 [SID_CREATEACCOUNT] = {
-	uint32{label="Result", },
+	uint32("Result"),
 },
 --[[
     Message ID:    0x07
@@ -1902,7 +1902,7 @@ SPacketDescription = {
 
 ]]
 [PACKET_USERLOGGINGOFF] = {
-	uint32{label="Bot id", },
+	uint32("Bot id"),
 },
 --[[
     Message ID:    0x10
@@ -1939,13 +1939,13 @@ SPacketDescription = {
 
 ]]
 [D2GS_CHARTOOBJ] = {
-	uint8{label="Unknown", },
-	uint32{label="Player ID", },
-	uint8{label="Movement Type", },
-	uint8{label="Destination Type", },
-	uint32{label="Object ID", },
-	uint16{label="X Coordinate", },
-	uint16{label="Y Coordinate", },
+	uint8("Unknown"),
+	uint32("Player ID"),
+	uint8("Movement Type"),
+	uint8("Destination Type"),
+	uint32("Object ID"),
+	uint16("X Coordinate"),
+	uint16("Y Coordinate"),
 },
 --[[
     Message ID:    0x79
@@ -1967,10 +1967,10 @@ SPacketDescription = {
 
 ]]
 [SID_CLANINVITATIONRESPONSE] = {
-	uint32{label="Cookie", },
-	uint32{label="Clan tag", },
-	stringz{label="Clan name", },
-	stringz{label="Inviter", },
+	uint32("Cookie"),
+	uint32("Clan tag"),
+	stringz("Clan name"),
+	stringz("Inviter"),
 },
 --[[
     Message ID:    0x17
@@ -2000,11 +2000,11 @@ SPacketDescription = {
 
 ]]
 [MCP_CHARLIST] = {
-	uint16{label="Number of characters requested", },
-	uint32{label="Number of characters that exist on this account", },
-	uint16{label="Number of characters returned", },
-	stringz{label="Character name", },
-	stringz{label="Character statstring", },
+	uint16("Number of characters requested"),
+	uint32("Number of characters that exist on this account"),
+	uint16("Number of characters returned"),
+	stringz("Character name"),
+	stringz("Character statstring"),
 },
 --[[
     Message ID:    0x3E
@@ -2046,13 +2046,13 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONREALMEX] = {
-	uint32{label="MCP Cookie", },
-	uint32{label="MCP Status", },
-	uint32{label="[2] MCP Chunk 1", },
-	uint32{label="IP", },
-	uint32{label="Port", },
-	uint32{label="[12] MCP Chunk 2", },
-	stringz{label="Battle.net unique name", },
+	uint32("MCP Cookie"),
+	uint32("MCP Status"),
+	uint32("[2] MCP Chunk 1"),
+	uint32("IP"),
+	uint32("Port"),
+	uint32("[12] MCP Chunk 2"),
+	stringz("Battle.net unique name"),
 },
 --[[
     Message ID:      0x11
@@ -2095,8 +2095,8 @@ SPacketDescription = {
 
 ]]
 [SID_GAMEPLAYERSEARCH] = {
-	uint8{label="Number of players", },
-	stringz{label="[] Player names", },
+	uint8("Number of players"),
+	stringz("[] Player names"),
 },
 --[[
     Message ID:    0x13
@@ -2147,10 +2147,10 @@ SPacketDescription = {
 
 ]]
 [PACKET_DATABASE] = {
-	uint32{label="command", },
-	stringz{label="usermask", },
-	stringz{label="flags", },
-	stringz{label="usermask", },
+	uint32("command"),
+	stringz("usermask"),
+	stringz("flags"),
+	stringz("usermask"),
 },
 --[[
     Message ID:    0xAF
@@ -2198,7 +2198,7 @@ SPacketDescription = {
 
 ]]
 [MCP_CHARCREATE] = {
-	uint32{label="Result", },
+	uint32("Result"),
 },
 --[[
     Message ID:    0x7A
@@ -2230,8 +2230,8 @@ SPacketDescription = {
 
 ]]
 [SID_CLANRANKCHANGE] = {
-	uint32{label="Cookie", },
-	uint8{label="Status", },
+	uint32("Cookie"),
+	uint8("Status"),
 },
 --[[
     Message ID:    0x35
@@ -2259,11 +2259,11 @@ SPacketDescription = {
 
 ]]
 [SID_PROFILE] = {
-	uint32{label="Cookie", },
-	uint8{label="Success", },
-	stringz{label="Profile\\Description value", },
-	stringz{label="Profile\\Location value", },
-	uint32{label="Clan Tag", },
+	uint32("Cookie"),
+	uint8("Success"),
+	stringz("Profile\\Description value"),
+	stringz("Profile\\Location value"),
+	uint32("Clan Tag"),
 },
 --[[
     Message ID:      0x2E
@@ -2330,30 +2330,30 @@ SPacketDescription = {
 
 ]]
 [SID_GETLADDERDATA] = {
-	uint32{label="Ladder type", },
-	uint32{label="League", },
-	uint32{label="Sort method", },
-	uint32{label="Starting rank", },
-	uint32{label="Number of ranks listed", },
-	uint32{label="Wins", },
-	uint32{label="Losses", },
-	uint32{label="Disconnects", },
-	uint32{label="Rating", },
-	uint32{label="Rank", },
-	uint32{label="Official wins", },
-	uint32{label="Official losses", },
-	uint32{label="Official disconnects", },
-	uint32{label="Official rating", },
-	uint32{label="Unknown", },
-	uint32{label="Official rank", },
-	uint32{label="Unknown", },
-	uint32{label="Unknown", },
-	uint32{label="Highest rating", },
-	uint32{label="Unknown", },
-	uint32{label="Season", },
-	wintime{label="Last game time", },
-	wintime{label="Official last game time", },
-	stringz{label="Name", },
+	uint32("Ladder type"),
+	uint32("League"),
+	uint32("Sort method"),
+	uint32("Starting rank"),
+	uint32("Number of ranks listed"),
+	uint32("Wins"),
+	uint32("Losses"),
+	uint32("Disconnects"),
+	uint32("Rating"),
+	uint32("Rank"),
+	uint32("Official wins"),
+	uint32("Official losses"),
+	uint32("Official disconnects"),
+	uint32("Official rating"),
+	uint32("Unknown"),
+	uint32("Official rank"),
+	uint32("Unknown"),
+	uint32("Unknown"),
+	uint32("Highest rating"),
+	uint32("Unknown"),
+	uint32("Season"),
+	wintime("Last game time"),
+	wintime("Official last game time"),
+	stringz("Name"),
 },
 --[[
     Message ID:    0x3D
@@ -2385,8 +2385,8 @@ SPacketDescription = {
 
 ]]
 [SID_CREATEACCOUNT2] = {
-	uint32{label="Status", },
-	stringz{label="Account name suggestion", },
+	uint32("Status"),
+	stringz("Account name suggestion"),
 },
 --[[
     Message ID:    0x68
@@ -2410,7 +2410,7 @@ SPacketDescription = {
 
 ]]
 [SID_FRIENDSREMOVE] = {
-	uint8{label="Entry Number", },
+	uint8("Entry Number"),
 },
 --[[
     Message ID:      0x7A
@@ -2437,7 +2437,7 @@ SPacketDescription = {
 
 ]]
 [D2GS_LOGONRESPONSE] = {
-	uint32{label="Unknown - Possible acceptance/request ID", },
+	uint32("Unknown - Possible acceptance/request ID"),
 },
 --[[
     Message ID:    0x09
@@ -2508,21 +2508,21 @@ SPacketDescription = {
 
 ]]
 [SID_GETADVLISTEX] = {
-	uint32{label="Number of games", },
-	uint32{label="Status", },
-	uint16{label="Game Type", },
-	uint16{label="Parameter", },
-	uint32{label="Language ID", },
-	uint16{label="Address Family", },
-	uint16{label="Port", },
-	uint32{label="Host's IP", },
-	uint32{label="sin_zero", },
-	uint32{label="sin_zero", },
-	uint32{label="Game Status", },
-	uint32{label="Elapsed time", },
-	stringz{label="Game name", },
-	stringz{label="Game password", },
-	stringz{label="Game statstring", },
+	uint32("Number of games"),
+	uint32("Status"),
+	uint16("Game Type"),
+	uint16("Parameter"),
+	uint32("Language ID"),
+	uint16("Address Family"),
+	uint16("Port"),
+	uint32("Host's IP"),
+	uint32("sin_zero"),
+	uint32("sin_zero"),
+	uint32("Game Status"),
+	uint32("Elapsed time"),
+	stringz("Game name"),
+	stringz("Game password"),
+	stringz("Game statstring"),
 },
 --[[
     Message ID:    0x19
@@ -2542,7 +2542,7 @@ SPacketDescription = {
 
 ]]
 [D2GS_SMALLGOLDPICKUP] = {
-	uint8{label="Amount", },
+	uint8("Amount"),
 },
 --[[
     Message ID:    0x15
@@ -2567,11 +2567,11 @@ SPacketDescription = {
 
 ]]
 [SID_CHECKAD] = {
-	uint32{label="Ad ID", },
-	uint32{label="File extension", },
-	wintime{label="Local file time", },
-	stringz{label="Filename", },
-	stringz{label="Link URL", },
+	uint32("Ad ID"),
+	uint32("File extension"),
+	wintime("Local file time"),
+	stringz("Filename"),
+	stringz("Link URL"),
 },
 --[[
     Message ID:      0x5C
@@ -2629,11 +2629,11 @@ SPacketDescription = {
 
 ]]
 [SID_QUERYREALMS2] = {
-	uint32{label="Unknown", },
-	uint32{label="Count", },
-	uint32{label="Unknown", },
-	stringz{label="Realm title", },
-	stringz{label="Realm description", },
+	uint32("Unknown"),
+	uint32("Count"),
+	uint32("Unknown"),
+	stringz("Realm title"),
+	stringz("Realm description"),
 },
 --[[
     Message ID:    0x70
@@ -2660,10 +2660,10 @@ SPacketDescription = {
 
 ]]
 [SID_CLANFINDCANDIDATES] = {
-	uint32{label="Cookie", },
-	uint8{label="Status", },
-	uint8{label="Number of potential candidates", },
-	stringz{label="[] Usernames", },
+	uint32("Cookie"),
+	uint8("Status"),
+	uint8("Number of potential candidates"),
+	stringz("[] Usernames"),
 },
 --[[
     Message ID:    0x71
@@ -2694,9 +2694,9 @@ SPacketDescription = {
 
 ]]
 [SID_CLANINVITEMULTIPLE] = {
-	uint32{label="Cookie", },
-	uint8{label="Result", },
-	stringz{label="[] Failed account names", },
+	uint32("Cookie"),
+	uint8("Result"),
+	stringz("[] Failed account names"),
 },
 --[[
     Message ID:    0x1D
@@ -2714,8 +2714,8 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONCHALLENGEEX] = {
-	uint32{label="UDP Token", },
-	uint32{label="Server Token", },
+	uint32("UDP Token"),
+	uint32("Server Token"),
 },
 --[[
     Message ID:    0x41
@@ -2736,8 +2736,8 @@ SPacketDescription = {
 
 ]]
 [SID_QUERYADURL] = {
-	uint32{label="Ad ID", },
-	stringz{label="Ad URL", },
+	uint32("Ad ID"),
+	stringz("Ad URL"),
 },
 --[[
     Message ID:      0x44
@@ -2870,52 +2870,52 @@ SPacketDescription = {
 
 ]]
 [SID_WARCRAFTGENERAL] = {
-	uint8{label="Subcommand ID", },
-	uint32{label="Cookie", },
-	uint32{label="Icon ID", },
-	uint8{label="Number of ladder records to read; this will be between 0", },
-	uint32{label="Ladder type; valid types are 'SOLO', 'TEAM', or", },
-	uint16{label="Number of wins", },
-	uint16{label="Number of losses", },
-	uint8{label="Level", },
-	uint8{label="Hours until XP decay, if applicable*", },
-	uint16{label="Experience", },
-	uint32{label="Rank", },
-	uint8{label="Number of race records to read; this will be 5 for WAR3", },
-	uint16{label="Wins", },
-	uint16{label="Losses", },
-	uint8{label="Number of team records to read.", },
-	uint32{label="Type of team; valid types are '2VS2', '3VS3', and", },
-	uint16{label="Number of wins", },
-	uint16{label="Number of losses", },
-	uint8{label="Level", },
-	uint8{label="Hours until XP decay, if applicable*", },
-	uint16{label="Experience", },
-	uint32{label="Rank", },
-	wintime{label="Time of last game played", },
-	uint8{label="Number of partners", },
-	stringz{label="[] Names of partners", },
-	uint32{label="Cookie", },
-	uint8{label="Number of ladder records to read; this will be between 0", },
-	uint32{label="Ladder type; valid types are 'SOLO', 'TEAM', or", },
-	uint16{label="Number of wins", },
-	uint16{label="Number of losses", },
-	uint8{label="Level", },
-	uint8{label="Hours until XP decay, if applicable*", },
-	uint16{label="Experience", },
-	uint32{label="Rank", },
-	uint8{label="Number of race records to read; this will be 5 for WAR3", },
-	uint16{label="Wins", },
-	uint16{label="Losses", },
-	uint32{label="Cookie", },
-	uint32{label="Unknown", },
-	uint8{label="Tiers", },
-	uint8{label="Count", },
-	uint32{label="Icon", },
-	uint32{label="Name", },
-	uint8{label="Race", },
-	uint16{label="Wins required", },
-	uint8{label="Unknown", },
+	uint8("Subcommand ID"),
+	uint32("Cookie"),
+	uint32("Icon ID"),
+	uint8("Number of ladder records to read; this will be between 0"),
+	uint32("Ladder type; valid types are 'SOLO', 'TEAM', or"),
+	uint16("Number of wins"),
+	uint16("Number of losses"),
+	uint8("Level"),
+	uint8("Hours until XP decay, if applicable*"),
+	uint16("Experience"),
+	uint32("Rank"),
+	uint8("Number of race records to read; this will be 5 for WAR3"),
+	uint16("Wins"),
+	uint16("Losses"),
+	uint8("Number of team records to read."),
+	uint32("Type of team; valid types are '2VS2', '3VS3', and"),
+	uint16("Number of wins"),
+	uint16("Number of losses"),
+	uint8("Level"),
+	uint8("Hours until XP decay, if applicable*"),
+	uint16("Experience"),
+	uint32("Rank"),
+	wintime("Time of last game played"),
+	uint8("Number of partners"),
+	stringz("[] Names of partners"),
+	uint32("Cookie"),
+	uint8("Number of ladder records to read; this will be between 0"),
+	uint32("Ladder type; valid types are 'SOLO', 'TEAM', or"),
+	uint16("Number of wins"),
+	uint16("Number of losses"),
+	uint8("Level"),
+	uint8("Hours until XP decay, if applicable*"),
+	uint16("Experience"),
+	uint32("Rank"),
+	uint8("Number of race records to read; this will be 5 for WAR3"),
+	uint16("Wins"),
+	uint16("Losses"),
+	uint32("Cookie"),
+	uint32("Unknown"),
+	uint8("Tiers"),
+	uint8("Count"),
+	uint32("Icon"),
+	uint32("Name"),
+	uint8("Race"),
+	uint16("Wins required"),
+	uint8("Unknown"),
 },
 --[[
     Message ID:    0x7E
@@ -2932,7 +2932,7 @@ SPacketDescription = {
 
 ]]
 [SID_CLANMEMBERREMOVED] = {
-	stringz{label="Clan member name", },
+	stringz("Clan member name"),
 },
 --[[
     Message ID:    0x1F
@@ -2955,8 +2955,8 @@ SPacketDescription = {
 
 ]]
 [D2GS_SETDWORDATTR] = {
-	uint8{label="Attribute - D2GS_SETWORDATTR", },
-	uint32{label="Amount", },
+	uint8("Attribute - D2GS_SETWORDATTR"),
+	uint32("Amount"),
 },
 --[[
     Message ID:    0x74
@@ -2980,8 +2980,8 @@ SPacketDescription = {
 
 ]]
 [SID_CLANMAKECHIEFTAIN] = {
-	uint32{label="Cookie", },
-	uint8{label="Status", },
+	uint32("Cookie"),
+	uint8("Status"),
 },
 --[[
     Message ID:    0x76
@@ -3001,7 +3001,7 @@ SPacketDescription = {
 
 ]]
 [SID_CLANQUITNOTIFY] = {
-	uint8{label="Status", },
+	uint8("Status"),
 },
 --[[
     Message ID:    0x0F
@@ -3164,14 +3164,14 @@ SPacketDescription = {
 
 ]]
 [SID_CHATEVENT] = {
-	uint32{label="Event ID", },
-	uint32{label="User's Flags", },
-	uint32{label="Ping", },
-	uint32{label="IP Address", },
-	uint32{label="Account number", },
-	uint32{label="Registration Authority", },
-	stringz{label="Username", },
-	stringz{label="Text", },
+	uint32("Event ID"),
+	uint32("User's Flags"),
+	uint32("Ping"),
+	uint32("IP Address"),
+	uint32("Account number"),
+	uint32("Registration Authority"),
+	stringz("Username"),
+	stringz("Text"),
 },
 --[[
     Message ID:    0x14
@@ -3188,7 +3188,7 @@ SPacketDescription = {
 
 ]]
 [MCP_CREATEQUEUE] = {
-	uint32{label="Position", },
+	uint32("Position"),
 },
 --[[
     Message ID:    0x02
@@ -3209,7 +3209,7 @@ SPacketDescription = {
 
 ]]
 [PACKET_STATSUPDATE] = {
-	uint32{label="Result", },
+	uint32("Result"),
 },
 --[[
     Message ID:      0x57
@@ -3237,8 +3237,8 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTUPGRADE] = {
-	uint32{label="Status", },
-	uint32{label="Server Token", },
+	uint32("Status"),
+	uint32("Server Token"),
 },
 --[[
     Message ID:    0x00
@@ -3282,7 +3282,7 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONRESPONSE] = {
-	uint32{label="Result", },
+	uint32("Result"),
 },
 --[[
     Message ID:    0x3C
@@ -3309,7 +3309,7 @@ SPacketDescription = {
 
 ]]
 [SID_CHECKDATAFILE2] = {
-	uint32{label="Result", },
+	uint32("Result"),
 },
 --[[
     Message ID:    0x7C
@@ -3330,9 +3330,9 @@ SPacketDescription = {
 
 ]]
 [SID_CLANMOTD] = {
-	uint32{label="Cookie", },
-	uint32{label="Unknown", },
-	stringz{label="MOTD", },
+	uint32("Cookie"),
+	uint32("Unknown"),
+	stringz("MOTD"),
 },
 --[[
     Message ID:      0x34
@@ -3366,11 +3366,11 @@ SPacketDescription = {
 
 ]]
 [SID_QUERYREALMS] = {
-	uint32{label="Unknown", },
-	uint32{label="Count", },
-	uint32{label="Unknown", },
-	stringz{label="Realm title", },
-	stringz{label="Realm description", },
+	uint32("Unknown"),
+	uint32("Count"),
+	uint32("Unknown"),
+	stringz("Realm title"),
+	stringz("Realm description"),
 },
 --[[
     Message ID:    0x12
@@ -3391,8 +3391,8 @@ SPacketDescription = {
 
 ]]
 [MCP_MOTD] = {
-	uint8{label="Unknown", },
-	stringz{label="MOTD", },
+	uint8("Unknown"),
+	stringz("MOTD"),
 },
 --[[
     Message ID:    0x02
@@ -3412,7 +3412,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_LOGONCHALLENGE] = {
-	uint32{label="[8] Data for SID_AUTH_ACCOUNTLOGON", },
+	uint32("[8] Data for SID_AUTH_ACCOUNTLOGON"),
 },
 --[[
     Message ID:    0x54
@@ -3443,9 +3443,9 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTLOGONPROOF] = {
-	uint32{label="Status", },
-	uint8{label="[20] Server Password Proof", },
-	stringz{label="Additional information", },
+	uint32("Status"),
+	uint8("[20] Server Password Proof"),
+	stringz("Additional information"),
 },
 --[[
     Message ID:      0x3F
@@ -3471,9 +3471,9 @@ SPacketDescription = {
 
 ]]
 [SID_STARTVERSIONING2] = {
-	wintime{label="MPQ Filetime", },
-	stringz{label="MPQ Filename", },
-	stringz{label="ValueString", },
+	wintime("MPQ Filetime"),
+	stringz("MPQ Filename"),
+	stringz("ValueString"),
 },
 --[[
     Message ID:    0x07
@@ -3501,7 +3501,7 @@ SPacketDescription = {
 
 ]]
 [MCP_CHARLOGON] = {
-	uint32{label="Result", },
+	uint32("Result"),
 },
 --[[
     Message ID:    0x18
@@ -3531,7 +3531,7 @@ SPacketDescription = {
 
 ]]
 [MCP_CHARUPGRADE] = {
-	uint32{label="Result", },
+	uint32("Result"),
 },
 --[[
     Message ID:    0x05
@@ -3561,10 +3561,10 @@ SPacketDescription = {
 
 ]]
 [SID_CLIENTID] = {
-	uint32{label="Registration Version", },
-	uint32{label="Registration Authority", },
-	uint32{label="Account Number", },
-	uint32{label="Registration Token", },
+	uint32("Registration Version"),
+	uint32("Registration Authority"),
+	uint32("Account Number"),
+	uint32("Registration Token"),
 },
 --[[
     Message ID:    0x19
@@ -3588,9 +3588,9 @@ SPacketDescription = {
 
 ]]
 [SID_MESSAGEBOX] = {
-	uint32{label="Style", },
-	stringz{label="Text", },
-	stringz{label="Caption", },
+	uint32("Style"),
+	stringz("Text"),
+	stringz("Caption"),
 },
 --[[
     Message ID:      0x07
@@ -3634,7 +3634,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_LOGONPROOF] = {
-	uint32{label="[5] Data for SID_AUTH_ACCOUNTLOGONPROOF", },
+	uint32("[5] Data for SID_AUTH_ACCOUNTLOGONPROOF"),
 },
 --[[
     Message ID:    0x03
@@ -3666,10 +3666,10 @@ SPacketDescription = {
 
 ]]
 [MCP_CREATEGAME] = {
-	uint16{label="Request Id", },
-	uint16{label="Game token", },
-	uint16{label="Unknown", },
-	uint32{label="Result", },
+	uint16("Request Id"),
+	uint16("Game token"),
+	uint16("Unknown"),
+	uint32("Result"),
 },
 --[[
     Message ID:    0x11
@@ -3778,19 +3778,19 @@ SPacketDescription = {
 
 ]]
 [MCP_REQUESTLADDERDATA] = {
-	uint8{label="Ladder type", },
-	uint16{label="Total response size", },
-	uint16{label="Current message size", },
-	uint16{label="Total size of unreceived messages", },
-	uint16{label="Rank of first entry", },
-	uint16{label="Unknown", },
-	uint32{label="Number of entries", },
-	uint32{label="Unknown", },
-	uint64{label="Character experience", },
-	uint8{label="Character Flags", },
-	uint8{label="Character title", },
-	uint16{label="Character level", },
-	uint8{label="[16] Character name", },
+	uint8("Ladder type"),
+	uint16("Total response size"),
+	uint16("Current message size"),
+	uint16("Total size of unreceived messages"),
+	uint16("Rank of first entry"),
+	uint16("Unknown"),
+	uint32("Number of entries"),
+	uint32("Unknown"),
+	uint64("Character experience"),
+	uint8("Character Flags"),
+	uint8("Character title"),
+	uint16("Character level"),
+	uint8("[16] Character name"),
 },
 --[[
     Message ID:      0x12
@@ -3819,7 +3819,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_RESERVESERVERSLOTS] = {
-	uint32{label="Number of slots reserved", },
+	uint32("Number of slots reserved"),
 },
 --[[
     Message ID:      0x0C
@@ -3849,11 +3849,11 @@ SPacketDescription = {
 
 ]]
 [BNLS_CDKEY_EX] = {
-	uint32{label="Cookie.", },
-	uint8{label="Number of CD-keys requested.", },
-	uint8{label="Number of", },
-	uint32{label="Bit mask .For each successful", },
-	uint32{label="Client session key.", },
+	uint32("Cookie."),
+	uint8("Number of CD-keys requested."),
+	uint8("Number of"),
+	uint32("Bit mask .For each successful"),
+	uint32("Client session key."),
 	uint32{label="CD-key data.", num=9},
 },
 --[[
@@ -3879,7 +3879,7 @@ SPacketDescription = {
 
 ]]
 [SID_GETCHANNELLIST] = {
-	stringz{label="[] Channel names, each terminated by a null string.", },
+	stringz("[] Channel names, each terminated by a null string."),
 },
 --[[
     Message ID:      0x0D
@@ -3899,8 +3899,8 @@ SPacketDescription = {
 
 ]]
 [PACKET_ACCOUNT] = {
-	uint32{label="Command", },
-	uint32{label="Result", },
+	uint32("Command"),
+	uint32("Result"),
 },
 --[[
     Message ID:    0x05
@@ -3941,12 +3941,12 @@ SPacketDescription = {
 
 ]]
 [MCP_GAMELIST] = {
-	uint16{label="Request Id", },
-	uint32{label="Index", },
-	uint8{label="Number of players in game", },
-	uint32{label="Status", },
-	stringz{label="Game name", },
-	stringz{label="Game description", },
+	uint16("Request Id"),
+	uint32("Index"),
+	uint8("Number of players in game"),
+	uint32("Status"),
+	stringz("Game name"),
+	stringz("Game description"),
 },
 --[[
     Message ID:      0x18
@@ -3970,11 +3970,11 @@ SPacketDescription = {
 ]]
 [BNLS_VERSIONCHECKEX] = {
 	uint32{label="Success*", desc=Descs.YesNo},
-	uint32{label="Version.", },
-	uint32{label="Checksum.", },
-	stringz{label="Version check", },
-	uint32{label="Cookie.", },
-	uint32{label="The latest version code for this", },
+	uint32("Version."),
+	uint32("Checksum."),
+	stringz("Version check"),
+	uint32("Cookie."),
+	uint32("The latest version code for this"),
 },
 --[[
     Message ID:    0x00
@@ -4026,7 +4026,7 @@ SPacketDescription = {
 
 ]]
 [MCP_STARTUP] = {
-	uint32{label="Result", },
+	uint32("Result"),
 },
 --[[
     Message ID:    0x78
@@ -4051,8 +4051,8 @@ SPacketDescription = {
 
 ]]
 [SID_CLANREMOVEMEMBER] = {
-	uint32{label="Cookie", },
-	uint8{label="Status", },
+	uint32("Cookie"),
+	uint8("Status"),
 },
 --[[
     Message ID:    0x3A
@@ -4081,8 +4081,8 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONRESPONSE2] = {
-	uint32{label="Result", },
-	stringz{label="Reason", },
+	uint32("Result"),
+	stringz("Reason"),
 },
 --[[
     Message ID:    0x56
@@ -4109,8 +4109,8 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCHANGEPROOF] = {
-	uint32{label="Status code", },
-	uint8{label="[20] Server password proof for old password", },
+	uint32("Status code"),
+	uint8("[20] Server password proof for old password"),
 },
 --[[
     Message ID:      0x0B
@@ -4132,7 +4132,7 @@ SPacketDescription = {
 ]]
 [BNLS_HASHDATA] = {
 	uint32{label="The data hash.Optional:", num=5},
-	uint32{label="Cookie. Same as the cookie", },
+	uint32("Cookie. Same as the cookie"),
 },
 --[[
     Message ID:    0x66
@@ -4169,11 +4169,11 @@ SPacketDescription = {
 
 ]]
 [SID_FRIENDSUPDATE] = {
-	uint8{label="Entry number", },
-	uint8{label="Friend Location", },
-	uint8{label="Friend Status", },
-	uint32{label="ProductID", },
-	stringz{label="Location", },
+	uint8("Entry number"),
+	uint8("Friend Location"),
+	uint8("Friend Status"),
+	uint32("ProductID"),
+	stringz("Location"),
 },
 --[[
     Message ID:      0x0A
@@ -4207,7 +4207,7 @@ SPacketDescription = {
 
 ]]
 [PACKET_BOTNETVERSION] = {
-	uint32{label="Server Version", },
+	uint32("Server Version"),
 },
 --[[
     Message ID:      0x18
@@ -4246,10 +4246,10 @@ SPacketDescription = {
 
 ]]
 [SID_REGISTRY] = {
-	uint32{label="Cookie", },
-	uint32{label="HKEY", },
-	stringz{label="Registry path", },
-	stringz{label="Registry key", },
+	uint32("Cookie"),
+	uint32("HKEY"),
+	stringz("Registry path"),
+	stringz("Registry key"),
 },
 --[[
     Message ID:    0x2F
@@ -4268,7 +4268,7 @@ SPacketDescription = {
 
 ]]
 [SID_FINDLADDERUSER] = {
-	uint32{label="Rank. Zero-based. 0xFFFFFFFF == Not ranked.", },
+	uint32("Rank. Zero-based. 0xFFFFFFFF == Not ranked."),
 },
 --[[
     Message ID:    0x81
@@ -4292,9 +4292,9 @@ SPacketDescription = {
 
 ]]
 [SID_CLANMEMBERRANKCHANGE] = {
-	uint8{label="Old rank", },
-	uint8{label="New rank", },
-	stringz{label="Clan member who changed your rank", },
+	uint8("Old rank"),
+	uint8("New rank"),
+	stringz("Clan member who changed your rank"),
 },
 --[[
     Message ID:      0x0E
@@ -4320,7 +4320,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_AUTHORIZE] = {
-	uint32{label="Server code.", },
+	uint32("Server code."),
 },
 --[[
     Message ID:      0x32
@@ -4350,7 +4350,7 @@ SPacketDescription = {
 
 ]]
 [SID_CHECKDATAFILE] = {
-	uint32{label="Status", },
+	uint32("Status"),
 },
 --[[
     Message ID:    0x73
@@ -4373,8 +4373,8 @@ SPacketDescription = {
 
 ]]
 [SID_CLANDISBAND] = {
-	uint32{label="Cookie", },
-	uint8{label="Result", },
+	uint32("Cookie"),
+	uint8("Result"),
 },
 --[[
     Message ID:      0x13
@@ -4399,7 +4399,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_SERVERLOGONCHALLENGE] = {
-	uint32{label="Slot index.", },
+	uint32("Slot index."),
 	uint32{label="Data for server's SID_AUTH_ACCOUNTLOGON", num=16},
 },
 --[[
@@ -4433,9 +4433,9 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCHANGE] = {
-	uint32{label="Status", },
-	uint8{label="[32] Salt", },
-	uint8{label="[32] Server key", },
+	uint32("Status"),
+	uint8("[32] Salt"),
+	uint8("[32] Server key"),
 },
 --[[
     Message ID:    0x0A
@@ -4466,7 +4466,7 @@ SPacketDescription = {
 
 ]]
 [MCP_CHARDELETE] = {
-	uint32{label="Result", },
+	uint32("Result"),
 },
 --[[
     Message ID:    0x07
@@ -4497,8 +4497,8 @@ SPacketDescription = {
 
 ]]
 [SID_REPORTVERSION] = {
-	uint32{label="Result", },
-	stringz{label="Patch path", },
+	uint32("Result"),
+	stringz("Patch path"),
 },
 --[[
     Message ID:    0x5E
@@ -4589,35 +4589,35 @@ SPacketDescription = {
 
 ]]
 [SID_WARDEN] = {
-	bytes{label="Encrypted Packet", },
-	uint8{label="Packet Code", },
-	uint32{label="[4] MD5 Hash of the current Module", },
-	uint32{label="[4] Decryption key for Module", },
-	uint32{label="Length of Module", },
-	uint16{label="Length of data", },
-	bytes{label="Data", },
-	uint8{label="String Length", },
-	bytes{label="String Data", },
-	uint8{label="Check ID", },
-	uint8{label="String Index", },
-	uint32{label="Address", },
-	uint8{label="Length to Read", },
-	uint32{label="Unknown", },
-	uint32{label="[5] SHA1", },
-	uint32{label="Address", },
-	uint8{label="Length to Read", },
-	uint8{label="IDXor", },
-	uint16{label="Length of data", },
-	uint32{label="Checksum of data", },
-	uint8{label="Unknown", },
-	uint8{label="Unknown", },
-	uint8{label="Unknown", },
-	stringz{label="Library Name", },
-	uint32{label="Funct1", },
-	uint32{label="Funct2", },
-	uint32{label="Funct3", },
-	uint32{label="Funct4", },
-	uint32{label="[5] Unknown", },
+	bytes("Encrypted Packet"),
+	uint8("Packet Code"),
+	uint32("[4] MD5 Hash of the current Module"),
+	uint32("[4] Decryption key for Module"),
+	uint32("Length of Module"),
+	uint16("Length of data"),
+	bytes("Data"),
+	uint8("String Length"),
+	bytes("String Data"),
+	uint8("Check ID"),
+	uint8("String Index"),
+	uint32("Address"),
+	uint8("Length to Read"),
+	uint32("Unknown"),
+	uint32("[5] SHA1"),
+	uint32("Address"),
+	uint8("Length to Read"),
+	uint8("IDXor"),
+	uint16("Length of data"),
+	uint32("Checksum of data"),
+	uint8("Unknown"),
+	uint8("Unknown"),
+	uint8("Unknown"),
+	stringz("Library Name"),
+	uint32("Funct1"),
+	uint32("Funct2"),
+	uint32("Funct3"),
+	uint32("Funct4"),
+	uint32("[5] Unknown"),
 },
 --[[
     Message ID:      0x4E
@@ -4684,16 +4684,16 @@ SPacketDescription = {
 
 ]]
 [SID_TOURNAMENT] = {
-	uint8{label="Unknown", },
-	uint8{label="Unknown, maybe number of non-null strings sent?", },
-	stringz{label="Description", },
-	stringz{label="Unknown", },
-	stringz{label="Website", },
-	uint32{label="Unknown", },
-	stringz{label="Name", },
-	stringz{label="Unknown", },
-	stringz{label="Unknown", },
-	stringz{label="Unknown", },
+	uint8("Unknown"),
+	uint8("Unknown, maybe number of non-null strings sent?"),
+	stringz("Description"),
+	stringz("Unknown"),
+	stringz("Website"),
+	uint32("Unknown"),
+	stringz("Name"),
+	stringz("Unknown"),
+	stringz("Unknown"),
+	stringz("Unknown"),
 	uint32{label="Unknown", num=5},
 },
 --[[
@@ -4729,6 +4729,6 @@ SPacketDescription = {
 
 ]]
 [D2GS_UNIQUEEVENTS] = {
-	uint8{label="EventId // see below,", },
+	uint8("EventId // see below,"),
 },
 }
