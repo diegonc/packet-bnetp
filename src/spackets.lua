@@ -1,601 +1,758 @@
--- Packets from server to client
 SPacketDescription = {
-	[SID_AUTH_INFO] = {
-		WProtoField.uint32("","Logon Type",base.DEC, {
-			[0x00] = "Broken SHA-1 (STAR/SEXP/D2DV/D2XP)",
-			[0x01] = "NLS version 1 (War3Beta)",
-			[0x02] = "NLS Version 2 (WAR3/W3XP)",
-		}),
-		WProtoField.uint32("","Server Token",base.HEX),
-		WProtoField.uint32("","UDPValue",base.HEX),
-		WProtoField.filetime("","MPQ Filetime",base.HEX),
-		WProtoField.stringz("","IX86 Filename"),
-		WProtoField.stringz("","Value String"),
-	},
-	[SID_NULL] = {},
-	[SID_SERVERLIST] = {
-		WProtoField.ipv4{label="Server version", big_endian=false},
-		WProtoField.stringz("","[] Server list"),
-	},
-	[SID_CLIENTID] = {
-		WProtoField.uint32("","Registration Version"),
-		WProtoField.uint32("","Registration Authority"),
-		WProtoField.uint32("","Account Number"),
-		WProtoField.uint32("","Registration Token"),
-	},
-	[SID_STARTVERSIONING] = {
-		WProtoField.filetime("","MPQ Filetime"),
-		WProtoField.stringz("","MPQ Filename"),
-		WProtoField.stringz("","ValueString"),
-	},
-	[SID_REPORTVERSION] = {
-		WProtoField.uint32("","Result"),
-		WProtoField.stringz("","Patch path"),
-	},
-	[SID_STARTADVEX] = {
-		WProtoField.uint32("","Status"),
-	},
-
-	[SID_GETADVLISTEX] = {
-		WProtoField.uint32{
-			label="Number of games",
-			key="games",
-			display=base.DEC,
-		},
-		-- TODO: if count is 0
-		WProtoField.when{
-			condition=function(self, state) return state.packet.games == 0 end,
-			block = {
-				WProtoField.uint32("","Game Status", base.DEC, {
-					[0] = "OK",
-					[1] = "Game doesn't exist",
-					[2] = "Incorrect password",
-					[3] = "Game full",
-					[4] = "Game already started",
-					[6] = "Too many server requests",
-				}),
-			}
-		},
-		WProtoField.when{
-			condition=function(self, state) return state.packet.games > 0 end,
-			block = {
-				WProtoField.iterator{
-					label="Game Info",
-					refkey="games",
-					repeated={
-						WProtoField.uint16("","Game Type", base.HEX, {
-							[0x02] = "Melee",
-							[0x03] = "Free for all",
-							[0x04] = "one vs one",
-							[0x05] = "CTF",
-							[0x06] = "Greed",
-							[0x07] = "Slaughter",
-							[0x08] = "Sudden Death",
-							[0x09] = "Ladder",
-							[0x10] = "Iron man ladder",
-							[0x0A] = "Use Map Settings",
-							[0x0B] = "Team Melee",
-							[0x0C] = "Team FFA",
-							[0x0D] = "Team CTF",
-							[0x0F] = "Top vs Bottom",
-						}),
-						WProtoField.uint16("","Parameter"),
-						WProtoField.uint32("","Unknown", base.HEX),
-						WProtoField.uint16("","Address Family (Always AF_INET)", base.DEC, {
-							[2] = "AF_INET",
-						}),
-						WProtoField.uint16{label="Port", big_endian=true},
-						WProtoField.ipv4("","Host's IP"),
-						WProtoField.uint32("","sin_zero (0)"),
-						WProtoField.uint32("","sin_zero (0)"),
-						WProtoField.uint32("","Game Status", base.DEC, {
-							[0] = "OK",
-							[1] = "Game doesn't exist",
-							[2] = "Incorrect password",
-							[3] = "Game full",
-							[4] = "Game already started",
-							[6] = "Too many server requests",
-						}),
-						WProtoField.uint32("","Elapsed time (in seconds)"),
-						WProtoField.stringz("","Game name"),
-						WProtoField.stringz("","Game password"),
-						WProtoField.stringz("","Game statstring"),
-					},
-				},
-			},
-		},
-	},
-	[SID_ENTERCHAT] = {
-		WProtoField.stringz("","Unique name"),
-		WProtoField.stringz("","Statstring"),
-		WProtoField.stringz("","Account name"),
-	},
-	[SID_GETCHANNELLIST] = {
-		WProtoField.iterator{
-			alias="none",
-			condition = function(self, state) return state.packet.chan ~="" end,
-			repeated = {
-				WProtoField.stringz{label="Channel name", key="chan"},
-			}
-		}
-	},
-	[SID_CHATEVENT] = {
-		WProtoField.uint32("","Event ID", base.HEX, {
-			[0x01] = "EID_USERSHOW",
-			[0x02] = "EID_USERJOIN",
-			[0x03] = "EID_USERLEAVE",
-			[0x04] = "EID_WHISPERRECEIVED",
-			[0x06] = "EID_BROADCAST",
-			[0x05] = "EID_USERTALK",
-			[0x07] = "EID_CHANNEL",
-			[0x09] = "EID_USERUPDATE",
-			[0x0A] = "EID_WHISPERSENT",
-			[0x0D] = "EID_CHANNELFULL",
-			[0x0E] = "EID_CHANNELDOESNOTEXIST",
-			[0x0F] = "EID_CHANNELRESTRICTED",
-			[0x12] = "EID_INFO",
-			[0x13] = "EID_ERROR",
-			[0x17] = "EID_EMOTE",
-		}),
-		WProtoField.uint32("","User's Flags"),
-		WProtoField.uint32("","Ping"),
-		WProtoField.uint32("","IP Address (Defunct)"),
-		WProtoField.uint32("","Account number (Defunct)", base.HEX),
-		WProtoField.uint32("","Registration Authority (Defunct)", base.HEX),
-		WProtoField.stringz("","Username"),
-		WProtoField.stringz("","Text"),
-	},
-	[SID_FLOODDETECTED] = {},
-	[SID_CHECKAD] = {
-		WProtoField.uint32("","Ad ID"),
-		WProtoField.uint32("","File extension"),
-		WProtoField.filetime("","Local file time"),
-		WProtoField.stringz("","Filename"),
-		WProtoField.stringz("","Link URL"),
-	},
-	[SID_REGISTRY] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint32("","HKEY"),
-		WProtoField.stringz("","Registry path"),
-		WProtoField.stringz("","Registry key"),
-	},
-	[SID_MESSAGEBOX] = {
-		WProtoField.uint32("","Style"),
-		WProtoField.stringz("","Text"),
-		WProtoField.stringz("","Caption"),
-	},
-	[SID_STARTADVEX3] = {
-		WProtoField.uint32("","Status"),
-	},
-	[SID_LOGONCHALLENGEEX] = {
-		WProtoField.uint32("","UDP Token"),
-		WProtoField.uint32("","Server Token"),
-	},
-	[SID_PING] = {
-		WProtoField.uint32("","Ping Value", base.HEX),
-	},
-	[SID_READUSERDATA] = {
-		WProtoField.uint32("","Number of accounts"),
-		WProtoField.uint32("","Number of keys"),
-		WProtoField.uint32("","Request ID"),
-		WProtoField.stringz("","[TODO: array] Requested Key Values"),
-	},
-	[SID_LOGONCHALLENGE] = {
-		WProtoField.uint32("","Server Token"),
-	},
-	[SID_LOGONRESPONSE] = {
-		WProtoField.uint32("","Result"),
-	},
-	[SID_CREATEACCOUNT] = {		-- 0x2A
-		WProtoField.uint32("","Result", base.DEC, {
-			[0] = "Fail",
-			[1] = "Success",
-		}),
-	},
-	[SID_GETICONDATA] = {
-		WProtoField.filetime("","Filetime"),
-		WProtoField.stringz("","Filename"),
-	},
-	[SID_GETFILETIME] = {
-		WProtoField.uint32("","Request ID"),
-		WProtoField.uint32("","Unknown"),
-		WProtoField.filetime("","Last update time"),
-		WProtoField.stringz("","Filename"),
-	},
-	[SID_QUERYREALMS] = {
-		WProtoField.uint32("","Unknown"),
-		WProtoField.uint32("","Count"),
-	},
-	[SID_PROFILE] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint8("","Success"),
-		WProtoField.stringz("","ProfileDescription value"),
-		WProtoField.stringz("","ProfileLocation value"),
-		WProtoField.uint32("","Clan Tag"),
-	},
-	[SID_CDKEY2] = {
-		WProtoField.uint32("","Result"),
-		WProtoField.stringz("","Key owner"),
-	},
-	[SID_LOGONRESPONSE2] = {
-		WProtoField.uint32("","Result", base.HEX, {
-			[0x00] = "Login successful",
-			[0x01] = "Account does not exist",
-			[0x02] = "Invalid password",
-			-- [0x06] = "Account closed"	-- TODO
-		}),
-		-- WProtoField.stringz("","Reason"), -- TODO: present only on 0x06?
-	},
-	[SID_CHECKDATAFILE2] = {
-		WProtoField.uint32("","Result"),
-	},
-	[SID_CREATEACCOUNT2] = { 	-- 0x3D
-		WProtoField.uint32("","Result", base.DEC, {
-			[0x00] = "Account created",
-			[0x02] = "Name contained invalid characters",
-			[0x03] = "Name contained a banned word",
-			[0x04] = "Account already exists",
-			[0x06] = "Name did not contain enough alphanumeric characters",
-		}),
-		WProtoField.stringz("","Account name suggestion"),
-	},	
-	[SID_NEWS_INFO] = {
-		WProtoField.uint8("","Number of entries"),
-		WProtoField.uint32("","Last logon timestamp"),
-		WProtoField.uint32("","Oldest news timestamp"),
-		WProtoField.uint32("","Newest news timestamp"),
-	},
-	[SID_OPTIONALWORK] = {
-		WProtoField.stringz("","MPQ Filename"),
-	},
-	[SID_REQUIREDWORK] = {
-		WProtoField.stringz("","ExtraWork MPQ FileName"),
-	},
-	[SID_TOURNAMENT] = {
-		WProtoField.uint8("","Unknown"),
-		WProtoField.uint8("","Unknown, maybe number of non-null strings sent?"),
-		WProtoField.stringz("","Description"),
-		WProtoField.stringz("","Unknown"),
-		WProtoField.stringz("","Website"),
-		WProtoField.uint32("","Unknown"),
-		WProtoField.stringz("","Name"),
-		WProtoField.stringz("","Unknown"),
-		WProtoField.stringz("","Unknown"),
-		WProtoField.stringz("","Unknown"),
-		WProtoField.uint32("","(TODO [5]) Unknown"),
-	},
-	[SID_AUTH_CHECK] = {
-		WProtoField.uint32("","Result", base.HEX, { -- TODO -xpeh
-			[0x000] = "Passed challenge",
-			[0x100] = "Old game version (Additional info field supplies patch MPQ filename)",
-			[0x101] = "Invalid version",
-			[0x102] = "Game version must be downgraded (Additional info field supplies patch MPQ filename)",
-			-- 0x0NN: (where NN is the version code supplied in SID_AUTH_INFO): Invalid version code (note that 0x100 is not set in this case).
-			[0x200] = "Invalid CD key ",
-			[0x201] = "CD key in use (Additional info field supplies name of user)",
-			[0x202] = "Banned key",
-			[0x203] = "Wrong product",
-			-- The last 4 codes also apply to the second cdkey, as indicated by a bitwise combination with 0x010.  
-		}),
-		WProtoField.stringz("","Additional Information"),
-	},
-	[SID_AUTH_ACCOUNTCREATE] = {
-		WProtoField.uint32("","Status"),
-	},
-	[SID_AUTH_ACCOUNTLOGON] = {
-		WProtoField.uint32("","Status"),
-		WProtoField.uint8("","(TODO [32]) Salt (s)"),
-		WProtoField.uint8("","(TODO [32]) Server Key (B)"),
-	},
-	[SID_AUTH_ACCOUNTLOGONPROOF] = {
-		WProtoField.uint32("","Status"),
-		WProtoField.uint8("","(TODO [20]) Server Password Proof (M2)"),
-		WProtoField.stringz("","Additional information"),
-	},
-	[SID_AUTH_ACCOUNTCHANGE] = {
-		WProtoField.uint32("","Status"),
-		WProtoField.uint8("","[32] Salt (s)"),
-		WProtoField.uint8("","[32] Server key (B)"),
-	},
-	[SID_AUTH_ACCOUNTCHANGEPROOF] = {
-		WProtoField.uint32("","Status code"),
-		WProtoField.uint8("","[20] Server password proof for old password (M2)"),
-	},
-	[SID_AUTH_ACCOUNTUPGRADE] = {
-		WProtoField.uint32("","Status"),
-		WProtoField.uint32("","Server Token"),
-	},
-	[SID_AUTH_ACCOUNTUPGRADEPROOF] = {
-		WProtoField.uint32("","Status"),
-		WProtoField.uint32("","[5] Password proof"),
-	},
-	[SID_WARDEN] = {},
-	[SID_GAMEPLAYERSEARCH] = {
-		WProtoField.uint8("","Number of players"),
-		WProtoField.stringz("","[] Player names"),
-	},
-	[SID_FRIENDSLIST] = {
-		WProtoField.uint8("","Number of Entries"),
-	},
-	[SID_FRIENDSUPDATE] = {
-		WProtoField.uint8("","Entry number"),
-		WProtoField.uint8("","Friend Location"),
-		WProtoField.uint8("","Friend Status"),
-		WProtoField.uint32("","ProductID"),
-		WProtoField.stringz("","Location"),
-	},
-	[SID_FRIENDSADD] = {
-		WProtoField.stringz("","Account"),
-		WProtoField.uint8("","Friend Type"),
-		WProtoField.uint8("","Friend Status"),
-		WProtoField.uint32("","ProductID"),
-		WProtoField.stringz("","Location"),
-	},
-	[SID_FRIENDSREMOVE] = {
-		WProtoField.uint8("","Entry Number"),
-	},
-	[SID_FRIENDSPOSITION] = {
-		WProtoField.uint8("","Old Position"),
-		WProtoField.uint8("","New Position"),
-	},
-	[SID_CLANFINDCANDIDATES] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint8("","Status"),
-		WProtoField.uint8("","Number of potential candidates"),
-		WProtoField.stringz("","[] Usernames"),
-	},
-	[SID_CLANINVITEMULTIPLE] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint8("","Result"),
-		WProtoField.stringz("","[] Failed account names"),
-	},
-	[SID_CLANCREATIONINVITATION] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint32("","Clan Tag"),
-		WProtoField.stringz("","Clan Name"),
-		WProtoField.stringz("","Inviter's username"),
-		WProtoField.uint8("","Number of users being invited"),
-		WProtoField.stringz("","[] List of users being invited"),
-	},
-	[SID_CLANDISBAND] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint8("","Result"),
-	},
-	[SID_CLANMAKECHIEFTAIN] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint8("","Status"),
-	},
-	[SID_CLANINFO] = {
-		WProtoField.uint8("","Unknown (0)"),
-		WProtoField.uint32("","Clan tag"),
-		WProtoField.uint8("","Rank"),
-	},
-	[SID_CLANQUITNOTIFY] = {
-		WProtoField.uint8("","Status"),
-	},
-	[SID_CLANINVITATION] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint8("","Result"),
-	},
-	[SID_CLANREMOVEMEMBER] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint8("","Status"),
-	},
-	[SID_CLANINVITATIONRESPONSE] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint32("","Clan tag"),
-		WProtoField.stringz("","Clan name"),
-		WProtoField.stringz("","Inviter"),
-	},
-	[SID_CLANRANKCHANGE] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint8("","Status"),
-	},
-	[SID_CLANMOTD] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint32("","Unknown (0)"),
-		WProtoField.stringz("","MOTD"),
-	},
-	[SID_CLANMEMBERLIST] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint8("","Number of Members"),
-		WProtoField.stringz("","Username"),
-		WProtoField.uint8("","Rank"),
-		WProtoField.uint8("","Online Status"),
-		WProtoField.stringz("","Location"),
-	},
-	[SID_CLANMEMBERREMOVED] = {
-		WProtoField.stringz("","Clan member name"),
-	},
-	[SID_CLANMEMBERSTATUSCHANGE] = {
-		WProtoField.stringz("","Username"),
-		WProtoField.uint8("","Rank"),
-		WProtoField.uint8("","Status"),
-		WProtoField.stringz("","Location"),
-	},
-	[SID_CLANMEMBERRANKCHANGE] = {
-		WProtoField.uint8("","Old rank"),
-		WProtoField.uint8("","New rank"),
-		WProtoField.stringz("","Clan member who changed your rank"),
-	},
-	[SID_CLANMEMBERINFORMATION] = {
-		WProtoField.uint32("","Cookie"),
-		WProtoField.uint8("","Status code"),
-		WProtoField.stringz("","Clan name"),
-		WProtoField.uint8("","User's rank"),
-		WProtoField.filetime("","Date joined"),
-	},
---[[ TODO: unsupported packets follow.
-	[PKT_SERVERPING] = {
-		WProtoField.uint32("","UDP Code"),
-	},
-	[MCP_STARTUP] = {
-		WProtoField.uint32("","Result"),
-	},
-	[MCP_CHARCREATE] = {
-		WProtoField.uint32("","Result"),
-	},
-	[MCP_CREATEGAME] = {
-		WProtoField.uint16("","Request Id"),
-		WProtoField.uint16("","Game token"),
-		WProtoField.uint16("","Unknown (0)"),
-		WProtoField.uint32("","Result"),
-	},
-	[MCP_JOINGAME] = {
-		WProtoField.uint16("","Request ID"),
-		WProtoField.uint16("","Game token"),
-		WProtoField.uint16("","Unknown (0)"),
-		WProtoField.uint32("","IP of D2GS Server"),
-		WProtoField.uint32("","Game hash"),
-		WProtoField.uint32("","Result"),
-	},
-	[MCP_GAMELIST] = {
-		WProtoField.uint16("","Request Id"),
-		WProtoField.uint32("","Index"),
-		WProtoField.uint8("","Number of players in game"),
-		WProtoField.uint32("","Status"),
-		WProtoField.stringz("","Game name"),
-		WProtoField.stringz("","Game description"),
-	},
-	[MCP_GAMEINFO] = {
-		WProtoField.uint16("","Request ID"),
-		WProtoField.uint32("","Status *"),
-		WProtoField.uint32("","Game Uptime (seconds)"),
-		WProtoField.uint16("","Unknown"),
-		WProtoField.uint8("","Maximum players allowed"),
-		WProtoField.uint8("","Number of characters in the game"),
-		WProtoField.uint8("","[16] Classes of ingame characters **"),
-		WProtoField.uint8("","[16] Levels of ingame characters **"),
-		WProtoField.uint8("","Unused (0)"),
-		WProtoField.stringz("","[16] Character names **"),
-	},
-	[MCP_CHARLOGON] = {
-		WProtoField.uint32("","Result"),
-	},
-	[MCP_CHARDELETE] = {
-		WProtoField.uint32("","Result"),
-	},
-	[MCP_REQUESTLADDERDATA] = {
-		WProtoField.uint8("","Ladder type"),
-		WProtoField.uint16("","Total response size"),
-		WProtoField.uint16("","Current message size"),
-		WProtoField.uint16("","Total size of unreceived messages"),
-		WProtoField.uint16("","Rank of first entry"),
-		WProtoField.uint16("","Unknown (0) Message data:"),
-		WProtoField.uint32("","Number of entries"),
-		WProtoField.uint32("","Unknown (0x10)"),
-	},
-	[MCP_MOTD] = {
-		WProtoField.uint8("","Unknown"),
-		WProtoField.stringz("","MOTD"),
-	},
-	[MCP_CREATEQUEUE] = {
-		WProtoField.uint32("","Position"),
-	},
-	[MCP_CHARLIST] = {
-		WProtoField.uint16("","Number of characters requested"),
-		WProtoField.uint32("","Number of characters that exist on this account"),
-		WProtoField.uint16("","Number of characters returned"),
-	},
-	[MCP_CHARUPGRADE] = {
-		WProtoField.uint32("","Result"),
-	},
-	[MCP_CHARLIST2] = {
-		WProtoField.uint16("","Number of characters requested"),
-		WProtoField.uint32("","Number of characters that exist on this account"),
-		WProtoField.uint16("","Number of characters returned"),
-	},
-	[D2GS_CHARTOOBJ] = {
-		WProtoField.uint8("","Unknown"),
-		WProtoField.uint32("","Player ID"),
-		WProtoField.uint8("","Movement Type"),
-		WProtoField.uint8("","Destination Type"),
-		WProtoField.uint32("","Object ID"),
-		WProtoField.uint16("","X Coordinate"),
-		WProtoField.uint16("","Y Coordinate"),
-	},
-	[D2GS_SMALLGOLDPICKUP] = {
-		WProtoField.uint8("","Amount"),
-	},
-	[D2GS_SETBYTEATTR] = {
-		WProtoField.uint8("","Attribute"),
-		WProtoField.uint8("","Amount"),
-	},
-	[D2GS_SETWORDATTR] = {
-		WProtoField.uint8("","Attribute"),
-		WProtoField.uint16("","Amount"),
-	},
-	[D2GS_SETDWORDATTR] = {
-		WProtoField.uint8("","Attribute - D2GS_SETWORDATTR"),
-		WProtoField.uint32("","Amount"),
-	},
-	[D2GS_WORLDOBJECT] = {
-		WProtoField.uint8("","Object Type - Any information appreciated"),
-		WProtoField.uint32("","Object ID"),
-		WProtoField.uint16("","Object unique code"),
-		WProtoField.uint16("","X Coordinate"),
-		WProtoField.uint16("","Y Coordinate"),
-		WProtoField.uint8("","State *"),
-		WProtoField.uint8("","Interaction Condition"),
-	},
-	????????? [D2GS_(COMP)STARTGAME] = {}, ?????????????????
-	[D2GS_TRADEACTION] = {
-		WProtoField.uint8("","Request Type"),
-	},
-	[D2GS_LOGONRESPONSE] = {
-		WProtoField.uint32("","Unknown - Possible acceptance/request ID"),
-	},
-	[D2GS_UNIQUEEVENTS] = {
-		WProtoField.uint8("","EventId // see below,"),
-	},
-	[D2GS_STARTLOGON] = {
-	},
-	[PACKET_IDLE] = {},
-	[PACKET_LOGON] = {
-		WProtoField.uint32("","Result"),
-	},
-	[PACKET_STATSUPDATE] = {
-		WProtoField.uint32("","Result"),
-	},
-	[PACKET_DATABASE] = {
-		WProtoField.uint32("","command"),
-	},
-	[BNLS_AUTHORIZEPROOF] = {
-		WProtoField.uint32("","Status code."),
-	},
-	[BNLS_REQUESTVERSIONBYTE] = {
-		WProtoField.uint32("","Product"),
-	},
-	[BNLS_VERIFYSERVER] = {
-		WProtoField.uint32("","Success. (32-bit)"),
-	},
-	[BNLS_RESERVESERVERSLOTS] = {
-		WProtoField.uint32("","Number of slots reserved"),
-	},
-	[BNLS_SERVERLOGONCHALLENGE] = {
-		WProtoField.uint32("","Slot index."),
-		WProtoField.uint32("","[16] Data for server's SID_AUTH_ACCOUNTLOGON (0x53) response."),
-	},
-	[BNLS_SERVERLOGONPROOF] = {
-		WProtoField.uint32("","Slot index."),
-		WProtoField.uint32("","Success. (32-bit)"),
-		WProtoField.uint32("","[5] Data server's SID_AUTH_ACCOUNTLOGONPROOF (0x54) response."),
-	},
-	[BNLS_VERSIONCHECKEX] = {
-		WProtoField.uint32("","Success*"),
-		WProtoField.uint32("","Version."),
-		WProtoField.uint32("","Checksum."),
-		WProtoField.stringz("","Version check stat string."),
-		WProtoField.uint32("","Cookie."),
-		WProtoField.uint32("","The latest version code for this product."),
-	},
-	[BNLS_VERSIONCHECKEX2] = {
-		WProtoField.uint32("","Success*"),
-		WProtoField.uint32("","Version."),
-		WProtoField.uint32("","Checksum."),
-		WProtoField.stringz("","Version check stat string."),
-		WProtoField.uint32("","Cookie."),
-		WProtoField.uint32("","The latest version code for this product."),
-	},
---]]
+[SID_SERVERLIST] = {
+	uint32{label="Server version", },
+	stringz{label="[] Server list", },
+},
+[SID_NEWS_INFO] = {
+	uint8{label="Number of entries", },
+	uint32{label="Last logon timestamp", },
+	uint32{label="Oldest news timestamp", },
+	uint32{label="Newest news timestamp", },
+	uint32{label="Timestamp", },
+	stringz{label="News", },
+},
+[SID_OPTIONALWORK] = {
+	stringz{label="MPQ Filename", },
+},
+[BNLS_CONFIRMLOGON] = {
+	uint32{label="Success", desc=Descs.YesNo},
+},
+[SID_AUTH_CHECK] = {
+	uint32{label="Result", },
+	stringz{label="Additional Information", },
+},
+[MCP_JOINGAME] = {
+	uint16{label="Request ID", },
+	uint16{label="Game token", },
+	uint16{label="Unknown", },
+	uint32{label="IP of D2GS Server", },
+	uint32{label="Game hash", },
+	uint32{label="Result", },
+},
+[SID_READUSERDATA] = {
+	uint32{label="Number of accounts", },
+	uint32{label="Number of keys", },
+	uint32{label="Request ID", },
+	stringz{label="[] Requested Key Values", },
+},
+[BNLS_CHANGECHALLENGE] = {
+	uint32{label="Data for SID_AUTH_ACCOUNTCHANGE", num=8},
+},
+[SID_CLANMEMBERSTATUSCHANGE] = {
+	stringz{label="Username", },
+	uint8{label="Rank", },
+	uint8{label="Status", },
+	stringz{label="Location", },
+},
+[SID_FRIENDSPOSITION] = {
+	uint8{label="Old Position", },
+	uint8{label="New Position", },
+},
+[SID_FRIENDSADD] = {
+	stringz{label="Account", },
+	uint8{label="Friend Type", },
+	uint8{label="Friend Status", },
+	uint32{label="ProductID", },
+	stringz{label="Location", },
+},
+[SID_GETICONDATA] = {
+	wintime{label="Filetime", },
+	stringz{label="Filename", },
+},
+[BNLS_CDKEY] = {
+	uint32{label="Result", desc=Descs.YesNo},
+	uint32{label="Client Token", },
+	uint32{label="CD key data for SID_AUTH_CHECK", num=9},
+},
+[PACKET_CYCLE] = {
+	stringz{label="Channel", },
+},
+[BNLS_VERSIONCHECKEX2] = {
+	uint32{label="Success*", desc=Descs.YesNo},
+	uint32{label="Version.", },
+	uint32{label="Checksum.", },
+	stringz{label="Version check stat string.", },
+	uint32{label="Cookie.", },
+	uint32{label="The latest version code for this product.", },
+},
+[SID_STARTVERSIONING] = {
+	wintime{label="MPQ Filetime", },
+	stringz{label="MPQ Filename", },
+	stringz{label="ValueString", },
+},
+[BNLS_REQUESTVERSIONBYTE] = {
+	uint32{label="Productif Product is nonzero:", },
+	uint32{label="Version byte", },
+},
+[SID_AUTH_ACCOUNTCREATE] = {
+	uint32{label="Status", },
+},
+[PACKET_MESSAGE] = {
+	stringz{label="User", },
+	stringz{label="Command", },
+},
+[D2GS_TRADEACTION] = {
+	uint8{label="Request Type", },
+},
+[SID_AUTH_INFO] = {
+	uint32{label="Logon Type", },
+	uint32{label="Server Token", },
+	uint32{label="UDPValue *", },
+	wintime{label="MPQ filetime", },
+	stringz{label="IX86ver filename", },
+	stringz{label="ValueString", },
+	bytes{label="128-byte Server signature", },
+},
+[D2GS_WORLDOBJECT] = {
+	uint8{label="Object Type - Any information appreciated", },
+	uint32{label="Object ID", },
+	uint16{label="Object unique code", },
+	uint16{label="X Coordinate", },
+	uint16{label="Y Coordinate", },
+	uint8{label="State *", },
+	uint8{label="Interaction Condition", },
+},
+[SID_STARTADVEX] = {
+	uint32{label="Status", },
+},
+[SID_CLANINFO] = {
+	uint8{label="Unknown", },
+	uint32{label="Clan tag", },
+	uint8{label="Rank", },
+},
+[SID_FRIENDSLIST] = {
+	uint8{label="Number of Entries", },
+	stringz{label="Account", },
+	uint8{label="Status", },
+	uint8{label="Location", },
+	uint32{label="ProductID", },
+	stringz{label="Location name", },
+},
+[SID_CLANCREATIONINVITATION] = {
+	uint32{label="Cookie", },
+	uint32{label="Clan Tag", },
+	stringz{label="Clan Name", },
+	stringz{label="Inviter's username", },
+	uint8{label="Number of users being invited", },
+	stringz{label="[] List of users being invited", },
+},
+[SID_CLANMEMBERINFORMATION] = {
+	uint32{label="Cookie", },
+	uint8{label="Status code", },
+	stringz{label="Clan name", },
+	uint8{label="User's rank", },
+	wintime{label="Date joined", },
+},
+[SID_LOGONCHALLENGE] = {
+	uint32{label="Server Token", },
+},
+[MCP_GAMEINFO] = {
+	uint16{label="Request ID", },
+	uint32{label="Status *", },
+	uint32{label="Game Uptime", },
+	uint16{label="Unknown", },
+	uint8{label="Maximum players allowed", },
+	uint8{label="Number of characters in the game", },
+	uint8{label="[16] Classes of ingame characters **", },
+	uint8{label="[16] Levels of ingame characters **", },
+	uint8{label="Unused", },
+	stringz{label="[16] Character names **", },
+},
+[SID_PING] = {
+	uint32{label="Ping Value", },
+},
+[PKT_SERVERPING] = {
+	uint32{label="UDP Code", },
+},
+[BNLS_SERVERLOGONPROOF] = {
+	uint32{label="Slot index.", },
+	uint32{label="Success.", desc=Descs.YesNo},
+	uint32{label="Data server's", num=5},
+},
+[SID_STARTADVEX3] = {
+	uint32{label="Status", },
+},
+[SID_REQUIREDWORK] = {
+	stringz{label="ExtraWork MPQ FileName", },
+},
+[BNLS_CREATEACCOUNT] = {
+	uint32{label="Data for Data for SID_AUTH_ACCOUNTCREATE", num=16},
+},
+[SID_CDKEY2] = {
+	uint32{label="Result", },
+	stringz{label="Key owner", },
+},
+[SID_ENTERCHAT] = {
+	stringz{label="Unique name", },
+	stringz{label="Statstring", },
+	stringz{label="Account name", },
+},
+[SID_CDKEY] = {
+	uint32{label="Result", },
+	stringz{label="Key owner", },
+},
+[MCP_CHARLIST2] = {
+	uint16{label="Number of characters requested", },
+	uint32{label="Number of characters that exist on this account", },
+	uint16{label="Number of characters returned", },
+	uint32{label="Expiration Date", },
+	stringz{label="Character name", },
+	stringz{label="Character statstring", },
+},
+[SID_GETFILETIME] = {
+	uint32{label="Request ID", },
+	uint32{label="Unknown", },
+	wintime{label="Last update time", },
+	stringz{label="Filename", },
+},
+[BNLS_AUTHORIZEPROOF] = {
+	uint32{label="Status code.", },
+},
+[PACKET_CHATDROPOPTIONS] = {
+	uint8{label="SubcommandFor subcommand 0:", },
+	uint8{label="Setting for broadcast", },
+	uint8{label="Setting for database", },
+	uint8{label="Setting for whispers", },
+	uint8{label="Refuse all", },
+},
+[PACKET_USERINFO] = {
+	uint32{label="Bot number", },
+	stringz{label="Bot name", },
+	stringz{label="Bot channel", },
+	uint32{label="Bot server", },
+	stringz{label="Unique account name", },
+	stringz{label="Current database", },
+},
+[BNLS_UPGRADEPROOF] = {
+	uint32{label="Data for SID_AUTH_ACCOUNTUPGRADEPROOF", num=22},
+},
+[BNLS_CHANGEPROOF] = {
+	uint32{label="Data for SID_AUTH_ACCOUNTCHANGEPROOF", num=21},
+},
+[PACKET_LOGON] = {
+	uint32{label="Result", },
+},
+[PACKET_BOTNETCHAT] = {
+	uint32{label="Command", },
+	uint32{label="Action", },
+	uint32{label="ID of source bot", },
+	stringz{label="Message", },
+},
+[BNLS_CHOOSENLSREVISION] = {
+	uint32{label="Success code.", desc=Descs.YesNo},
+},
+[SID_AUTH_ACCOUNTLOGON] = {
+	uint32{label="Status", },
+	uint8{label="[32] Salt", },
+	uint8{label="[32] Server Key", },
+},
+[SID_CLANINVITATION] = {
+	uint32{label="Cookie", },
+	uint8{label="Result", },
+},
+[BNLS_VERSIONCHECK] = {
+	uint32{label="Success If Success is TRUE:", desc=Descs.YesNo},
+	uint32{label="Version.", },
+	uint32{label="Checksum.", },
+	stringz{label="Version check stat string.", },
+},
+[SID_CLANMEMBERLIST] = {
+	uint32{label="Cookie", },
+	uint8{label="Number of Members", },
+	stringz{label="Username", },
+	uint8{label="Rank", },
+	uint8{label="Online Status", },
+	stringz{label="Location", },
+},
+[SID_AUTH_ACCOUNTUPGRADEPROOF] = {
+	uint32{label="Status", },
+	uint32{label="[5] Password proof", },
+},
+[SID_CHANGEPASSWORD] = {
+	uint32{label="Password change succeeded", desc=Descs.YesNo},
+},
+[D2GS_SETBYTEATTR] = {
+	uint8{label="Attribute", },
+	uint8{label="Amount", },
+},
+[D2GS_SETWORDATTR] = {
+	uint8{label="Attribute", },
+	uint16{label="Amount", },
+},
+[SID_SETEMAIL] = {
+},
+[SID_CREATEACCOUNT] = {
+	uint32{label="Result", },
+},
+[PACKET_USERLOGGINGOFF] = {
+	uint32{label="Bot id", },
+},
+[D2GS_CHARTOOBJ] = {
+	uint8{label="Unknown", },
+	uint32{label="Player ID", },
+	uint8{label="Movement Type", },
+	uint8{label="Destination Type", },
+	uint32{label="Object ID", },
+	uint16{label="X Coordinate", },
+	uint16{label="Y Coordinate", },
+},
+[SID_CLANINVITATIONRESPONSE] = {
+	uint32{label="Cookie", },
+	uint32{label="Clan tag", },
+	stringz{label="Clan name", },
+	stringz{label="Inviter", },
+},
+[MCP_CHARLIST] = {
+	uint16{label="Number of characters requested", },
+	uint32{label="Number of characters that exist on this account", },
+	uint16{label="Number of characters returned", },
+	stringz{label="Character name", },
+	stringz{label="Character statstring", },
+},
+[SID_LOGONREALMEX] = {
+	uint32{label="MCP Cookie", },
+	uint32{label="MCP Status", },
+	uint32{label="[2] MCP Chunk 1", },
+	uint32{label="IP", },
+	uint32{label="Port", },
+	uint32{label="[12] MCP Chunk 2", },
+	stringz{label="Battle.net unique name", },
+},
+[BNLS_VERIFYSERVER] = {
+	uint32{label="Success.", desc=Descs.YesNo},
+},
+[SID_GAMEPLAYERSEARCH] = {
+	uint8{label="Number of players", },
+	stringz{label="[] Player names", },
+},
+[SID_FLOODDETECTED] = {
+},
+[PACKET_DATABASE] = {
+	uint32{label="command", },
+	stringz{label="usermask", },
+	stringz{label="flags", },
+	stringz{label="usermask", },
+},
+[D2GS_STARTLOGON] = {
+},
+[MCP_CHARCREATE] = {
+	uint32{label="Result", },
+},
+[SID_CLANRANKCHANGE] = {
+	uint32{label="Cookie", },
+	uint8{label="Status", },
+},
+[SID_PROFILE] = {
+	uint32{label="Cookie", },
+	uint8{label="Success", },
+	stringz{label="Profile\\Description value", },
+	stringz{label="Profile\\Location value", },
+	uint32{label="Clan Tag", },
+},
+[SID_GETLADDERDATA] = {
+	uint32{label="Ladder type", },
+	uint32{label="League", },
+	uint32{label="Sort method", },
+	uint32{label="Starting rank", },
+	uint32{label="Number of ranks listed", },
+	uint32{label="Wins", },
+	uint32{label="Losses", },
+	uint32{label="Disconnects", },
+	uint32{label="Rating", },
+	uint32{label="Rank", },
+	uint32{label="Official wins", },
+	uint32{label="Official losses", },
+	uint32{label="Official disconnects", },
+	uint32{label="Official rating", },
+	uint32{label="Unknown", },
+	uint32{label="Official rank", },
+	uint32{label="Unknown", },
+	uint32{label="Unknown", },
+	uint32{label="Highest rating", },
+	uint32{label="Unknown", },
+	uint32{label="Season", },
+	wintime{label="Last game time", },
+	wintime{label="Official last game time", },
+	stringz{label="Name", },
+},
+[SID_CREATEACCOUNT2] = {
+	uint32{label="Status", },
+	stringz{label="Account name suggestion", },
+},
+[SID_FRIENDSREMOVE] = {
+	uint8{label="Entry Number", },
+},
+[D2GS_LOGONRESPONSE] = {
+	uint32{label="Unknown - Possible acceptance/request ID", },
+},
+[SID_GETADVLISTEX] = {
+	uint32{label="Number of games", },
+	uint32{label="Status", },
+	uint16{label="Game Type", },
+	uint16{label="Parameter", },
+	uint32{label="Language ID", },
+	uint16{label="Address Family", },
+	uint16{label="Port", },
+	uint32{label="Host's IP", },
+	uint32{label="sin_zero", },
+	uint32{label="sin_zero", },
+	uint32{label="Game Status", },
+	uint32{label="Elapsed time", },
+	stringz{label="Game name", },
+	stringz{label="Game password", },
+	stringz{label="Game statstring", },
+},
+[D2GS_SMALLGOLDPICKUP] = {
+	uint8{label="Amount", },
+},
+[SID_CHECKAD] = {
+	uint32{label="Ad ID", },
+	uint32{label="File extension", },
+	wintime{label="Local file time", },
+	stringz{label="Filename", },
+	stringz{label="Link URL", },
+},
+[D2GS_COMPSTARTGAME] = {
+},
+[SID_QUERYREALMS2] = {
+	uint32{label="Unknown", },
+	uint32{label="Count", },
+	uint32{label="Unknown", },
+	stringz{label="Realm title", },
+	stringz{label="Realm description", },
+},
+[SID_CLANFINDCANDIDATES] = {
+	uint32{label="Cookie", },
+	uint8{label="Status", },
+	uint8{label="Number of potential candidates", },
+	stringz{label="[] Usernames", },
+},
+[SID_CLANINVITEMULTIPLE] = {
+	uint32{label="Cookie", },
+	uint8{label="Result", },
+	stringz{label="[] Failed account names", },
+},
+[SID_LOGONCHALLENGEEX] = {
+	uint32{label="UDP Token", },
+	uint32{label="Server Token", },
+},
+[SID_QUERYADURL] = {
+	uint32{label="Ad ID", },
+	stringz{label="Ad URL", },
+},
+[SID_WARCRAFTGENERAL] = {
+	uint8{label="Subcommand ID", },
+	uint32{label="Cookie", },
+	uint32{label="Icon ID", },
+	uint8{label="Number of ladder records to read; this will be between 0", },
+	uint32{label="Ladder type; valid types are 'SOLO', 'TEAM', or", },
+	uint16{label="Number of wins", },
+	uint16{label="Number of losses", },
+	uint8{label="Level", },
+	uint8{label="Hours until XP decay, if applicable*", },
+	uint16{label="Experience", },
+	uint32{label="Rank", },
+	uint8{label="Number of race records to read; this will be 5 for WAR3", },
+	uint16{label="Wins", },
+	uint16{label="Losses", },
+	uint8{label="Number of team records to read.", },
+	uint32{label="Type of team; valid types are '2VS2', '3VS3', and", },
+	uint16{label="Number of wins", },
+	uint16{label="Number of losses", },
+	uint8{label="Level", },
+	uint8{label="Hours until XP decay, if applicable*", },
+	uint16{label="Experience", },
+	uint32{label="Rank", },
+	wintime{label="Time of last game played", },
+	uint8{label="Number of partners", },
+	stringz{label="[] Names of partners", },
+	uint32{label="Cookie", },
+	uint8{label="Number of ladder records to read; this will be between 0", },
+	uint32{label="Ladder type; valid types are 'SOLO', 'TEAM', or", },
+	uint16{label="Number of wins", },
+	uint16{label="Number of losses", },
+	uint8{label="Level", },
+	uint8{label="Hours until XP decay, if applicable*", },
+	uint16{label="Experience", },
+	uint32{label="Rank", },
+	uint8{label="Number of race records to read; this will be 5 for WAR3", },
+	uint16{label="Wins", },
+	uint16{label="Losses", },
+	uint32{label="Cookie", },
+	uint32{label="Unknown", },
+	uint8{label="Tiers", },
+	uint8{label="Count", },
+	uint32{label="Icon", },
+	uint32{label="Name", },
+	uint8{label="Race", },
+	uint16{label="Wins required", },
+	uint8{label="Unknown", },
+},
+[SID_CLANMEMBERREMOVED] = {
+	stringz{label="Clan member name", },
+},
+[D2GS_SETDWORDATTR] = {
+	uint8{label="Attribute - D2GS_SETWORDATTR", },
+	uint32{label="Amount", },
+},
+[SID_CLANMAKECHIEFTAIN] = {
+	uint32{label="Cookie", },
+	uint8{label="Status", },
+},
+[SID_CLANQUITNOTIFY] = {
+	uint8{label="Status", },
+},
+[SID_CHATEVENT] = {
+	uint32{label="Event ID", },
+	uint32{label="User's Flags", },
+	uint32{label="Ping", },
+	uint32{label="IP Address", },
+	uint32{label="Account number", },
+	uint32{label="Registration Authority", },
+	stringz{label="Username", },
+	stringz{label="Text", },
+},
+[MCP_CREATEQUEUE] = {
+	uint32{label="Position", },
+},
+[PACKET_STATSUPDATE] = {
+	uint32{label="Result", },
+},
+[SID_AUTH_ACCOUNTUPGRADE] = {
+	uint32{label="Status", },
+	uint32{label="Server Token", },
+},
+[PACKET_IDLE] = {
+},
+[SID_LOGONRESPONSE] = {
+	uint32{label="Result", },
+},
+[SID_CHECKDATAFILE2] = {
+	uint32{label="Result", },
+},
+[SID_CLANMOTD] = {
+	uint32{label="Cookie", },
+	uint32{label="Unknown", },
+	stringz{label="MOTD", },
+},
+[SID_QUERYREALMS] = {
+	uint32{label="Unknown", },
+	uint32{label="Count", },
+	uint32{label="Unknown", },
+	stringz{label="Realm title", },
+	stringz{label="Realm description", },
+},
+[MCP_MOTD] = {
+	uint8{label="Unknown", },
+	stringz{label="MOTD", },
+},
+[BNLS_LOGONCHALLENGE] = {
+	uint32{label="[8] Data for SID_AUTH_ACCOUNTLOGON", },
+},
+[SID_AUTH_ACCOUNTLOGONPROOF] = {
+	uint32{label="Status", },
+	uint8{label="[20] Server Password Proof", },
+	stringz{label="Additional information", },
+},
+[SID_STARTVERSIONING2] = {
+	wintime{label="MPQ Filetime", },
+	stringz{label="MPQ Filename", },
+	stringz{label="ValueString", },
+},
+[MCP_CHARLOGON] = {
+	uint32{label="Result", },
+},
+[MCP_CHARUPGRADE] = {
+	uint32{label="Result", },
+},
+[SID_CLIENTID] = {
+	uint32{label="Registration Version", },
+	uint32{label="Registration Authority", },
+	uint32{label="Account Number", },
+	uint32{label="Registration Token", },
+},
+[SID_MESSAGEBOX] = {
+	uint32{label="Style", },
+	stringz{label="Text", },
+	stringz{label="Caption", },
+},
+[BNLS_UPGRADECHALLENGE] = {
+	uint32{label="Success code.", desc=Descs.YesNo},
+},
+[BNLS_LOGONPROOF] = {
+	uint32{label="[5] Data for SID_AUTH_ACCOUNTLOGONPROOF", },
+},
+[MCP_CREATEGAME] = {
+	uint16{label="Request Id", },
+	uint16{label="Game token", },
+	uint16{label="Unknown", },
+	uint32{label="Result", },
+},
+[MCP_REQUESTLADDERDATA] = {
+	uint8{label="Ladder type", },
+	uint16{label="Total response size", },
+	uint16{label="Current message size", },
+	uint16{label="Total size of unreceived messages", },
+	uint16{label="Rank of first entry", },
+	uint16{label="Unknown", },
+	uint32{label="Number of entries", },
+	uint32{label="Unknown", },
+	uint64{label="Character experience", },
+	uint8{label="Character Flags", },
+	uint8{label="Character title", },
+	uint16{label="Character level", },
+	uint8{label="[16] Character name", },
+},
+[BNLS_RESERVESERVERSLOTS] = {
+	uint32{label="Number of slots reserved", },
+},
+[BNLS_CDKEY_EX] = {
+	uint32{label="Cookie.", },
+	uint8{label="Number of CD-keys requested.", },
+	uint8{label="Number of", },
+	uint32{label="Bit mask .For each successful", },
+	uint32{label="Client session key.", },
+	uint32{label="CD-key data.", num=9},
+},
+[SID_GETCHANNELLIST] = {
+	stringz{label="[] Channel names, each terminated by a null string.", },
+},
+[PACKET_ACCOUNT] = {
+	uint32{label="Command", },
+	uint32{label="Result", },
+},
+[MCP_GAMELIST] = {
+	uint16{label="Request Id", },
+	uint32{label="Index", },
+	uint8{label="Number of players in game", },
+	uint32{label="Status", },
+	stringz{label="Game name", },
+	stringz{label="Game description", },
+},
+[BNLS_VERSIONCHECKEX] = {
+	uint32{label="Success*", desc=Descs.YesNo},
+	uint32{label="Version.", },
+	uint32{label="Checksum.", },
+	stringz{label="Version check", },
+	uint32{label="Cookie.", },
+	uint32{label="The latest version code for this", },
+},
+[SID_NULL] = {
+},
+[MCP_STARTUP] = {
+	uint32{label="Result", },
+},
+[SID_CLANREMOVEMEMBER] = {
+	uint32{label="Cookie", },
+	uint8{label="Status", },
+},
+[SID_LOGONRESPONSE2] = {
+	uint32{label="Result", },
+	stringz{label="Reason", },
+},
+[SID_AUTH_ACCOUNTCHANGEPROOF] = {
+	uint32{label="Status code", },
+	uint8{label="[20] Server password proof for old password", },
+},
+[BNLS_HASHDATA] = {
+	uint32{label="The data hash.Optional:", num=5},
+	uint32{label="Cookie. Same as the cookie", },
+},
+[SID_FRIENDSUPDATE] = {
+	uint8{label="Entry number", },
+	uint8{label="Friend Location", },
+	uint8{label="Friend Status", },
+	uint32{label="ProductID", },
+	stringz{label="Location", },
+},
+[PACKET_BOTNETVERSION] = {
+	uint32{label="Server Version", },
+},
+[SID_REGISTRY] = {
+	uint32{label="Cookie", },
+	uint32{label="HKEY", },
+	stringz{label="Registry path", },
+	stringz{label="Registry key", },
+},
+[SID_FINDLADDERUSER] = {
+	uint32{label="Rank. Zero-based. 0xFFFFFFFF == Not ranked.", },
+},
+[SID_CLANMEMBERRANKCHANGE] = {
+	uint8{label="Old rank", },
+	uint8{label="New rank", },
+	stringz{label="Clan member who changed your rank", },
+},
+[BNLS_AUTHORIZE] = {
+	uint32{label="Server code.", },
+},
+[SID_CHECKDATAFILE] = {
+	uint32{label="Status", },
+},
+[SID_CLANDISBAND] = {
+	uint32{label="Cookie", },
+	uint8{label="Result", },
+},
+[BNLS_SERVERLOGONCHALLENGE] = {
+	uint32{label="Slot index.", },
+	uint32{label="Data for server's SID_AUTH_ACCOUNTLOGON", num=16},
+},
+[SID_AUTH_ACCOUNTCHANGE] = {
+	uint32{label="Status", },
+	uint8{label="[32] Salt", },
+	uint8{label="[32] Server key", },
+},
+[MCP_CHARDELETE] = {
+	uint32{label="Result", },
+},
+[SID_REPORTVERSION] = {
+	uint32{label="Result", },
+	stringz{label="Patch path", },
+},
+[SID_WARDEN] = {
+	bytes{label="Encrypted Packet", },
+	uint8{label="Packet Code", },
+	uint32{label="[4] MD5 Hash of the current Module", },
+	uint32{label="[4] Decryption key for Module", },
+	uint32{label="Length of Module", },
+	uint16{label="Length of data", },
+	bytes{label="Data", },
+	uint8{label="String Length", },
+	bytes{label="String Data", },
+	uint8{label="Check ID", },
+	uint8{label="String Index", },
+	uint32{label="Address", },
+	uint8{label="Length to Read", },
+	uint32{label="Unknown", },
+	uint32{label="[5] SHA1", },
+	uint32{label="Address", },
+	uint8{label="Length to Read", },
+	uint8{label="IDXor", },
+	uint16{label="Length of data", },
+	uint32{label="Checksum of data", },
+	uint8{label="Unknown", },
+	uint8{label="Unknown", },
+	uint8{label="Unknown", },
+	stringz{label="Library Name", },
+	uint32{label="Funct1", },
+	uint32{label="Funct2", },
+	uint32{label="Funct3", },
+	uint32{label="Funct4", },
+	uint32{label="[5] Unknown", },
+},
+[SID_TOURNAMENT] = {
+	uint8{label="Unknown", },
+	uint8{label="Unknown, maybe number of non-null strings sent?", },
+	stringz{label="Description", },
+	stringz{label="Unknown", },
+	stringz{label="Website", },
+	uint32{label="Unknown", },
+	stringz{label="Name", },
+	stringz{label="Unknown", },
+	stringz{label="Unknown", },
+	stringz{label="Unknown", },
+	uint32{label="Unknown", num=5},
+},
+[D2GS_UNIQUEEVENTS] = {
+	uint8{label="EventId // see below,", },
+},
 }

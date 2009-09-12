@@ -222,6 +222,12 @@ do
 
 	-- Supported data types
 	local typemap = {
+		["bytes"] = {
+			["size"] = function(self, state)
+				return self.length
+			end,
+			["length"] = 1,
+		},
 		["uint64"] = {
 			["size"] = function(...) return 8 end,
 		},
@@ -371,10 +377,9 @@ do
 
 	local function make_args_table(args, ...)
 		if type(args) ~= "table" then
-			args = {}
-			args.label = arg[1]
-			args.display = arg[2]
-			args.desc = arg[3]
+			args = {label=args}
+			args.display = arg[1]
+			args.desc = arg[2]
 		end
 		return args
 	end
@@ -430,9 +435,11 @@ do
         end
 	})
 
-	%include "constants.lua"
+	#include "constants.lua"
+	#include "valuemaps.lua"
 
 	do
+		local bytes = WProtoField.bytes
 		local uint64 = WProtoField.uint64
 		local uint32 = WProtoField.uint32
 		local uint16 = WProtoField.uint16
@@ -444,7 +451,7 @@ do
 		local ipv4 = WProtoField.ipv4
 		local stringz = WProtoField.stringz
 		local sockaddr = WProtoField.sockaddr
-		local filetime = WProtoField.filetime
+		local wintime = WProtoField.filetime
 		local posixtime = WProtoField.posixtime
 		local iterator = WProtoField.iterator
 		local version = function(arg)
@@ -484,7 +491,7 @@ do
 			return iterator(arg)
 		end
 
-		%include "spackets.lua"
-		%include "cpackets.lua"
+		#include "spackets.lua"
+		#include "cpackets.lua"
 	end
 end
