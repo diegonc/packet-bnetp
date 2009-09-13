@@ -9,18 +9,12 @@ use HTML::FormatText::WithLinks::AndTables;
 
 sub Fix_AndTables;
 sub do_label;
+sub dump_packets;
 
 Fix_AndTables;
 
 my $htmltree = HTML::TreeBuilder->new;
 my $formatter = HTML::FormatText->new();
-
-open(my $CNST, ">", "constants.lua")
-	or die("Couldn't open constants.lua");
-open(my $SRVR, ">", "spackets.lua")
-	or die("Couldn't open spackets.lua");
-open(my $CLNT, ">", "cpackets.lua")
-	or die("Couldn't open cpackets.lua");
 
 my $current_name = "";
 my $current_id = "";
@@ -53,14 +47,27 @@ my %typemap = (
 );
 
 my %prefixes = (
-	"SID"    => 0xFF,
-	"W3GS"   => 0xF7, # ???, prefix is not real
-	"BNLS"   => 0x70, # fake, theres no header id byte
-	"D2GS"   => 0x71, # fake, theres no header id byte
-	"MCP"    => 0x72, # fake, theres no header id byte
-	"PACKET" => 0x73, # fake, theres no header id byte (may be 0x01)
-	"PKT"    => 0x74, # fake, theres no header id byte
+	"S_SID"    => 0xFF,
+	"C_SID"    => 0xFF,
+	"S_W3GS"   => 0xF7, # ???, prefix is not real
+	"C_W3GS"   => 0xF7, # ???, prefix is not real
+	"S_BNLS"   => 0x70, # fake, theres no header id byte
+	"C_BNLS"   => 0x70, # fake, theres no header id byte
+	"S_D2GS"   => 0x071, # fake, theres no header id byte
+	"C_D2GS"   => 0x171, # fake, theres no header id byte
+	"S_MCP"    => 0x72, # fake, theres no header id byte
+	"C_MCP"    => 0x72, # fake, theres no header id byte
+	"S_PACKET" => 0x73, # fake, theres no header id byte (may be 0x01)
+	"C_PACKET" => 0x73, # fake, theres no header id byte (may be 0x01)
+	"S_PKT"    => 0x74, # fake, theres no header id byte
+	"C_PKT"    => 0x74, # fake, theres no header id byte
 );
+
+my %C_packets_by_id = ();
+my %S_packets_by_id = ();
+my %packet_names = ();
+my $tmpbuf;
+open (my $TMP, ">", \$tmpbuf);
 
 select((select(STDERR), $| = 1)[0]); 
 
@@ -74,15 +81,6 @@ $htmltree->parse($htmldb);
 $htmltree->eof();
 print STDERR "Done\n";
 print STDERR "Processing tables...";
-
-print CLNT q
-"-- Packets from client to server
-CPacketDescription = {
-";
-print SRVR q
-"-- Packets from server to client
-SPacketDescription = {
-";
 
 my @tables = $htmltree->look_down("_tag", "table", "id", "code");
 
@@ -107,11 +105,9 @@ foreach my $table (@tables) {
 
 finish_current();
 
-print CLNT "}\n";
-print SRVR "}\n";
-close ($CNST);
-close ($SRVR);
-close ($CLNT);
+close($TMP);
+
+dump_packets;
 
 print STDERR "Done\n";
 exit (0);
@@ -135,12 +131,15 @@ sub Fix_AndTables {
 
 sub finish_current {
 	if ($current_name ne "") {
+		print $TMP "},\n";
+		close ($TMP);
 		if ($current_source eq "S") {
-			print $SRVR "},\n";
+			$S_packets_by_id{${current_id}} = $tmpbuf;
 		}
 		else {
-			print $CLNT "},\n";
+			$C_packets_by_id{${current_id}} = $tmpbuf;
 		}
+		open ($TMP, ">", \$tmpbuf);
 	}
 }
 
@@ -155,26 +154,34 @@ sub do_label {
 	}
 	if ($label =~ /Message Name/) {
 		$current_name = $text;
-		$current_name =~ /[[:space:]]*([A-Z0-9]+)_.*/;
-		
-		my $numid = $prefixes{$1};
-		print STDERR "Unknown prefix: $1\n" if ($numid == 0);
-		$numid = $numid * 0x100 + hex($current_id);
-		print $CNST sprintf("local $current_name = 0x%04X\n", $numid);
 	}
 	if ($label =~ /Direction/) {
 		if ($text =~ /Server[ ]*->[ ]*Client/) {
 			$current_source = "S";
-			print $SRVR "--[[\n${current_raw}\n]]\n";
-			print $SRVR "[$current_name] = {\n";
 		}
 		elsif ($text =~ /Client[ ]*->[ ]*Server/) {
 			$current_source = "C";
-			print $CLNT "--[[\n${current_raw}\n]]\n";
-			print $CLNT "[$current_name] = {\n";
 		} else {
-			print $STDERR "Unknown direction: $text\n",
+			die("Unknown direction: $text\n");
 		}
+
+		$current_name =~ /[[:space:]]*([A-Z0-9]+)_.*/;
+		my $prefid = $prefixes{"${current_source}_$1"};
+		print STDERR "Unknown prefix: ${current_source}_$1\n" unless $prefid;
+		$current_id = $prefid * 0x100 + hex($current_id);
+		if ($packet_names{$current_id} and
+				$packet_names{$current_id} ne $current_name) {
+			print STDERR qq"
+WARN: $current_name and $packet_names{$current_id} have the same id.
+$current_name will get a new random id.
+";
+			$current_id = int(rand(255)) * 0x100 + ($current_id % 0x100);
+		}
+		$packet_names{$current_id} = $current_name;
+
+		print $TMP "--[[doc\n${current_raw}\n]]\n";
+		my $real_id = $current_id % 0x100;
+		print $TMP sprintf("[$current_name] = { -- 0x%02X\n", $real_id);
 	}
 	if ($label =~ /Format/) {
 		my $formatted = $formatter->format($value);
@@ -192,16 +199,59 @@ sub do_label {
 			$name =~ s/"/\\"/g;
 			if (defined($typemap{$type})) {
 				my @method = @{$typemap{$type}};
-				if ($current_source eq "S") {
-					print $SRVR "\t${method[0]}{label=\"${name}\", ${method[1]}},\n";	
-				} elsif ($current_source eq "C") {
-					print $CLNT "\t${method[0]}{label=\"${name}\", ${method[1]}},\n";
-				} else { print "Unknown source: $current_source.\n"; }
+				if (${method[1]} ne "") {
+					print $TMP "\t${method[0]}{label=\"${name}\", ${method[1]}},\n";
+				} else {
+					print $TMP "\t${method[0]}(\"${name}\"),\n";
+				}
 			} else {print "Unknown type: $type. In:\n$formatted\n"; }
 		}
 	}
+}
 
-	#print "Label: $label\n";
-	#print "Data: " . $value->as_text() . "\n";
-	#print $formatter->format($value) . "\n";
+sub dump_packets {
+	open(my $CNST, ">", "constants.lua")
+		or die("Couldn't open constants.lua");
+	open(my $SRVR, ">", "spackets.lua")
+		or die("Couldn't open spackets.lua");
+	open(my $CLNT, ">", "cpackets.lua")
+		or die("Couldn't open cpackets.lua");
+
+	print $CNST q
+"packet_names = {
+";
+
+	print $CLNT q
+"-- Packets from client to server
+CPacketDescription = {
+";
+	print $SRVR q
+"-- Packets from server to client
+SPacketDescription = {
+";
+	my @keys =  sort {$a <=> $b} keys %C_packets_by_id;
+	
+	foreach my $key (@keys) {
+		print $CLNT $C_packets_by_id{$key};
+	}
+
+	@keys =  sort {$a <=> $b} keys %S_packets_by_id;
+	
+	foreach my $key (@keys) {
+		print $SRVR $S_packets_by_id{$key};
+	}
+
+	@keys =  sort {$a <=> $b} keys %packet_names;
+	
+	foreach my $key (@keys) {
+		print $CNST sprintf("#define ${packet_names{$key}}    0x%04X\n", $key);
+		print $CNST sprintf("[${packet_names{$key}}] = \"${packet_names{$key}}\",\n", $key);
+	}
+	
+	print $CNST "}\n";
+	print $CLNT "}\n";
+	print $SRVR "}\n";
+	close ($SRVR);
+	close ($CLNT);
+	close ($CNST);
 }
