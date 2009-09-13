@@ -408,7 +408,6 @@ do
 	})
 
 packet_names = {
-[0x1E07] = "PACKET_USERLOGGINGOFF",
 [0x7000] = "BNLS_NULL",
 [0x7001] = "BNLS_CDKEY",
 [0x7002] = "BNLS_LOGONCHALLENGE",
@@ -432,51 +431,105 @@ packet_names = {
 [0x7014] = "BNLS_SERVERLOGONPROOF",
 [0x7018] = "BNLS_VERSIONCHECKEX",
 [0x701A] = "BNLS_VERSIONCHECKEX2",
-[0x7110] = "D2GS_CHARTOOBJ",
-[0x7119] = "D2GS_SMALLGOLDPICKUP",
-[0x711D] = "D2GS_SETBYTEATTR",
-[0x711E] = "D2GS_SETWORDATTR",
-[0x711F] = "D2GS_SETDWORDATTR",
-[0x7151] = "D2GS_WORLDOBJECT",
-[0x715C] = "D2GS_COMPSTARTGAME",
-[0x7177] = "D2GS_TRADEACTION",
-[0x717A] = "D2GS_LOGONRESPONSE",
-[0x7189] = "D2GS_UNIQUEEVENTS",
-[0x71AF] = "D2GS_STARTLOGON",
-[0x7201] = "MCP_STARTUP",
-[0x7202] = "MCP_CHARCREATE",
-[0x7203] = "MCP_CREATEGAME",
-[0x7204] = "MCP_JOINGAME",
-[0x7205] = "MCP_GAMELIST",
-[0x7206] = "MCP_GAMEINFO",
-[0x7207] = "MCP_CHARLOGON",
-[0x720A] = "MCP_CHARDELETE",
-[0x7211] = "MCP_REQUESTLADDERDATA",
-[0x7212] = "MCP_MOTD",
-[0x7213] = "MCP_CANCELGAMECREATE",
-[0x7214] = "MCP_CREATEQUEUE",
-[0x7217] = "MCP_CHARLIST",
-[0x7218] = "MCP_CHARUPGRADE",
-[0x7219] = "MCP_CHARLIST2",
-[0x7300] = "PACKET_IDLE",
-[0x7301] = "PACKET_LOGON",
-[0x7302] = "PACKET_STATSUPDATE",
-[0x7303] = "PACKET_DATABASE",
-[0x7304] = "PACKET_MESSAGE",
-[0x7305] = "PACKET_CYCLE",
-[0x7306] = "PACKET_USERINFO",
-[0x7307] = "PACKET_BROADCASTMESSAGE",
-[0x7308] = "PACKET_COMMAND",
-[0x7309] = "PACKET_CHANGEDBPASSWORD",
-[0x730A] = "PACKET_BOTNETVERSION",
-[0x730B] = "PACKET_BOTNETCHAT",
-[0x730D] = "PACKET_ACCOUNT",
-[0x7310] = "PACKET_CHATDROPOPTIONS",
-[0x7403] = "PKT_CLIENTREQ",
-[0x7405] = "PKT_SERVERPING",
-[0x7407] = "PKT_KEEPALIVE",
-[0x7408] = "PKT_CONNTEST",
-[0x7409] = "PKT_CONNTEST2",
+[0x8010] = "D2GS_CHARTOOBJ",
+[0x8019] = "D2GS_SMALLGOLDPICKUP",
+[0x801D] = "D2GS_SETBYTEATTR",
+[0x801E] = "D2GS_SETWORDATTR",
+[0x801F] = "D2GS_SETDWORDATTR",
+[0x8051] = "D2GS_WORLDOBJECT",
+[0x805C] = "D2GS_COMPSTARTGAME",
+[0x8077] = "D2GS_TRADEACTION",
+[0x807A] = "D2GS_LOGONRESPONSE",
+[0x8089] = "D2GS_UNIQUEEVENTS",
+[0x80AF] = "D2GS_STARTLOGON",
+[0x8101] = "D2GS_WALKTOLOCATION",
+[0x8102] = "D2GS_WALKTOENTITY",
+[0x8103] = "D2GS_RUNTOLOCATION",
+[0x8104] = "D2GS_RUNTOENTITY",
+[0x8105] = "D2GS_LEFTSKILLONLOCATION",
+[0x8106] = "D2GS_LEFTSKILLONENTITY",
+[0x8107] = "D2GS_LEFTSKILLONENTITYEX",
+[0x8108] = "D2GS_LEFTSKILLONLOCATIONEX",
+[0x8109] = "D2GS_LEFTSKILLONENTITYEX2",
+[0x810A] = "D2GS_LEFTSKILLONENTITYEX3",
+[0x810C] = "D2GS_RIGHTSKILLONLOCATION",
+[0x810D] = "D2GS_RIGHTSKILLONENTITY",
+[0x810E] = "D2GS_RIGHTSKILLONENTITYEX",
+[0x810F] = "D2GS_RIGHTSKILLONLOCATIONEX",
+[0x8110] = "D2GS_RIGHTSKILLONENTITYEX2",
+[0x8111] = "D2GS_RIGHTSKILLONENTITYEX3",
+[0x8113] = "D2GS_INTERACTWITHENTITY",
+[0x8114] = "D2GS_OVERHEADMESSAGE",
+[0x8115] = "D2GS_CHATMESSAGE",
+[0x8116] = "D2GS_PICKUPITEM",
+[0x8117] = "D2GS_DROPITEM",
+[0x8118] = "D2GS_ITEMTOBUFFER",
+[0x8119] = "D2GS_PICKUPBUFFERITEM",
+[0x811A] = "D2GS_ITEMTOBODY",
+[0x811B] = "D2GS_SWAP2HANDEDITEM",
+[0x811C] = "D2GS_PICKUPBODYITEM",
+[0x811D] = "D2GS_SWITCHBODYITEM",
+[0x811F] = "D2GS_SWITCHINVENTORYITEM",
+[0x8120] = "D2GS_USEITEM",
+[0x8121] = "D2GS_STACKITEM",
+[0x8122] = "D2GS_REMOVESTACKITEM",
+[0x8123] = "D2GS_ITEMTOBELT",
+[0x8124] = "D2GS_REMOVEBELTITEM",
+[0x8125] = "D2GS_SWITCHBELTITEM",
+[0x8126] = "D2GS_USEBELTITEM",
+[0x8128] = "D2GS_INSERTSOCKETITEM",
+[0x8129] = "D2GS_SCROLLTOTOME",
+[0x812A] = "D2GS_ITEMTOCUBE",
+[0x812D] = "D2GS_UNSELECTOBJ",
+[0x812F] = "D2GS_NPCINIT",
+[0x8130] = "D2GS_NPCCANCEL",
+[0x8132] = "D2GS_NPCBUY",
+[0x8133] = "D2GS_NPCSELL",
+[0x8138] = "D2GS_NPCTRADE",
+[0x813F] = "D2GS_CHARACTERPHRASE",
+[0x8149] = "D2GS_WAYPOINT",
+[0x814F] = "D2GS_TRADE",
+[0x8150] = "D2GS_DROPGOLD",
+[0x815E] = "D2GS_PARTY",
+[0x8161] = "D2GS_POTIONTOMERCENARY",
+[0x8168] = "D2GS_GAMELOGON",
+[0x816A] = "D2GS_ENTERGAMEENVIRONMENT",
+[0x816D] = "D2GS_PING",
+[0x9001] = "MCP_STARTUP",
+[0x9002] = "MCP_CHARCREATE",
+[0x9003] = "MCP_CREATEGAME",
+[0x9004] = "MCP_JOINGAME",
+[0x9005] = "MCP_GAMELIST",
+[0x9006] = "MCP_GAMEINFO",
+[0x9007] = "MCP_CHARLOGON",
+[0x900A] = "MCP_CHARDELETE",
+[0x9011] = "MCP_REQUESTLADDERDATA",
+[0x9012] = "MCP_MOTD",
+[0x9013] = "MCP_CANCELGAMECREATE",
+[0x9014] = "MCP_CREATEQUEUE",
+[0x9017] = "MCP_CHARLIST",
+[0x9018] = "MCP_CHARUPGRADE",
+[0x9019] = "MCP_CHARLIST2",
+[0xA000] = "PACKET_IDLE",
+[0xA001] = "PACKET_LOGON",
+[0xA002] = "PACKET_STATSUPDATE",
+[0xA003] = "PACKET_DATABASE",
+[0xA004] = "PACKET_MESSAGE",
+[0xA005] = "PACKET_CYCLE",
+[0xA006] = "PACKET_USERINFO",
+[0xA007] = "PACKET_BROADCASTMESSAGE",
+[0xA008] = "PACKET_COMMAND",
+[0xA009] = "PACKET_CHANGEDBPASSWORD",
+[0xA00A] = "PACKET_BOTNETVERSION",
+[0xA00B] = "PACKET_BOTNETCHAT",
+[0xA00D] = "PACKET_ACCOUNT",
+[0xA010] = "PACKET_CHATDROPOPTIONS",
+[0xB003] = "PKT_CLIENTREQ",
+[0xB005] = "PKT_SERVERPING",
+[0xB007] = "PKT_KEEPALIVE",
+[0xB008] = "PKT_CONNTEST",
+[0xB009] = "PKT_CONNTEST2",
+[0xCE07] = "PACKET_USERLOGGINGOFF",
 [0xFF00] = "SID_NULL",
 [0xFF02] = "SID_STOPADV",
 [0xFF04] = "SID_SERVERLIST",
@@ -577,59 +630,6 @@ packet_names = {
 [0xFF7F] = "SID_CLANMEMBERSTATUSCHANGE",
 [0xFF81] = "SID_CLANMEMBERRANKCHANGE",
 [0xFF82] = "SID_CLANMEMBERINFORMATION",
-[0x17101] = "D2GS_WALKTOLOCATION",
-[0x17102] = "D2GS_WALKTOENTITY",
-[0x17103] = "D2GS_RUNTOLOCATION",
-[0x17104] = "D2GS_RUNTOENTITY",
-[0x17105] = "D2GS_LEFTSKILLONLOCATION",
-[0x17106] = "D2GS_LEFTSKILLONENTITY",
-[0x17107] = "D2GS_LEFTSKILLONENTITYEX",
-[0x17108] = "D2GS_LEFTSKILLONLOCATIONEX",
-[0x17109] = "D2GS_LEFTSKILLONENTITYEX2",
-[0x1710A] = "D2GS_LEFTSKILLONENTITYEX3",
-[0x1710C] = "D2GS_RIGHTSKILLONLOCATION",
-[0x1710D] = "D2GS_RIGHTSKILLONENTITY",
-[0x1710E] = "D2GS_RIGHTSKILLONENTITYEX",
-[0x1710F] = "D2GS_RIGHTSKILLONLOCATIONEX",
-[0x17110] = "D2GS_RIGHTSKILLONENTITYEX2",
-[0x17111] = "D2GS_RIGHTSKILLONENTITYEX3",
-[0x17113] = "D2GS_INTERACTWITHENTITY",
-[0x17114] = "D2GS_OVERHEADMESSAGE",
-[0x17115] = "D2GS_CHATMESSAGE",
-[0x17116] = "D2GS_PICKUPITEM",
-[0x17117] = "D2GS_DROPITEM",
-[0x17118] = "D2GS_ITEMTOBUFFER",
-[0x17119] = "D2GS_PICKUPBUFFERITEM",
-[0x1711A] = "D2GS_ITEMTOBODY",
-[0x1711B] = "D2GS_SWAP2HANDEDITEM",
-[0x1711C] = "D2GS_PICKUPBODYITEM",
-[0x1711D] = "D2GS_SWITCHBODYITEM",
-[0x1711F] = "D2GS_SWITCHINVENTORYITEM",
-[0x17120] = "D2GS_USEITEM",
-[0x17121] = "D2GS_STACKITEM",
-[0x17122] = "D2GS_REMOVESTACKITEM",
-[0x17123] = "D2GS_ITEMTOBELT",
-[0x17124] = "D2GS_REMOVEBELTITEM",
-[0x17125] = "D2GS_SWITCHBELTITEM",
-[0x17126] = "D2GS_USEBELTITEM",
-[0x17128] = "D2GS_INSERTSOCKETITEM",
-[0x17129] = "D2GS_SCROLLTOTOME",
-[0x1712A] = "D2GS_ITEMTOCUBE",
-[0x1712D] = "D2GS_UNSELECTOBJ",
-[0x1712F] = "D2GS_NPCINIT",
-[0x17130] = "D2GS_NPCCANCEL",
-[0x17132] = "D2GS_NPCBUY",
-[0x17133] = "D2GS_NPCSELL",
-[0x17138] = "D2GS_NPCTRADE",
-[0x1713F] = "D2GS_CHARACTERPHRASE",
-[0x17149] = "D2GS_WAYPOINT",
-[0x1714F] = "D2GS_TRADE",
-[0x17150] = "D2GS_DROPGOLD",
-[0x1715E] = "D2GS_PARTY",
-[0x17161] = "D2GS_POTIONTOMERCENARY",
-[0x17168] = "D2GS_GAMELOGON",
-[0x1716A] = "D2GS_ENTERGAMEENVIRONMENT",
-[0x1716D] = "D2GS_PING",
 }
 local Descs = {
 	YesNo = {
@@ -694,9 +694,6 @@ local Descs = {
 		end
 
 SPacketDescription = {
-[0x1E07] = { 
-	uint32("Bot id"),
-},
 [0x7001] = { 
 	uint32{label="Result", desc=Descs.YesNo},
 	uint32("Client Token", base.HEX),
@@ -791,7 +788,7 @@ SPacketDescription = {
 	uint32("Cookie.", base.HEX),
 	uint32("The latest version code for this product.", base.HEX),
 },
-[0x7110] = { 
+[0x8010] = { 
 	uint8("Unknown"),
 	uint32("Player ID"),
 	uint8("Movement Type"),
@@ -800,22 +797,22 @@ SPacketDescription = {
 	uint16("X Coordinate"),
 	uint16("Y Coordinate"),
 },
-[0x7119] = { 
+[0x8019] = { 
 	uint8("Amount"),
 },
-[0x711D] = { 
+[0x801D] = { 
 	uint8("Attribute"),
 	uint8("Amount"),
 },
-[0x711E] = { 
+[0x801E] = { 
 	uint8("Attribute"),
 	uint16("Amount"),
 },
-[0x711F] = { 
+[0x801F] = { 
 	uint8("Attribute - D2GS_SETWORDATTR"),
 	uint32("Amount"),
 },
-[0x7151] = { 
+[0x8051] = { 
 	uint8("Object Type - Any information appreciated"),
 	uint32("Object ID"),
 	uint16("Object unique code"),
@@ -824,32 +821,32 @@ SPacketDescription = {
 	uint8("State *"),
 	uint8("Interaction Condition"),
 },
-[0x715C] = { 
+[0x805C] = { 
 },
-[0x7177] = { 
+[0x8077] = { 
 	uint8("Request Type"),
 },
-[0x717A] = { 
+[0x807A] = { 
 	uint32("Unknown - Possible acceptance/request ID"),
 },
-[0x7189] = { 
+[0x8089] = { 
 	uint8("EventId // see below,"),
 },
-[0x71AF] = { 
+[0x80AF] = { 
 },
-[0x7201] = { 
+[0x9001] = { 
 	uint32("Result"),
 },
-[0x7202] = { 
+[0x9002] = { 
 	uint32("Result"),
 },
-[0x7203] = { 
+[0x9003] = { 
 	uint16("Request Id"),
 	uint16("Game token"),
 	uint16("Unknown"),
 	uint32("Result"),
 },
-[0x7204] = { 
+[0x9004] = { 
 	uint16("Request ID"),
 	uint16("Game token"),
 	uint16("Unknown"),
@@ -870,7 +867,7 @@ SPacketDescription = {
 		[0x7D] = "A non-ladder character cannot join a game created by a Ladder character.",
 	}),
 },
-[0x7205] = { 
+[0x9005] = { 
 	uint16("Request Id"),
 	uint32("Index"),
 	uint8("Number of players in game"),
@@ -878,7 +875,7 @@ SPacketDescription = {
 	stringz("Game name"),
 	stringz("Game description"),
 },
-[0x7206] = { 
+[0x9006] = { 
 	uint16("Request ID"),
 	uint32("Status *"),
 	uint32("Game Uptime"),
@@ -890,13 +887,13 @@ SPacketDescription = {
 	uint8("Unused"),
 	stringz("[16] Character names **"),
 },
-[0x7207] = { 
+[0x9007] = { 
 	uint32("Result"),
 },
-[0x720A] = { 
+[0x900A] = { 
 	uint32("Result"),
 },
-[0x7211] = { 
+[0x9011] = { 
 	uint8("Ladder type"),
 	uint16("Total response size"),
 	uint16("Current message size"),
@@ -911,24 +908,24 @@ SPacketDescription = {
 	uint16("Character level"),
 	uint8("[16] Character name"),
 },
-[0x7212] = { 
+[0x9012] = { 
 	uint8("Unknown"),
 	stringz("MOTD"),
 },
-[0x7214] = { 
+[0x9014] = { 
 	uint32("Position"),
 },
-[0x7217] = { 
+[0x9017] = { 
 	uint16("Number of characters requested"),
 	uint32("Number of characters that exist on this account"),
 	uint16("Number of characters returned"),
 	stringz("Character name"),
 	stringz("Character statstring"),
 },
-[0x7218] = { 
+[0x9018] = { 
 	uint32("Result"),
 },
-[0x7219] = { 
+[0x9019] = { 
 	uint16("Number of characters requested"),
 	uint32("Number of characters that exist on this account"),
 	uint16("Number of characters returned"),
@@ -936,28 +933,28 @@ SPacketDescription = {
 	stringz("Character name"),
 	stringz("Character statstring"),
 },
-[0x7300] = { 
+[0xA000] = { 
 },
-[0x7301] = { 
+[0xA001] = { 
 	uint32("Result"),
 },
-[0x7302] = { 
+[0xA002] = { 
 	uint32("Result"),
 },
-[0x7303] = { 
+[0xA003] = { 
 	uint32("command"),
 	stringz("usermask"),
 	stringz("flags"),
 	stringz("usermask"),
 },
-[0x7304] = { 
+[0xA004] = { 
 	stringz("User"),
 	stringz("Command"),
 },
-[0x7305] = { 
+[0xA005] = { 
 	stringz("Channel"),
 },
-[0x7306] = { 
+[0xA006] = { 
 	uint32("Bot number"),
 	stringz("Bot name"),
 	stringz("Bot channel"),
@@ -965,28 +962,31 @@ SPacketDescription = {
 	stringz("Unique account name"),
 	stringz("Current database"),
 },
-[0x730A] = { 
+[0xA00A] = { 
 	uint32("Server Version"),
 },
-[0x730B] = { 
+[0xA00B] = { 
 	uint32("Command"),
 	uint32("Action"),
 	uint32("ID of source bot"),
 	stringz("Message"),
 },
-[0x730D] = { 
+[0xA00D] = { 
 	uint32("Command"),
 	uint32("Result"),
 },
-[0x7310] = { 
+[0xA010] = { 
 	uint8("SubcommandFor subcommand 0:"),
 	uint8("Setting for broadcast"),
 	uint8("Setting for database"),
 	uint8("Setting for whispers"),
 	uint8("Refuse all"),
 },
-[0x7405] = { 
+[0xB005] = { 
 	uint32("UDP Code"),
+},
+[0xCE07] = { 
+	uint32("Bot id"),
 },
 [0xFF00] = { 
 },
@@ -994,12 +994,12 @@ SPacketDescription = {
 	uint32("Server version"),
 	iterator{
 		label="Server list",
-		alias="bytes",
-		condition = function(self, state) return state.packet.srvr ~="" end,
-		repeated = {
-			WProtoField.stringz{label="Server", key="srvr"},
-		},
-	}
+ 		alias="bytes",
+ 		condition = function(self, state) return state.packet.srvr ~="" end,
+ 		repeated = {
+ 			WProtoField.stringz{label="Server", key="srvr"},
+ 		},
+ 	}
 },
 [0xFF05] = { 
 	uint32("Registration Version"),
@@ -1637,19 +1637,250 @@ CPacketDescription = {
 	stringz("Version check archive filename."),
 	stringz("Checksum formula."),
 },
-[0x7201] = { 
+[0x8101] = { 
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
+},
+[0x8102] = { 
+	uint32("*Entity Type"),
+	uint32("Entity ID"),
+},
+[0x8103] = { 
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
+},
+[0x8104] = { 
+	uint32("*Entity Type"),
+	uint32("Entity ID"),
+},
+[0x8105] = { 
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
+},
+[0x8106] = { 
+	uint32("*Entity Type"),
+	uint32("Entity ID"),
+},
+[0x8107] = { 
+	uint32("Entity Type"),
+	uint32("Entity ID"),
+},
+[0x8108] = { 
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
+},
+[0x8109] = { 
+	uint32("*Entity Type"),
+	uint32("Entity ID"),
+},
+[0x810A] = { 
+	uint32("*Entity Type"),
+	uint32("Entity ID"),
+},
+[0x810C] = { 
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
+},
+[0x810D] = { 
+	uint32("Entity Type"),
+	uint32("Entity ID"),
+},
+[0x810E] = { 
+	uint32("Entity Type"),
+	uint32("Entity ID"),
+},
+[0x810F] = { 
+	uint16("X coordinate"),
+	uint16("Y coordinate"),
+},
+[0x8110] = { 
+	uint32("Entity Type"),
+	uint32("Entity ID"),
+},
+[0x8111] = { 
+	uint32("Entity Type"),
+	uint32("Entity ID"),
+},
+[0x8113] = { 
+	uint32("Entity Type"),
+	uint32("Entity ID"),
+},
+[0x8114] = { 
+	uint16("Unknown - 0x00, 0x00"),
+	stringz("Message"),
+	uint8("Unused - 0x00"),
+	uint16("Unknown - 0x00, 0x00"),
+},
+[0x8115] = { 
+	uint8("Message Type"),
+	uint8("Unknown"),
+	stringz("Message"),
+	uint8("Unknown"),
+	uint16("Unknown - Only if normal chat"),
+	stringz("Player to whisper to - Only if whispering"),
+	uint8("Unknown - Only if whispering"),
+},
+[0x8116] = { 
+	uint32("Unit Type"),
+	uint32("Unit ID"),
+	uint32("Action ID"),
+},
+[0x8117] = { 
+	uint32("Item ID"),
+},
+[0x8118] = { 
+	uint32("Item ID"),
+	uint32("X coordinate"),
+	uint32("Y coordinate"),
+	uint32("Buffer Type"),
+},
+[0x8119] = { 
+	uint32("Item ID"),
+},
+[0x811A] = { 
+	uint32("Item ID"),
+	uint32("Body Location"),
+},
+[0x811B] = { 
+	uint32("Item ID"),
+	uint32("Body Location"),
+},
+[0x811C] = { 
+	uint16("Body Location"),
+},
+[0x811D] = { 
+	uint32("Item ID"),
+	uint32("Body Location"),
+},
+[0x811F] = { 
+	uint32("Item ID - Item to place in inventory"),
+	uint32("Item ID - Item to be replaced"),
+	uint32("X coordinate for replace"),
+	uint32("Y coordinate for replace"),
+},
+[0x8120] = { 
+	uint32("Item ID"),
+	uint32("X coordinate"),
+	uint32("Y coordinate"),
+},
+[0x8121] = { 
+	uint32("Item ID - Stack item"),
+	uint32("Item ID - Target item"),
+},
+[0x8122] = { 
+	uint32("Item ID"),
+},
+[0x8123] = { 
+	uint32("Item ID"),
+	uint32("Belt Location"),
+},
+[0x8124] = { 
+	uint32("Item ID"),
+},
+[0x8125] = { 
+	uint32("Item ID - Cursor buffer"),
+	uint32("Item ID - Item to be replaced"),
+},
+[0x8126] = { 
+	uint32("Item ID"),
+	uint32("Unknown - Possibly unused"),
+	uint32("Unknown - Possibly unused"),
+},
+[0x8128] = { 
+	uint32("Item ID - Item to place in socket"),
+	uint32("Item ID - Socketed item"),
+},
+[0x8129] = { 
+	uint32("Item ID - Scroll"),
+	uint32("Item ID - Tome"),
+},
+[0x812A] = { 
+	uint32("Item ID"),
+	uint32("Cube ID"),
+},
+[0x812D] = { 
+},
+[0x812F] = { 
+	uint32("Entity Type"),
+	uint32("Entity ID"),
+},
+[0x8130] = { 
+	uint32("Entity Type"),
+	uint32("NPC ID"),
+},
+[0x8132] = { 
+	uint32("NPC ID - Unconfirmed"),
+	uint32("Item ID - Unconfirmed"),
+	uint32("Buffer Type - Unconfirmed"),
+	uint32("Cost"),
+},
+[0x8133] = { 
+	uint32("NPC ID - Unconfirmed"),
+	uint32("Item ID - Unconfirmed"),
+	uint32("Buffer ID - Unconfirmed - Possible value 0x04"),
+	uint32("Cost"),
+},
+[0x8138] = { 
+	uint32("Trade Type - Unconfirmed"),
+	uint32("NPC ID - Unconfirmed"),
+	uint32("Unknown - Unconfirmed - Possible value 0x00"),
+},
+[0x813F] = { 
+	uint16("Phrase ID"),
+},
+[0x8149] = { 
+	uint8("Waypoint ID"),
+	uint8("Unknown - Appears to be random"),
+	uint16("Unknown - 0x00"),
+	uint8("Level number"),
+	uint16("Unknown - 0x00"),
+},
+[0x814F] = { 
+	uint32("Request ID"),
+	uint16("Gold Amount"),
+},
+[0x8150] = { 
+	uint32("PlayerID"),
+	uint32("GoldAmount"),
+},
+[0x815E] = { 
+	uint16("Action ID"),
+	uint32("Player ID"),
+},
+[0x8161] = { 
+	uint16("Unknown - 0x00"),
+},
+[0x8168] = { 
+	uint32("D2GS Server Hash"),
+	uint16("D2GS Server Token"),
+	uint8("Character ID"),
+	uint32("Version byte"),
+	uint32("Unknown - Suggested Const"),
+	uint32("Unknown - Suggested Const"),
+	uint8("Unknown - Suggested"),
+	stringz("Character name"),
+	bytes("*See user-comment below"),
+},
+[0x816A] = { 
+},
+[0x816D] = { 
+	uint32("Tick Count"),
+	uint32("Null"),
+	uint32("Null"),
+},
+[0x9001] = { 
 	uint32("MCP Cookie"),
 	uint32("MCP Status"),
 	uint32("[2] MCP Chunk 1"),
 	uint32("[12] MCP Chunk 2"),
 	stringz("Battle.net Unique Name"),
 },
-[0x7202] = { 
+[0x9002] = { 
 	uint32("Character class"),
 	uint16("Character flags"),
 	stringz("Character name"),
 },
-[0x7203] = { 
+[0x9003] = { 
 	uint16("Request Id *"),
 	uint32("Difficulty"),
 	uint8("Unknown - 1"),
@@ -1659,93 +1890,93 @@ CPacketDescription = {
 	stringz("Game password"),
 	stringz("Game description"),
 },
-[0x7204] = { 
+[0x9004] = { 
 	uint16("Request ID"),
 	stringz("Game name"),
 	stringz("Game Password"),
 },
-[0x7205] = { 
+[0x9005] = { 
 	uint16("Request ID"),
 	uint32("Unknown"),
 	stringz("Search String *"),
 },
-[0x7206] = { 
+[0x9006] = { 
 	uint16("Request ID"),
 	stringz("Game name"),
 },
-[0x7207] = { 
+[0x9007] = { 
 	stringz("Character name"),
 },
-[0x720A] = { 
+[0x900A] = { 
 	uint16("Unknown"),
 	stringz("Character name"),
 },
-[0x7211] = { 
+[0x9011] = { 
 	uint8("Ladder type"),
 	uint16("Starting position"),
 },
-[0x7212] = { 
+[0x9012] = { 
 },
-[0x7213] = { 
+[0x9013] = { 
 },
-[0x7217] = { 
+[0x9017] = { 
 	uint32("Number of characters to list"),
 },
-[0x7218] = { 
+[0x9018] = { 
 	stringz("Character Name"),
 },
-[0x7219] = { 
+[0x9019] = { 
 	uint32("Number of characters to list."),
 },
-[0x7300] = { 
+[0xA000] = { 
 },
-[0x7301] = { 
+[0xA001] = { 
 	stringz("BotID"),
 	stringz("Bot Password"),
 },
-[0x7302] = { 
+[0xA002] = { 
 	stringz("Unique username on Battle.net"),
 	stringz("Current channel on Battle.net"),
 	uint32("Battle.net server IP address"),
 	stringz("DatabaseID"),
 	uint32("Cycle status"),
 },
-[0x7303] = { 
+[0xA003] = { 
 	uint32("Command"),
 	stringz("Usermask"),
 	stringz("Flags"),
 	stringz("Usermask"),
 },
-[0x7304] = { 
+[0xA004] = { 
 	stringz("User"),
 	stringz("Command"),
 },
-[0x7305] = { 
+[0xA005] = { 
 	uint32("Count"),
 	stringz{label="Usernames to cycle", todo="maybe iterator"},
 },
-[0x7306] = { 
+[0xA006] = { 
 },
-[0x7307] = { 
+[0xA007] = { 
 	stringz("User"),
 	stringz("Command"),
 },
-[0x7308] = { 
+[0xA008] = { 
 	uint32("Target BotID"),
 	stringz("Sending User"),
 	stringz("Command"),
 },
-[0x7309] = { 
+[0xA009] = { 
 	uint32("Password to change"),
 	stringz("New password"),
 },
-[0x730B] = { 
+[0xA00B] = { 
 	uint32("Command"),
 	uint32("Action"),
 	uint32("For Command 2, ID of destination"),
 	stringz("Message"),
 },
-[0x730D] = { 
+[0xA00D] = { 
 	uint32("CommandFor Command 0x00"),
 	stringz("Account name"),
 	stringz("Account passwordFor Command 0x01"),
@@ -1755,23 +1986,23 @@ CPacketDescription = {
 	stringz("Account name"),
 	stringz("Account password"),
 },
-[0x7310] = { 
+[0xA010] = { 
 	uint8("SubcommandFor subcommand 0:"),
 	uint8("Setting for broadcast"),
 	uint8("Setting for database"),
 	uint8("Setting for whispers"),
 	uint8("Refuse all"),
 },
-[0x7403] = { 
+[0xB003] = { 
 	uint32("Code"),
 },
-[0x7407] = { 
+[0xB007] = { 
 	uint32("Tick count"),
 },
-[0x7408] = { 
+[0xB008] = { 
 	uint32("Server Token"),
 },
-[0x7409] = { 
+[0xB009] = { 
 	uint32("Server Token"),
 	uint32("UDP Token*"),
 },
@@ -2070,14 +2301,14 @@ CPacketDescription = {
 },
 [0xFF50] = { 
 	uint32("Protocol ID"),
-	strdw("Platform ID"),
-	strdw("Product ID"),
+	uint32("Platform ID"),
+	uint32("Product ID"),
 	uint32("Version Byte"),
-	strdw("Product language"),
-	ipv4("Local IP for NAT compatibility"),
-	uint32("Time zone bias"),
-	uint32("Locale ID"),
-	uint32("Language ID"),
+	uint32("Product language"),
+	uint32("Local IP for NAT compatibility*"),
+	uint32("Time zone bias*"),
+	uint32("Locale ID*"),
+	uint32("Language ID*"),
 	stringz("Country abreviation"),
 	stringz("Country"),
 },
@@ -2223,237 +2454,6 @@ CPacketDescription = {
 	uint32("Cookie"),
 	uint32("User's clan tag"),
 	stringz("Username"),
-},
-[0x17101] = { 
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x17102] = { 
-	uint32("*Entity Type"),
-	uint32("Entity ID"),
-},
-[0x17103] = { 
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x17104] = { 
-	uint32("*Entity Type"),
-	uint32("Entity ID"),
-},
-[0x17105] = { 
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x17106] = { 
-	uint32("*Entity Type"),
-	uint32("Entity ID"),
-},
-[0x17107] = { 
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x17108] = { 
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x17109] = { 
-	uint32("*Entity Type"),
-	uint32("Entity ID"),
-},
-[0x1710A] = { 
-	uint32("*Entity Type"),
-	uint32("Entity ID"),
-},
-[0x1710C] = { 
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x1710D] = { 
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x1710E] = { 
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x1710F] = { 
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x17110] = { 
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x17111] = { 
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x17113] = { 
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x17114] = { 
-	uint16("Unknown - 0x00, 0x00"),
-	stringz("Message"),
-	uint8("Unused - 0x00"),
-	uint16("Unknown - 0x00, 0x00"),
-},
-[0x17115] = { 
-	uint8("Message Type"),
-	uint8("Unknown"),
-	stringz("Message"),
-	uint8("Unknown"),
-	uint16("Unknown - Only if normal chat"),
-	stringz("Player to whisper to - Only if whispering"),
-	uint8("Unknown - Only if whispering"),
-},
-[0x17116] = { 
-	uint32("Unit Type"),
-	uint32("Unit ID"),
-	uint32("Action ID"),
-},
-[0x17117] = { 
-	uint32("Item ID"),
-},
-[0x17118] = { 
-	uint32("Item ID"),
-	uint32("X coordinate"),
-	uint32("Y coordinate"),
-	uint32("Buffer Type"),
-},
-[0x17119] = { 
-	uint32("Item ID"),
-},
-[0x1711A] = { 
-	uint32("Item ID"),
-	uint32("Body Location"),
-},
-[0x1711B] = { 
-	uint32("Item ID"),
-	uint32("Body Location"),
-},
-[0x1711C] = { 
-	uint16("Body Location"),
-},
-[0x1711D] = { 
-	uint32("Item ID"),
-	uint32("Body Location"),
-},
-[0x1711F] = { 
-	uint32("Item ID - Item to place in inventory"),
-	uint32("Item ID - Item to be replaced"),
-	uint32("X coordinate for replace"),
-	uint32("Y coordinate for replace"),
-},
-[0x17120] = { 
-	uint32("Item ID"),
-	uint32("X coordinate"),
-	uint32("Y coordinate"),
-},
-[0x17121] = { 
-	uint32("Item ID - Stack item"),
-	uint32("Item ID - Target item"),
-},
-[0x17122] = { 
-	uint32("Item ID"),
-},
-[0x17123] = { 
-	uint32("Item ID"),
-	uint32("Belt Location"),
-},
-[0x17124] = { 
-	uint32("Item ID"),
-},
-[0x17125] = { 
-	uint32("Item ID - Cursor buffer"),
-	uint32("Item ID - Item to be replaced"),
-},
-[0x17126] = { 
-	uint32("Item ID"),
-	uint32("Unknown - Possibly unused"),
-	uint32("Unknown - Possibly unused"),
-},
-[0x17128] = { 
-	uint32("Item ID - Item to place in socket"),
-	uint32("Item ID - Socketed item"),
-},
-[0x17129] = { 
-	uint32("Item ID - Scroll"),
-	uint32("Item ID - Tome"),
-},
-[0x1712A] = { 
-	uint32("Item ID"),
-	uint32("Cube ID"),
-},
-[0x1712D] = { 
-},
-[0x1712F] = { 
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x17130] = { 
-	uint32("Entity Type"),
-	uint32("NPC ID"),
-},
-[0x17132] = { 
-	uint32("NPC ID - Unconfirmed"),
-	uint32("Item ID - Unconfirmed"),
-	uint32("Buffer Type - Unconfirmed"),
-	uint32("Cost"),
-},
-[0x17133] = { 
-	uint32("NPC ID - Unconfirmed"),
-	uint32("Item ID - Unconfirmed"),
-	uint32("Buffer ID - Unconfirmed - Possible value 0x04"),
-	uint32("Cost"),
-},
-[0x17138] = { 
-	uint32("Trade Type - Unconfirmed"),
-	uint32("NPC ID - Unconfirmed"),
-	uint32("Unknown - Unconfirmed - Possible value 0x00"),
-},
-[0x1713F] = { 
-	uint16("Phrase ID"),
-},
-[0x17149] = { 
-	uint8("Waypoint ID"),
-	uint8("Unknown - Appears to be random"),
-	uint16("Unknown - 0x00"),
-	uint8("Level number"),
-	uint16("Unknown - 0x00"),
-},
-[0x1714F] = { 
-	uint32("Request ID"),
-	uint16("Gold Amount"),
-},
-[0x17150] = { 
-	uint32("PlayerID"),
-	uint32("GoldAmount"),
-},
-[0x1715E] = { 
-	uint16("Action ID"),
-	uint32("Player ID"),
-},
-[0x17161] = { 
-	uint16("Unknown - 0x00"),
-},
-[0x17168] = { 
-	uint32("D2GS Server Hash"),
-	uint16("D2GS Server Token"),
-	uint8("Character ID"),
-	uint32("Version byte"),
-	uint32("Unknown - Suggested Const"),
-	uint32("Unknown - Suggested Const"),
-	uint8("Unknown - Suggested"),
-	stringz("Character name"),
-	bytes("*See user-comment below"),
-},
-[0x1716A] = { 
-},
-[0x1716D] = { 
-	uint32("Tick Count"),
-	uint32("Null"),
-	uint32("Null"),
 },
 }
 	end
