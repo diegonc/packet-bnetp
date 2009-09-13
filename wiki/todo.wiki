@@ -10,7 +10,7 @@ data types:
   * ~~iteration until empty string (S>0x0b getchannellist)~~
   * ~~conditions (if..)~~
   * ~~string-dword (swap dword and output as string)~~
-  * supress raw values output on custom types (time, dwordstr)
+  * ~~supress raw values output on custom types (time, dwordstr)~~
 
 ===less important===
   * ~~ip (network byte order, opposite to intel). For some reason lua's built-in ipv4 uses inter order (lol?)~~
