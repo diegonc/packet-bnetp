@@ -285,19 +285,13 @@ do
 			["length"] = -1,
 			dissect = function(self, state)
 				local size = self:size(state)
-				local buf = state:read(size):tvb()
+				local str = state:peek(size):string()
 
 				if self.reversed then
-					local tmp = ByteArray.new()
-					tmp:set_size(size)
-					for i=size - 1, 0, -1 do
-						tmp:set_index(size - i - 1,
-							buf(i, 1):uint())
-					end
-					buf = tmp:tvb("Reversed String")
+					str = string.reverse(str)
 				end
 
-				state.bnet_node:add(self.pf, buf())
+				state.bnet_node:add(self.pf, state:read(size), str)
 			end,
 			value = function (self, state)
 				local val = state:peek(self:size(state))
@@ -310,10 +304,10 @@ do
 		},
 		["filetime"] = {
 			["size"] = function(...) return 8 end,
-			["alias"] = "uint64",
+			["alias"] = "string",
 			dissect = function(self, state)
 				local size = self.size(state:tvb())
-				local node = state.bnet_node:add(self.pf, state:peek(8))
+				local node = state.bnet_node:add(self.pf, state:peek(8), "")
 				-- POSIX epoch filetime
 				local epoch = 0xd53e8000 + (0x100000000 * 0x019db1de)
 				-- Read filetime
@@ -322,16 +316,16 @@ do
 				-- Convert to POSIX time if possible
 				if filetime > epoch then
 					-- Append text form of date to the node label.
-					node:append_text(os.date(" %c", (filetime - epoch) * 1E-7))
+					node:append_text(os.date("%c", (filetime - epoch) * 1E-7))
 				end
 			end,
 		},
 		["posixtime"] = {
 			["size"] = function(...) return 4 end,
-			["alias"] = "uint32",
+			["alias"] = "string",
 			dissect = function(self, state)
-				local node = state.bnet_node:add(self.pf, state:peek(4))
-				local unixtime = os.date(" %c", state:read(4):le_uint())
+				local node = state.bnet_node:add(self.pf, state:peek(4), "")
+				local unixtime = os.date("%c", state:read(4):le_uint())
 				-- Append text form of date to the node label.
 				node:append_text(unixtime)
 			end,
