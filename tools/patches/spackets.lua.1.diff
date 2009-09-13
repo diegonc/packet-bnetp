@@ -1,0 +1,89 @@
+Index: spackets.lua
+===================================================================
+--- spackets.lua	(revisi¢n: 49)
++++ spackets.lua	(revisi¢n: 52)
+@@ -1,9 +1,9 @@
+ [MCP_JOINGAME] = { -- 0x04
+ 	uint16("Request ID"),
+ 	uint16("Game token"),
+ 	uint16("Unknown"),
+-	uint32("IP of D2GS Server"),
++	ipv4("IP of D2GS Server"),
+ 	uint32("Game hash"),
+ 	uint32("Result"),
+ },
+ --[[doc
+@@ -1,5 +1,12 @@
+ [SID_SERVERLIST] = { -- 0x04
+ 	uint32("Server version"),
+-	stringz("[] Server list"),
++	iterator{
++		label="Server list",
++ 		alias="bytes",
++ 		condition = function(self, state) return state.packet.srvr ~="" end,
++ 		repeated = {
++ 			WProtoField.stringz{label="Server", key="srvr"},
++ 		},
++ 	}
+ },
+ --[[doc
+@@ -1,10 +1,16 @@
+ ]]
+ [SID_NEWS_INFO] = { -- 0x46
+-	uint8("Number of entries"),
+-	uint32("Last logon timestamp"),
+-	uint32("Oldest news timestamp"),
+-	uint32("Newest news timestamp"),
+-	uint32("Timestamp"),
+-	stringz("News"),
++	uint8{label="Number of entries", key="news" },
++	posixtime("Last logon timestamp"),
++	posixtime("Oldest news timestamp"),
++	posixtime("Newest news timestamp"),
++	iterator{alias="none", refkey="news", repeated={
++		posixtime{label="Timestamp", key="stamp"},
++		when{
++			condition=function(self, state) return state.packet.stamp == 0 end,
++			block = { stringz("MOTD") },
++			otherwise = {stringz("News")},
++		},},
++	},
+ },
+ --[[doc
+@@ -1,6 +1,34 @@
+ ]]
+ [SID_AUTH_CHECK] = { -- 0x51
+-	uint32("Result"),
+-	stringz("Additional Information"),
++	uint32{label="Result", key="res", display = base.HEX, desc={
++		[0x000] = "Passed challenge",
++		[0x100] = "Old game version",
++		[0x101] = "Invalid version",
++		[0x102] = "Game version must be downgraded",
++		-- ?? [0x0NN] = "(where NN is the version code supplied in SID_AUTH_INFO):
++		-- Invalid version code (note that 0x100 is not set in this case)",
++		[0x200] = "Invalid CD key",
++		[0x201] = "CD key in use",
++		[0x202] = "Banned key",
++		[0x203] = "Wrong product",
++		-- The last 4 codes also apply to the second CDKey, as indicated by a
++		-- bitwise combination with 0x010.
++		[0x210] = "Invalid CD key",
++		[0x211] = "CD key in use",
++		[0x212] = "Banned key",
++		[0x213] = "Wrong product",
++	}},
++	when{
++		condition=function(self, state)
++			return (state.packet.res == 0x100) or (state.packet.res == 0x102)
++		end,
++		block = { stringz("MPQ Filename") },
++	},
++	when{
++		condition=function(self, state)
++			return bit.band(state.packet.res, 0x201) == 0x201
++		end,
++		block = { stringz("Username") },
++	},
+ },
+ --[[doc
