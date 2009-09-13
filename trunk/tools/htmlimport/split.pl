@@ -53,14 +53,14 @@ my %prefixes = (
 	"C_W3GS"   => 0xF7, # ???, prefix is not real
 	"S_BNLS"   => 0x70, # fake, theres no header id byte
 	"C_BNLS"   => 0x70, # fake, theres no header id byte
-	"S_D2GS"   => 0x071, # fake, theres no header id byte
-	"C_D2GS"   => 0x171, # fake, theres no header id byte
-	"S_MCP"    => 0x72, # fake, theres no header id byte
-	"C_MCP"    => 0x72, # fake, theres no header id byte
-	"S_PACKET" => 0x73, # fake, theres no header id byte (may be 0x01)
-	"C_PACKET" => 0x73, # fake, theres no header id byte (may be 0x01)
-	"S_PKT"    => 0x74, # fake, theres no header id byte
-	"C_PKT"    => 0x74, # fake, theres no header id byte
+	"S_D2GS"   => 0x80, # fake, theres no header id byte
+	"C_D2GS"   => 0x81, # fake, theres no header id byte
+	"S_MCP"    => 0x90, # fake, theres no header id byte
+	"C_MCP"    => 0x90, # fake, theres no header id byte
+	"S_PACKET" => 0xA0, # fake, theres no header id byte (may be 0x01)
+	"C_PACKET" => 0xA0, # fake, theres no header id byte (may be 0x01)
+	"S_PKT"    => 0xB0, # fake, theres no header id byte
+	"C_PKT"    => 0xB0, # fake, theres no header id byte
 );
 
 my %C_packets_by_id = ();
