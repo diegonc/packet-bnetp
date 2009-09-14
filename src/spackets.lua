@@ -3576,13 +3576,20 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_INFO] = { -- 0x50
-	uint32("Logon Type"),
-	uint32("Server Token"),
-	uint32("UDPValue *"),
+	uint32{label="Logon Type", key="type", desc={
+		[0x00] = "Broken SHA-1 (STAR/SEXP/D2DV/D2XP)",
+		[0x01] = "NLS Version 1",
+		[0x02] = "NLS Version 2 (WA3/W3XP)",
+	}},
+	uint32("Server Token", base.HEX),
+	uint32("UDPValue", base.HEX),
 	wintime("MPQ filetime"),
 	stringz("IX86ver filename"),
 	stringz("ValueString"),
-	bytes("128-byte Server signature"),
+	when{
+		condition = function(self,state) return state.packet.type == 2 end,
+		block = { bytes{label="Server signature", length=128}},
+	},
 },
 --[[doc
     Message ID:    0x51
