@@ -72,6 +72,11 @@ do
 			["error"] = function(o, str)
 				o.bnet_node:add_expert_info(PI_DEBUG, PI_NOTE, str)
 			end,
+			["tail"] = function(o)
+				local tmp = State()
+				tmp.buf = o:tvb()
+				return tmp
+			end,
 		}
 	end
 
@@ -472,31 +477,26 @@ do
 			args.length = 4
 			return stringz(args)
 		end
-		local array = function(arg)
-			arg.repeated = arg.of
-			arg.of = nil
-			arg.priv = {size = arg.size}
-			arg.size = nil
-			arg.initialize = function (self, state)
-				self.priv.index = 0
-				self.priv.bn = state.bnet_node
-				state.bnet_node = self.priv.bn:add(self.pf, state:peek(1))
-				self.priv.start = state.used
+		local array = function(args)
+			if args.of ~= uint32 and args.of ~= uint8 then
+				error("Arrays of types other than uint32 or uint8 are not supported.")
 			end
-			arg.condition = function (self, state)
-				return (self.priv.index < self.priv.size)
-			end
-			arg.iteration = function (self, state)
-				dissect_packet(state, self.repeated)
-				self.priv.index = self.priv.index + 1
-			end
-			arg.finalize = function (self, state)
-				if state.bnet_node.set_len then
-					state.bnet_node:set_len(state.used - self.priv.start)
+			args.of = args.of{alias="none"}
+			args.length = args.of:size() * args.num
+			args.dissect = function (self, state)
+				local str = ""
+				local isz = args.of:size()
+				local fmt = "%0" .. (isz * 2) .. "X "
+				local tail = state:tail()
+				for i=0, self.num - 1 do
+					str = str .. string.format(fmt,
+						args.of:value(tail))
+					tail:read(isz)
 				end
-				state.bnet_node = self.priv.bn
+				str = (string.gsub(str, "^(.-)%s*$", "%1")) 
+				state.bnet_node:add(self.pf, state:read(args.length), str)
 			end
-			return iterator(arg)
+			return stringz(args)
 		end
 
 		#include "spackets.lua"
