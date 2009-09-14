@@ -1,0 +1,19 @@
+Index: spackets.lua
+===================================================================
+--- spackets.lua	(revision 62)
++++ spackets.lua	(working copy)
+@@ -1,7 +1,11 @@
+ ]]
+ [SID_AUTH_ACCOUNTLOGON] = { -- 0x53
+-	uint32("Status"),
+-	uint8("[32] Salt"),
+-	uint8("[32] Server Key"),
++	uint32("Status", base.HEX, {
++		[0x00] = "Logon accepted, requires proof.",
++		[0x01] = "Account doesn't exist.",
++		[0x05] = "Account requires upgrade.",
++	}),
++	array{of=uint8, num=32, label="Salt"},
++	array{of=uint8, num=32, label="Server Key"},
+ },
+ --[[doc

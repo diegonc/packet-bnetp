@@ -1330,7 +1330,11 @@ SPacketDescription = {
 	uint32("Status"),
 },
 [0xFF53] = { 
-	uint32("Status"),
+	uint32("Status", base.HEX, {
+		[0x00] = "Logon accepted, requires proof.",
+		[0x01] = "Account doesn't exist.",
+		[0x05] = "Account requires upgrade.",
+	}),
 	array{of=uint8, num=32, label="Salt"},
 	array{of=uint8, num=32, label="Server Key"},
 },
@@ -2313,18 +2317,20 @@ CPacketDescription = {
 	stringz("Country"),
 },
 [0xFF51] = { 
-	uint32("Client Token"),
-	uint32("EXE Version"),
-	uint32("EXE Hash"),
-	uint32("Number of CD-keys in this packet"),
+	uint32("Client Token", base.HEX),
+	version("EXE Version"),
+	uint32("EXE Hash", base.HEX),
+	uint32{label="Number of CD-keys in this packet", key="cdkeys"},
 	uint32{label="Spawn CD-key", desc=Descs.YesNo},
-	uint32("Key Length"),
-	uint32("CD-key's product value"),
-	uint32("CD-key's public value"),
-	uint32("Unknown"),
-	array{of=uint32, num=5, label="Hashed Key Data"},
-	stringz("Exe Information"),
-	stringz("CD-Key owner name"),
+	iterator{label="CD-Key", refkey="cdkeys", repeated={
+		uint32("Key Length"),
+		uint32("CD-key's product value", base.HEX),
+		uint32("CD-key's public value", base.HEX),
+		uint32("Unknown", base.HEX),
+		array{of=uint32, num=5, label="Hashed Key Data"},
+		stringz("Exe Information"),
+		stringz("CD-Key owner name"),
+	}},
 },
 [0xFF52] = { 
 	uint8("[32] Salt"),
