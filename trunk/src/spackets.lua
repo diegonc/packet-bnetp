@@ -3535,7 +3535,7 @@ SPacketDescription = {
 	stringz("Unknown"),
 	stringz("Unknown"),
 	stringz("Unknown"),
-	uint32{label="Unknown", num=5},
+	array{of=uint32, label="Unknown", num=5},
 },
 --[[doc
     Message ID:    0x50
