@@ -3525,12 +3525,12 @@ SPacketDescription = {
 
 ]]
 [SID_TOURNAMENT] = { -- 0x4E
-	uint8("Unknown"),
-	uint8("Unknown, maybe number of non-null strings sent?"),
+	uint8("Unknown", base.HEX),
+	uint8("Unknown, maybe number of non-null strings sent?", base.HEX),
 	stringz("Description"),
 	stringz("Unknown"),
 	stringz("Website"),
-	uint32("Unknown"),
+	uint32("Unknown", base.HEX),
 	stringz("Name"),
 	stringz("Unknown"),
 	stringz("Unknown"),
