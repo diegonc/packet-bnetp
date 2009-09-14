@@ -1287,7 +1287,7 @@ SPacketDescription = {
 	stringz("Unknown"),
 	stringz("Unknown"),
 	stringz("Unknown"),
-	uint32{label="Unknown", num=5},
+	array{of=uint32, label="Unknown", num=5},
 },
 [0xFF50] = { 
 	uint32{label="Logon Type", key="type", desc={
