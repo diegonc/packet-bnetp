@@ -6,3 +6,12 @@ local Descs = {
 		[0] = "No",
 	},
 }
+
+-- Common condition functions
+local Cond = {
+	equals = function(key, value)
+		return function(self, state)
+			return state.packet[key] == value
+		end
+	end,
+}	
