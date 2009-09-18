@@ -131,7 +131,9 @@ do
 				elseif not r then
 					error(need_more)
 				end
-				state.bnet_node:set_len(state.used - pdu_start)
+				if state.bnet_node.set_len then
+					state.bnet_node:set_len(state.used - pdu_start)
+				end
 			end
 			if state.used > available then
 				error("Used more data than available.")
