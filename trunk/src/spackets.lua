@@ -1925,10 +1925,10 @@ SPacketDescription = {
 
 ]]
 [SID_CLIENTID] = { -- 0x05
-	uint32("Registration Version"),
-	uint32("Registration Authority"),
-	uint32("Account Number"),
-	uint32("Registration Token"),
+	uint32("Registration Version", base.HEX),
+	uint32("Registration Authority", base.HEX),
+	uint32("Account Number", base.HEX),
+	uint32("Registration Token", base.HEX),
 },
 --[[doc
     Message ID:    0x06
@@ -1983,7 +1983,12 @@ SPacketDescription = {
 
 ]]
 [SID_REPORTVERSION] = { -- 0x07
-	uint32("Result"),
+	uint32("Result", base.DEC, {
+		[0x00] = "Failed version check",
+		[0x01] = "Old game version",
+		[0x02] = "Success",
+		[0x03] = "Reinstall required",
+	}),
 	stringz("Patch path"),
 },
 --[[doc
@@ -2007,7 +2012,10 @@ SPacketDescription = {
 
 ]]
 [SID_STARTADVEX] = { -- 0x08
-	uint32("Status"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Failed",
+		[0x01] = "Success",
+	}),
 },
 --[[doc
     Message ID:    0x09
@@ -2078,21 +2086,29 @@ SPacketDescription = {
 
 ]]
 [SID_GETADVLISTEX] = { -- 0x09
-	uint32("Number of games"),
-	uint32("Status"),
-	uint16("Game Type"),
-	uint16("Parameter"),
-	uint32("Language ID"),
-	uint16("Address Family"),
-	uint16("Port"),
-	uint32("Host's IP"),
-	uint32("sin_zero"),
-	uint32("sin_zero"),
-	uint32("Game Status"),
-	uint32("Elapsed time"),
-	stringz("Game name"),
-	stringz("Game password"),
-	stringz("Game statstring"),
+	uint32{label="Number of games", key="games"},
+	when{condition=Cond.equals("games", 0),
+		block = {
+			uint32("Status", base.DEC, Descs.GameStatus)
+		},
+		otherwise = {
+			iterator{label="Game Information", refkey="games", repeated={
+				uint16("Game Type", base.HEX),
+				uint16("Parameter", base.HEX),
+				uint32("Language ID", base.HEX),
+				uint16("Address Family", base.DEC, {[2]="AF_INET"}),
+				uint16{label="Port", big_endian=true},
+				ipv4("Host's IP"),
+				uint32("sin_zero"),
+				uint32("sin_zero"),
+				uint32("Status", base.DEC, Descs.GameStatus),
+				uint32("Elapsed time"),
+				stringz("Game name"),
+				stringz("Game password"),
+				stringz("Game statstring"),
+			}},
+		}
+	},
 },
 --[[doc
     Message ID:    0x0A
