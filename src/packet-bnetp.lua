@@ -105,6 +105,7 @@ do
 			info ("dissector: start to process pdus")
 
 			while state.used < available do
+				local pdu_start = state.used
 				state.bnet_node = root:add(p_bnetp, buf(state.used))
 
 				local thread = coroutine.create(do_dissection)
@@ -115,7 +116,7 @@ do
 					else
 						pkt.desegment_len = DESEGMENT_ONE_MORE_SEGMENT
 					end
-					pkt.desegment_offset = 0
+					pkt.desegment_offset = pdu_start
 					info ("dissector: requesting data -" 
 							.. " r: " .. tostring(r)
 							.. " need_more: " .. tostring(need_more)
@@ -127,6 +128,7 @@ do
 				elseif not r then
 					error(need_more)
 				end
+				state.bnet_node:set_len(state.used - pdu_start)
 			end
 			if state.used > available then
 				error("Used more data than available.")
@@ -641,6 +643,14 @@ local Descs = {
 		[1] = "Yes",
 		[0] = "No",
 	},
+	GameStatus = {
+		[0x00] = "OK",
+		[0x01] = "Game doesn't exist",
+		[0x02] = "Incorrect password",
+		[0x03] = "Game full",
+		[0x04] = "Game already started",
+		[0x06] = "Too many server requests",
+	},
 }
 
 local Cond = {
@@ -1010,10 +1020,10 @@ SPacketDescription = {
  	}
 },
 [0xFF05] = { 
-	uint32("Registration Version"),
-	uint32("Registration Authority"),
-	uint32("Account Number"),
-	uint32("Registration Token"),
+	uint32("Registration Version", base.HEX),
+	uint32("Registration Authority", base.HEX),
+	uint32("Account Number", base.HEX),
+	uint32("Registration Token", base.HEX),
 },
 [0xFF06] = { 
 	wintime("MPQ Filetime"),
@@ -1021,28 +1031,44 @@ SPacketDescription = {
 	stringz("ValueString"),
 },
 [0xFF07] = { 
-	uint32("Result"),
+	uint32("Result", base.DEC, {
+		[0x00] = "Failed version check",
+		[0x01] = "Old game version",
+		[0x02] = "Success",
+		[0x03] = "Reinstall required",
+	}),
 	stringz("Patch path"),
 },
 [0xFF08] = { 
-	uint32("Status"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Failed",
+		[0x01] = "Success",
+	}),
 },
 [0xFF09] = { 
-	uint32("Number of games"),
-	uint32("Status"),
-	uint16("Game Type"),
-	uint16("Parameter"),
-	uint32("Language ID"),
-	uint16("Address Family"),
-	uint16("Port"),
-	uint32("Host's IP"),
-	uint32("sin_zero"),
-	uint32("sin_zero"),
-	uint32("Game Status"),
-	uint32("Elapsed time"),
-	stringz("Game name"),
-	stringz("Game password"),
-	stringz("Game statstring"),
+	uint32{label="Number of games", key="games"},
+	when{condition=Cond.equals("games", 0),
+		block = {
+			uint32("Status", base.DEC, Descs.GameStatus)
+		},
+		otherwise = {
+			iterator{label="Game Information", refkey="games", repeated={
+				uint16("Game Type", base.HEX),
+				uint16("Parameter", base.HEX),
+				uint32("Language ID", base.HEX),
+				uint16("Address Family", base.DEC, {[2]="AF_INET"}),
+				uint16{label="Port", big_endian=true},
+				ipv4("Host's IP"),
+				uint32("sin_zero"),
+				uint32("sin_zero"),
+				uint32("Status", base.DEC, Descs.GameStatus),
+				uint32("Elapsed time"),
+				stringz("Game name"),
+				stringz("Game password"),
+				stringz("Game statstring"),
+			}},
+		}
+	},
 },
 [0xFF0A] = { 
 	stringz("Unique name"),
