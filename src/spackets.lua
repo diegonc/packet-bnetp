@@ -2458,8 +2458,16 @@ SPacketDescription = {
 
 ]]
 [SID_REGISTRY] = { -- 0x18
-	uint32("Cookie"),
-	uint32("HKEY"),
+	uint32("Cookie", base.HEX),
+	uint32("HKEY", base.HEX, {
+		[0x80000000] = "HKEY_CLASSES_ROOT",
+		[0x80000001] = "HKEY_CURRENT_USER",
+		[0x80000002] = "HKEY_LOCAL_MACHINE",
+		[0x80000003] = "HKEY_USERS",
+		[0x80000004] = "HKEY_PERFORMANCE_DATA",
+		[0x80000005] = "HKEY_CURRENT_CONFIG",
+		[0x80000006] = "HKEY_DYN_DATA",
+	}),
 	stringz("Registry path"),
 	stringz("Registry key"),
 },
@@ -2510,7 +2518,7 @@ SPacketDescription = {
 
 ]]
 [SID_STARTADVEX3] = { -- 0x1C
-	uint32("Status"),
+	uint32("Status", base.DEC,{[0x00] ="Ok", [0x01] = "Failed"}),
 },
 --[[doc
     Message ID:    0x1D
@@ -2528,8 +2536,8 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONCHALLENGEEX] = { -- 0x1D
-	uint32("UDP Token"),
-	uint32("Server Token"),
+	uint32("UDP Token", base.HEX),
+	uint32("Server Token", base.HEX),
 },
 --[[doc
     Message ID:    0x25
@@ -2561,7 +2569,7 @@ SPacketDescription = {
 
 ]]
 [SID_PING] = { -- 0x25
-	uint32("Ping Value"),
+	uint32("Ping Value", base.HEX),
 },
 --[[doc
     Message ID:    0x26
@@ -2609,7 +2617,7 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONCHALLENGE] = { -- 0x28
-	uint32("Server Token"),
+	uint32("Server Token", base.HEX),
 },
 --[[doc
     Message ID:    0x29
@@ -2634,7 +2642,10 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONRESPONSE] = { -- 0x29
-	uint32("Result"),
+	uint32("Result", base.DEC, {
+		[0x00] = "Invalid password",
+		[0x01] = "Success",
+	}),
 },
 --[[doc
     Message ID:    0x2A
@@ -2660,7 +2671,10 @@ SPacketDescription = {
 
 ]]
 [SID_CREATEACCOUNT] = { -- 0x2A
-	uint32("Result"),
+	uint32("Result", base.DEC, {
+		[0x00] = "Failed",
+		[0x01] = "Success",
+	}),
 },
 --[[doc
     Message ID:    0x2D
@@ -2750,30 +2764,37 @@ SPacketDescription = {
 
 ]]
 [SID_GETLADDERDATA] = { -- 0x2E
-	uint32("Ladder type"),
-	uint32("League"),
-	uint32("Sort method"),
-	uint32("Starting rank"),
-	uint32("Number of ranks listed"),
-	uint32("Wins"),
-	uint32("Losses"),
-	uint32("Disconnects"),
-	uint32("Rating"),
-	uint32("Rank"),
-	uint32("Official wins"),
-	uint32("Official losses"),
-	uint32("Official disconnects"),
-	uint32("Official rating"),
-	uint32("Unknown"),
-	uint32("Official rank"),
-	uint32("Unknown"),
-	uint32("Unknown"),
-	uint32("Highest rating"),
-	uint32("Unknown"),
-	uint32("Season"),
-	wintime("Last game time"),
-	wintime("Official last game time"),
-	stringz("Name"),
+	uint32("Ladder type", base.HEX),
+	uint32("League", base.HEX),
+	uint32("Sort method", base.DEC, {
+		[0x00] = "Highest rating",
+		[0x01] = "Fastest climbers",
+		[0x02] = "Most wins on record",
+		[0x03] = "Most games played",
+	}),
+	uint32("Starting rank", base.HEX),
+	uint32{label="Number of ranks listed", key="ranks"},
+	iterator{label="Rank", refkey="ranks", repeated={
+		uint32("Wins"),
+		uint32("Losses"),
+		uint32("Disconnects"),
+		uint32("Rating"),
+		uint32("Rank"),
+		uint32("Official wins"),
+		uint32("Official losses"),
+		uint32("Official disconnects"),
+		uint32("Official rating"),
+		uint32("Unknown", base.HEX),
+		uint32("Official rank"),
+		uint32("Unknown", base.HEX),
+		uint32("Unknown", base.HEX),
+		uint32("Highest rating"),
+		uint32("Unknown", base.HEX),
+		uint32("Season"),
+		wintime("Last game time"),
+		wintime("Official last game time"),
+		stringz("Name"),
+	}},
 },
 --[[doc
     Message ID:    0x2F
