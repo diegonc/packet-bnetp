@@ -705,7 +705,7 @@ local Cond = {
 						args.of:value(tail))
 					tail:read(isz)
 				end
-				str = (string.gsub(str, "^(.-)%s*$", "%1")) 
+				str = (string.gsub(str, "^(.*)%s*$", "%1")) 
 				state.bnet_node:add(self.pf, state:read(args.length), str)
 			end
 			return stringz(args)
