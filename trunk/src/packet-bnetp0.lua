@@ -141,7 +141,9 @@ do
 					error(need_more)
 				end
 				-- fix the length of the pdu
-				state.bnet_node:set_len(state.used - pdu_start)
+				if state.bnet_node.set_len then
+					state.bnet_node:set_len(state.used - pdu_start)
+				end
 			end
 			if state.used > available then
 				error("Used more data than available.")
