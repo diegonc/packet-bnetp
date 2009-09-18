@@ -1,14 +1,16 @@
-MKDIR=mkdir
-RM=rm
-ZIP=zip
-FILEPP=tools/filepp/filepp
+MKDIR?=mkdir
+RM?=rm
+ZIP?=zip
+PERL?=/bin/perl
+
+FILEPP=$(PERL) tools/filepp/filepp
 FILEPP_FLAGS= \
 	-m lua-comment.pm \
 	-m literal.pm
 
 PKGNAME=packet-bnetp
 DISTNAME=packet-bnetp-src
-VERSION=$(shell date +%Y%m%d)
+VERSION:=$(shell date +%Y%m%d)
 
 DIST = \
 	src \

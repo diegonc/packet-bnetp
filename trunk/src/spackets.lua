@@ -23,7 +23,7 @@ SPacketDescription = {
 [BNLS_CDKEY] = { -- 0x01
 	uint32{label="Result", desc=Descs.YesNo},
 	uint32("Client Token", base.HEX),
-	uint32{label="CD key data for SID_AUTH_CHECK", num=9},
+	array{label="CD key data for SID_AUTH_CHECK", of=uint32, num=9},
 },
 --[[doc
     Message ID:    0x02
@@ -85,7 +85,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_CREATEACCOUNT] = { -- 0x04
-	uint32{label="Data for Data for SID_AUTH_ACCOUNTCREATE", num=16},
+	array{label="Data for Data for SID_AUTH_ACCOUNTCREATE", of=uint32, num=16},
 },
 --[[doc
     Message ID:      0x05
@@ -106,7 +106,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_CHANGECHALLENGE] = { -- 0x05
-	uint32{label="Data for SID_AUTH_ACCOUNTCHANGE", display=base.HEX, num=8},
+	array{label="Data for SID_AUTH_ACCOUNTCHANGE", of=uint32, num=8},
 },
 --[[doc
     Message ID:      0x06
@@ -127,7 +127,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_CHANGEPROOF] = { -- 0x06
-	uint32{label="Data for SID_AUTH_ACCOUNTCHANGEPROOF", num=21},
+	array{label="Data for SID_AUTH_ACCOUNTCHANGEPROOF", of=uint32, num=21},
 },
 --[[doc
     Message ID:      0x07
@@ -171,7 +171,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_UPGRADEPROOF] = { -- 0x08
-	uint32{label="Data for SID_AUTH_ACCOUNTUPGRADEPROOF", num=22},
+	array{label="Data for SID_AUTH_ACCOUNTUPGRADEPROOF", of=uint32, num=22},
 },
 --[[doc
     Message ID:      0x09
@@ -241,7 +241,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_HASHDATA] = { -- 0x0B
-	uint32{label="The data hash.Optional:", num=5},
+	array{label="The data hash.Optional:", of=uint32, num=5},
 	uint32("Cookie. Same as the cookie"),
 },
 --[[doc
@@ -277,7 +277,7 @@ SPacketDescription = {
 	uint8("Number of"),
 	uint32("Bit mask .For each successful"),
 	uint32("Client session key."),
-	uint32{label="CD-key data.", num=9},
+	array{label="CD-key data.", of=uint32, num=9},
 },
 --[[doc
     Message ID:      0x0D
@@ -467,7 +467,7 @@ SPacketDescription = {
 ]]
 [BNLS_SERVERLOGONCHALLENGE] = { -- 0x13
 	uint32("Slot index."),
-	uint32{label="Data for server's SID_AUTH_ACCOUNTLOGON", num=16},
+	array{label="Data for server's SID_AUTH_ACCOUNTLOGON", of=uint32, num=16},
 },
 --[[doc
     Message ID:      0x14
@@ -500,7 +500,7 @@ SPacketDescription = {
 [BNLS_SERVERLOGONPROOF] = { -- 0x14
 	uint32("Slot index."),
 	uint32{label="Success.", desc=Descs.YesNo},
-	uint32{label="Data server's", num=5},
+	array{label="Data server's", of=uint32, num=5},
 },
 --[[doc
     Message ID:      0x18
@@ -1083,9 +1083,9 @@ SPacketDescription = {
 
 ]]
 [MCP_JOINGAME] = { -- 0x04
-	uint16("Request ID"),
-	uint16("Game token"),
-	uint16("Unknown"),
+	uint16("Request ID", base.HEX),
+	uint16("Game token", base.HEX),
+	uint16("Unknown", base.HEX),
 	ipv4("IP of D2GS Server"),
 	uint32("Game hash"),
 	uint32("Result", base.HEX, {
@@ -3536,9 +3536,7 @@ SPacketDescription = {
 	posixtime("Last logon timestamp"),
 	posixtime("Oldest news timestamp"),
 	posixtime("Newest news timestamp"),
-	iterator{
-		label="News",
-		refkey="news", repeated={
+	iterator{label="News", refkey="news", repeated={
 		posixtime{label="Timestamp", key="stamp"},
 		when{
 			condition=function(self, state) return state.packet.stamp == 0 end,
@@ -3671,7 +3669,7 @@ SPacketDescription = {
 	stringz("Unknown"),
 	stringz("Unknown"),
 	stringz("Unknown"),
-	array{of=uint32, label="Unknown", num=5},
+	array{label="Unknown", of=uint32, num=5},
 },
 --[[doc
     Message ID:    0x50

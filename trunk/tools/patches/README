@@ -1,6 +1,6 @@
 This directory contains patches to be applied after importing packets from html.
-Offset information is not recorded in this patches. Nevertheless patch should
-with a null fuzz factor.
+Offset information is not recorded in this patches and the lowest fuzz factor
+that can be used to successfully apply them is 1.
 
 Patches depending on another must have a higher numeric identification than its
 dependency and must be applied in order.
