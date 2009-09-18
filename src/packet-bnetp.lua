@@ -1053,7 +1053,22 @@ SPacketDescription = {
 		},
 		otherwise = {
 			iterator{label="Game Information", refkey="games", repeated={
-				uint16("Game Type", base.HEX),
+				uint16("Game Type", base.HEX, {
+					[0x02] = "Melee",
+					[0x03] = "Free for all",
+					[0x04] = "one vs one",
+					[0x05] = "CTF",
+					[0x06] = "Greed",
+					[0x07] = "Slaughter",
+					[0x08] = "Sudden Death",
+					[0x09] = "Ladder",
+					[0x10] = "Iron man ladder",
+					[0x0A] = "Use Map Settings",
+					[0x0B] = "Team Melee",
+					[0x0C] = "Team FFA",
+					[0x0D] = "Team CTF",
+					[0x0F] = "Top vs Bottom",
+				}),
 				uint16("Parameter", base.HEX),
 				uint32("Language ID", base.HEX),
 				uint16("Address Family", base.DEC, {[2]="AF_INET"}),
@@ -1076,7 +1091,13 @@ SPacketDescription = {
 	stringz("Account name"),
 },
 [0xFF0B] = { 
-	stringz("[] Channel names, each terminated by a null string."),
+	iterator{
+		alias="none",
+		condition = function(self, state) return state.packet.chan ~="" end,
+		repeated = {
+			stringz{label="Channel name", key="chan"},
+		}
+	}
 },
 [0xFF0F] = { 
 	uint32("Event ID"),
