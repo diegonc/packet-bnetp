@@ -1229,58 +1229,97 @@ SPacketDescription = {
 	uint32("Rank. Zero-based. 0xFFFFFFFF == Not ranked."),
 },
 [0xFF30] = { 
-	uint32("Result"),
+	uint32("Result", base.DEC, {
+		[0x01] = "Ok",
+		[0x02] = "Invalid key",
+		[0x03] = "Bad product",
+		[0x04] = "Banned",
+		[0x05] = "In use",
+	}),
 	stringz("Key owner"),
 },
 [0xFF31] = { 
 	uint32{label="Password change succeeded", desc=Descs.YesNo},
 },
 [0xFF32] = { 
-	uint32("Status"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Rejected",
+		[0x01] = "Approved",
+		[0x02] = "Ladder approved",
+	}),
 },
 [0xFF33] = { 
-	uint32("Request ID"),
-	uint32("Unknown"),
+	uint32("Request ID", base.HEX),
+	uint32("Unknown", base.HEX),
 	wintime("Last update time"),
 	stringz("Filename"),
 },
 [0xFF34] = { 
-	uint32("Unknown"),
-	uint32("Count"),
-	uint32("Unknown"),
-	stringz("Realm title"),
-	stringz("Realm description"),
+	uint32("Unknown", base.HEX),
+	uint32{label="Count", key="realms"},
+	iterator{label="Realm", refkey="realms", repeated={
+		uint32("Unknown", base.HEX),
+		stringz("Realm title"),
+		stringz("Realm description"),
+	}},
 },
 [0xFF35] = { 
-	uint32("Cookie"),
-	uint8("Success"),
-	stringz("Profile\\Description value"),
-	stringz("Profile\\Location value"),
-	uint32("Clan Tag"),
+	uint32("Cookie", base.HEX),
+	uint8{label="Success", key="status"},
+	when{condition=Cond.equals("status", 0), block={
+		stringz("Profile\\Description value"),
+		stringz("Profile\\Location value"),
+		uint32("Clan Tag"),
+	}},
 },
 [0xFF36] = { 
-	uint32("Result"),
+	uint32("Result", base.DEC, {
+		[0x01] = "Ok",
+		[0x02] = "Invalid key",
+		[0x03] = "Bad product",
+		[0x04] = "Banned",
+		[0x05] = "In use",
+	}),
 	stringz("Key owner"),
 },
 [0xFF3A] = { 
-	uint32("Result"),
-	stringz("Reason"),
+	uint32{label="Result", display=base.DEC, desc={
+		[0x00] = "Success",
+		[0x01] = "Account Does Not Exist",
+		[0x02] = "Invalid Password",
+		[0x06] = "Account Closed",
+	}, key="res"},
+	when{condition=Cond.equals("res", 6), block={
+		stringz("Reason"),
+	}},
 },
 [0xFF3C] = { 
-	uint32("Result"),
+	uint32("Result", base.DEC, {
+		[0x00] = "Not approved",
+		[0x01] = "Blizzard approved",
+		[0x02] = "Approved for ladder",
+	}),
 },
 [0xFF3D] = { 
-	uint32("Status"),
-	stringz("Account name suggestion"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Account created",
+		[0x02] = "Name contained invalid characters",
+		[0x03] = "Name contained a banned word",
+		[0x04] = "Account already exists",
+		[0x06] = "Name did not contain enough alphanumeric characters",
+	}),
 },
 [0xFF3E] = { 
-	uint32("MCP Cookie"),
-	uint32("MCP Status"),
-	uint32("[2] MCP Chunk 1"),
-	uint32("IP"),
-	uint32("Port"),
-	uint32("[12] MCP Chunk 2"),
-	stringz("Battle.net unique name"),
+	uint32("MCP Cookie", base.HEX),
+	uint32{label="MCP Status", key="status"},
+	when{condition=Cond.equals("status", 0), block={
+		array{of=uint32, label="MCP Chunk 1", num=2},
+		ipv4("IP"),
+		uint16{label="Port", big_endian=true},
+		bytes{label="Padding", length=2},
+		array{of=uint32, label="MCP Chunk 2", num=12},
+		stringz("Battle.net unique name"),
+	}},
 },
 [0xFF3F] = { 
 	wintime("MPQ Filetime"),
@@ -1288,11 +1327,13 @@ SPacketDescription = {
 	stringz("ValueString"),
 },
 [0xFF40] = { 
-	uint32("Unknown"),
-	uint32("Count"),
-	uint32("Unknown"),
-	stringz("Realm title"),
-	stringz("Realm description"),
+	uint32("Unknown", base.HEX),
+	uint32{label="Count", key="realms"},
+	iterator{label="Realm", refkey="realms", repeated={
+		uint32("Unknown", base.HEX),
+		stringz("Realm title"),
+		stringz("Realm description"),
+	}},
 },
 [0xFF41] = { 
 	uint32("Ad ID"),
@@ -1446,7 +1487,16 @@ SPacketDescription = {
 	},
 },
 [0xFF52] = { 
-	uint32("Status"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Successfully created account name.",
+		[0x04] = "Name already exists.",
+		[0x07] = "Name is too short/blank.",
+		[0x08] = "Name contains an illegal character.",
+		[0x09] = "Name contains an illegal word.",
+		[0x0a] = "Name contains too few alphanumeric characters.",
+		[0x0b] = "Name contains adjacent punctuation characters.",
+		[0x0c] = "Name contains too many punctuation characters.",
+	}),
 },
 [0xFF53] = { 
 	uint32("Status", base.HEX, {
@@ -1458,63 +1508,59 @@ SPacketDescription = {
 	array{of=uint8, num=32, label="Server Key"},
 },
 [0xFF54] = { 
-	uint32("Status"),
-	uint8("[20] Server Password Proof"),
-	stringz("Additional information"),
+	uint32{label="Status", display=base.DEC, desc={
+		[0x00] = "Logon successful.",
+		[0x02] = "Incorrect password.",
+		[0x0E] = "An email address should be registered for this account.",
+		[0x0F] = "Custom error. A string at the end of this message contains the error.",
+	}, key="status"},
+	array{of=uint8, num=20, label="Server Password Proof"},
+	when{condition=Cond.equals("status", 0x0F), block={
+		stringz("Additional information")
+	}},
 },
 [0xFF55] = { 
-	uint32("Status"),
-	uint8("[32] Salt"),
-	uint8("[32] Server key"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Change accepted, requires proof.",
+		[0x01] = "Account doesn't exist.",
+		[0x05] = "Account requires upgrade",
+	}),
+	array{of=uint8, num=32, label="Salt"},
+	array{of=uint8, num=32, label="Server Key"}
 },
 [0xFF56] = { 
-	uint32("Status code"),
-	uint8("[20] Server password proof for old password"),
+	uint32("Status code", base.DEC, {
+		[0x00] = "Password changed.",
+		[0x02] = "Incorrect old password.",
+	}),
+	array{of=uint8, num=20, label="Server password proof for old password"},
 },
 [0xFF57] = { 
-	uint32("Status"),
-	uint32("Server Token"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Upgrade Request Accepted",
+		[0x01] = "Upgrade Request Denied",
+	}),
+	uint32("Server Token", base.HEX),
 },
 [0xFF58] = { 
-	uint32("Status"),
-	uint32("[5] Password proof"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Password changed.",
+		[0x02] = "Incorrect old password.",
+	}),
+	array{of=uint32, num=5, label="Password proof"},
 },
 [0xFF59] = { 
 },
 [0xFF5E] = { 
-	bytes("Encrypted Packet"),
-	uint8("Packet Code"),
-	uint32("[4] MD5 Hash of the current Module"),
-	uint32("[4] Decryption key for Module"),
-	uint32("Length of Module"),
-	uint16("Length of data"),
-	bytes("Data"),
-	uint8("String Length"),
-	bytes("String Data"),
-	uint8("Check ID"),
-	uint8("String Index"),
-	uint32("Address"),
-	uint8("Length to Read"),
-	uint32("Unknown"),
-	uint32("[5] SHA1"),
-	uint32("Address"),
-	uint8("Length to Read"),
-	uint8("IDXor"),
-	uint16("Length of data"),
-	uint32("Checksum of data"),
-	uint8("Unknown"),
-	uint8("Unknown"),
-	uint8("Unknown"),
-	stringz("Library Name"),
-	uint32("Funct1"),
-	uint32("Funct2"),
-	uint32("Funct3"),
-	uint32("Funct4"),
-	uint32("[5] Unknown"),
+	bytes{label="Encrypted Packet",
+		size=function(self, state) return state.packet.length end,
+	},
 },
 [0xFF60] = { 
-	uint8("Number of players"),
-	stringz("[] Player names"),
+	uint8{label="Number of players", key="players"},
+	iterator{alias="none", refkey="players", repeated={
+		stringz("Player name"),
+	}},
 },
 [0xFF65] = { 
 	uint8("Number of Entries"),
