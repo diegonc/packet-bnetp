@@ -69,6 +69,9 @@ do
 			["tail"] = function(o)
 				local tmp = State()
 				tmp.buf = o:tvb()
+				tmp.bnet_node = o.bnet_node
+				tmp.packet = o.packet
+				tmp.pkt = o.pkt
 				return tmp
 			end,
 		}
@@ -709,6 +712,40 @@ local Cond = {
 				state.bnet_node:add(self.pf, state:read(args.length), str)
 			end
 			return stringz(args)
+		end
+		local flags = function(args)
+			local tmp = args.of(args)
+			local fields = {}
+			
+			for k,v in pairs(tmp.fields) do
+				local pfarg = {}
+				pfarg.label = v.label or v.sname
+				pfarg.display = v.display
+				pfarg.desc = v.desc
+				pfarg.params = { v.mask }
+				fields[k] = tmp.of(pfarg)
+			end
+			tmp.fields = fields
+			tmp.dissect = function(self, state)
+				local infostr = ""
+				local bn = state.bnet_node
+				state.bnet_node = bn:add(self.pf, state:peek(self.size()))
+				for k,v in pairs(self.fields) do
+					local tail = state:tail()
+					local block = { v }
+					dissect_packet(tail, block)
+					if v.sname and v.sname ~= "" then
+						infostr = infostr .. v.sname .. ", "
+					end
+				end
+				state.bnet_node = bn
+				state:read(self.size())
+				if infostr ~= "" then
+					infostr = (string.gsub(infostr, "^(.*),%s*$", "%1"))
+					state.bnet_node:append_text(" (" .. infostr .. ")")
+				end
+			end
+			return tmp
 		end
 
 SPacketDescription = {
@@ -1561,19 +1598,43 @@ SPacketDescription = {
 	}},
 },
 [0xFF65] = { 
-	uint8("Number of Entries"),
-	stringz("Account"),
-	uint8("Status"),
-	uint8("Location"),
-	uint32("ProductID"),
-	stringz("Location name"),
+	uint8{label="Number of Entries", key="friends"},
+	iterator{label="Friend", refkey="friends", repeated={
+		stringz("Account"),
+		flags{of=uint8, label="Status", fields={
+			{sname="Mutual", mask=0x01, desc=Descs.YesNo},
+			{sname="DND", mask=0x02, desc=Descs.YesNo},
+			{sname="Away", mask=0x04, desc=Descs.YesNo} 
+		}},
+		uint8("Location", base.DEC, {
+			[0x00] = "Offline",
+			[0x01] = "Not in chat",
+			[0x02] = "In chat",
+			[0x03] = "In a public game",
+			[0x04] = "In a private game, and you are not that person's friend.",
+			[0x05] = "In a private game, and you are that person's friend.",
+		}),
+		strdw("ProductID"),
+		stringz("Location name"),
+	}},
 },
 [0xFF66] = { 
 	uint8("Entry number"),
-	uint8("Friend Location"),
-	uint8("Friend Status"),
-	uint32("ProductID"),
-	stringz("Location"),
+	flags{of=uint8, label="Status", fields={
+		{sname="Mutual", mask=0x01, desc=Descs.YesNo},
+		{sname="DND", mask=0x02, desc=Descs.YesNo},
+		{sname="Away", mask=0x04, desc=Descs.YesNo} 
+	}},
+	uint8("Location", base.DEC, {
+		[0x00] = "Offline",
+		[0x01] = "Not in chat",
+		[0x02] = "In chat",
+		[0x03] = "In a public game",
+		[0x04] = "In a private game, and you are not that person's friend.",
+		[0x05] = "In a private game, and you are that person's friend.",
+	}),
+	strdw("ProductID"),
+	stringz("Location name"),
 },
 [0xFF67] = { 
 	stringz("Account"),
@@ -1602,10 +1663,17 @@ SPacketDescription = {
 	uint8("New Position"),
 },
 [0xFF70] = { 
-	uint32("Cookie"),
-	uint8("Status"),
-	uint8("Number of potential candidates"),
-	stringz("[] Usernames"),
+	uint32("Cookie", base.HEX),
+	uint8("Status", base.DEC, {
+		[0x00] = "Successfully found candidate(s)",
+		[0x01] = "Clan tag already taken",
+		[0x08] = "Already in clan",
+		[0x0a] = "Invalid clan tag specified",
+	}),
+	uint8{label="Number of potential candidates", key="names"},
+	iterator{alias="none", refkey="names", repeted={
+		stringz("Username"),
+	}},
 },
 [0xFF71] = { 
 	uint32("Cookie"),

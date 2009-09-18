@@ -75,6 +75,9 @@ do
 			["tail"] = function(o)
 				local tmp = State()
 				tmp.buf = o:tvb()
+				tmp.bnet_node = o.bnet_node
+				tmp.packet = o.packet
+				tmp.pkt = o.pkt
 				return tmp
 			end,
 		}
@@ -502,6 +505,40 @@ do
 				state.bnet_node:add(self.pf, state:read(args.length), str)
 			end
 			return stringz(args)
+		end
+		local flags = function(args)
+			local tmp = args.of(args)
+			local fields = {}
+			
+			for k,v in pairs(tmp.fields) do
+				local pfarg = {}
+				pfarg.label = v.label or v.sname
+				pfarg.display = v.display
+				pfarg.desc = v.desc
+				pfarg.params = { v.mask }
+				fields[k] = tmp.of(pfarg)
+			end
+			tmp.fields = fields
+			tmp.dissect = function(self, state)
+				local infostr = ""
+				local bn = state.bnet_node
+				state.bnet_node = bn:add(self.pf, state:peek(self.size()))
+				for k,v in pairs(self.fields) do
+					local tail = state:tail()
+					local block = { v }
+					dissect_packet(tail, block)
+					if v.sname and v.sname ~= "" then
+						infostr = infostr .. v.sname .. ", "
+					end
+				end
+				state.bnet_node = bn
+				state:read(self.size())
+				if infostr ~= "" then
+					infostr = (string.gsub(infostr, "^(.*),%s*$", "%1"))
+					state.bnet_node:append_text(" (" .. infostr .. ")")
+				end
+			end
+			return tmp
 		end
 
 		#include "spackets.lua"
