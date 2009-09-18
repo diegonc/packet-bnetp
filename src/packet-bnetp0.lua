@@ -112,6 +112,8 @@ do
 			info ("dissector: start to process pdus")
 
 			while state.used < available do
+				-- record offset where pdu starts
+				local pdu_start = state.used
 				state.bnet_node = root:add(p_bnetp, buf(state.used))
 
 				local thread = coroutine.create(do_dissection)
@@ -122,7 +124,7 @@ do
 					else
 						pkt.desegment_len = DESEGMENT_ONE_MORE_SEGMENT
 					end
-					pkt.desegment_offset = 0
+					pkt.desegment_offset = pdu_start
 					info ("dissector: requesting data -" 
 							.. " r: " .. tostring(r)
 							.. " need_more: " .. tostring(need_more)
@@ -135,6 +137,8 @@ do
 				elseif not r then
 					error(need_more)
 				end
+				-- fix the length of the pdu
+				state.bnet_node:set_len(state.used - pdu_start)
 			end
 			if state.used > available then
 				error("Used more data than available.")
