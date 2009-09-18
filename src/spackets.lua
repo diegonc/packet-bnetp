@@ -2849,7 +2849,13 @@ SPacketDescription = {
 
 ]]
 [SID_CDKEY] = { -- 0x30
-	uint32("Result"),
+	uint32("Result", base.DEC, {
+		[0x01] = "Ok",
+		[0x02] = "Invalid key",
+		[0x03] = "Bad product",
+		[0x04] = "Banned",
+		[0x05] = "In use",
+	}),
 	stringz("Key owner"),
 },
 --[[doc
@@ -2900,7 +2906,11 @@ SPacketDescription = {
 
 ]]
 [SID_CHECKDATAFILE] = { -- 0x32
-	uint32("Status"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Rejected",
+		[0x01] = "Approved",
+		[0x02] = "Ladder approved",
+	}),
 },
 --[[doc
     Message ID:    0x33
@@ -2925,8 +2935,8 @@ SPacketDescription = {
 
 ]]
 [SID_GETFILETIME] = { -- 0x33
-	uint32("Request ID"),
-	uint32("Unknown"),
+	uint32("Request ID", base.HEX),
+	uint32("Unknown", base.HEX),
 	wintime("Last update time"),
 	stringz("Filename"),
 },
@@ -2962,11 +2972,13 @@ SPacketDescription = {
 
 ]]
 [SID_QUERYREALMS] = { -- 0x34
-	uint32("Unknown"),
-	uint32("Count"),
-	uint32("Unknown"),
-	stringz("Realm title"),
-	stringz("Realm description"),
+	uint32("Unknown", base.HEX),
+	uint32{label="Count", key="realms"},
+	iterator{label="Realm", refkey="realms", repeated={
+		uint32("Unknown", base.HEX),
+		stringz("Realm title"),
+		stringz("Realm description"),
+	}},
 },
 --[[doc
     Message ID:    0x35
@@ -2994,11 +3006,13 @@ SPacketDescription = {
 
 ]]
 [SID_PROFILE] = { -- 0x35
-	uint32("Cookie"),
-	uint8("Success"),
-	stringz("Profile\\Description value"),
-	stringz("Profile\\Location value"),
-	uint32("Clan Tag"),
+	uint32("Cookie", base.HEX),
+	uint8{label="Success", key="status"},
+	when{condition=Cond.equals("status", 0), block={
+		stringz("Profile\\Description value"),
+		stringz("Profile\\Location value"),
+		uint32("Clan Tag"),
+	}},
 },
 --[[doc
     Message ID:    0x36
@@ -3034,7 +3048,13 @@ SPacketDescription = {
 
 ]]
 [SID_CDKEY2] = { -- 0x36
-	uint32("Result"),
+	uint32("Result", base.DEC, {
+		[0x01] = "Ok",
+		[0x02] = "Invalid key",
+		[0x03] = "Bad product",
+		[0x04] = "Banned",
+		[0x05] = "In use",
+	}),
 	stringz("Key owner"),
 },
 --[[doc
@@ -3064,8 +3084,15 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONRESPONSE2] = { -- 0x3A
-	uint32("Result"),
-	stringz("Reason"),
+	uint32{label="Result", display=base.DEC, desc={
+		[0x00] = "Success",
+		[0x01] = "Account Does Not Exist",
+		[0x02] = "Invalid Password",
+		[0x06] = "Account Closed",
+	}, key="res"},
+	when{condition=Cond.equals("res", 6), block={
+		stringz("Reason"),
+	}},
 },
 --[[doc
     Message ID:    0x3C
@@ -3092,7 +3119,11 @@ SPacketDescription = {
 
 ]]
 [SID_CHECKDATAFILE2] = { -- 0x3C
-	uint32("Result"),
+	uint32("Result", base.DEC, {
+		[0x00] = "Not approved",
+		[0x01] = "Blizzard approved",
+		[0x02] = "Approved for ladder",
+	}),
 },
 --[[doc
     Message ID:    0x3D
@@ -3124,8 +3155,14 @@ SPacketDescription = {
 
 ]]
 [SID_CREATEACCOUNT2] = { -- 0x3D
-	uint32("Status"),
-	stringz("Account name suggestion"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Account created",
+		[0x02] = "Name contained invalid characters",
+		[0x03] = "Name contained a banned word",
+		[0x04] = "Account already exists",
+		[0x06] = "Name did not contain enough alphanumeric characters",
+	}),
+	-- stringz("Account name suggestion"),
 },
 --[[doc
     Message ID:    0x3E
@@ -3167,13 +3204,16 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONREALMEX] = { -- 0x3E
-	uint32("MCP Cookie"),
-	uint32("MCP Status"),
-	uint32("[2] MCP Chunk 1"),
-	uint32("IP"),
-	uint32("Port"),
-	uint32("[12] MCP Chunk 2"),
-	stringz("Battle.net unique name"),
+	uint32("MCP Cookie", base.HEX),
+	uint32{label="MCP Status", key="status"},
+	when{condition=Cond.equals("status", 0), block={
+		array{of=uint32, label="MCP Chunk 1", num=2},
+		ipv4("IP"),
+		uint16{label="Port", big_endian=true},
+		bytes{label="Padding", length=2},
+		array{of=uint32, label="MCP Chunk 2", num=12},
+		stringz("Battle.net unique name"),
+	}},
 },
 --[[doc
     Message ID:      0x3F
@@ -3231,11 +3271,13 @@ SPacketDescription = {
 
 ]]
 [SID_QUERYREALMS2] = { -- 0x40
-	uint32("Unknown"),
-	uint32("Count"),
-	uint32("Unknown"),
-	stringz("Realm title"),
-	stringz("Realm description"),
+	uint32("Unknown", base.HEX),
+	uint32{label="Count", key="realms"},
+	iterator{label="Realm", refkey="realms", repeated={
+		uint32("Unknown", base.HEX),
+		stringz("Realm title"),
+		stringz("Realm description"),
+	}},
 },
 --[[doc
     Message ID:    0x41
@@ -3806,7 +3848,16 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCREATE] = { -- 0x52
-	uint32("Status"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Successfully created account name.",
+		[0x04] = "Name already exists.",
+		[0x07] = "Name is too short/blank.",
+		[0x08] = "Name contains an illegal character.",
+		[0x09] = "Name contains an illegal word.",
+		[0x0a] = "Name contains too few alphanumeric characters.",
+		[0x0b] = "Name contains adjacent punctuation characters.",
+		[0x0c] = "Name contains too many punctuation characters.",
+	}),
 },
 --[[doc
     Message ID:    0x53
@@ -3875,9 +3926,16 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTLOGONPROOF] = { -- 0x54
-	uint32("Status"),
-	uint8("[20] Server Password Proof"),
-	stringz("Additional information"),
+	uint32{label="Status", display=base.DEC, desc={
+		[0x00] = "Logon successful.",
+		[0x02] = "Incorrect password.",
+		[0x0E] = "An email address should be registered for this account.",
+		[0x0F] = "Custom error. A string at the end of this message contains the error.",
+	}, key="status"},
+	array{of=uint8, num=20, label="Server Password Proof"},
+	when{condition=Cond.equals("status", 0x0F), block={
+		stringz("Additional information")
+	}},
 },
 --[[doc
     Message ID:    0x55
@@ -3910,9 +3968,13 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCHANGE] = { -- 0x55
-	uint32("Status"),
-	uint8("[32] Salt"),
-	uint8("[32] Server key"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Change accepted, requires proof.",
+		[0x01] = "Account doesn't exist.",
+		[0x05] = "Account requires upgrade",
+	}),
+	array{of=uint8, num=32, label="Salt"},
+	array{of=uint8, num=32, label="Server Key"}
 },
 --[[doc
     Message ID:    0x56
@@ -3939,8 +4001,11 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCHANGEPROOF] = { -- 0x56
-	uint32("Status code"),
-	uint8("[20] Server password proof for old password"),
+	uint32("Status code", base.DEC, {
+		[0x00] = "Password changed.",
+		[0x02] = "Incorrect old password.",
+	}),
+	array{of=uint8, num=20, label="Server password proof for old password"},
 },
 --[[doc
     Message ID:      0x57
@@ -3968,8 +4033,11 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTUPGRADE] = { -- 0x57
-	uint32("Status"),
-	uint32("Server Token"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Upgrade Request Accepted",
+		[0x01] = "Upgrade Request Denied",
+	}),
+	uint32("Server Token", base.HEX),
 },
 --[[doc
     Message ID:      0x58
@@ -3997,8 +4065,11 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTUPGRADEPROOF] = { -- 0x58
-	uint32("Status"),
-	uint32("[5] Password proof"),
+	uint32("Status", base.DEC, {
+		[0x00] = "Password changed.",
+		[0x02] = "Incorrect old password.",
+	}),
+	array{of=uint32, num=5, label="Password proof"},
 },
 --[[doc
     Message ID:    0x59
@@ -4110,7 +4181,10 @@ SPacketDescription = {
 
 ]]
 [SID_WARDEN] = { -- 0x5E
-	bytes("Encrypted Packet"),
+	bytes{label="Encrypted Packet",
+		size=function(self, state) return state.packet.length end,
+	},
+--[[TODO
 	uint8("Packet Code"),
 	uint32("[4] MD5 Hash of the current Module"),
 	uint32("[4] Decryption key for Module"),
@@ -4139,6 +4213,7 @@ SPacketDescription = {
 	uint32("Funct3"),
 	uint32("Funct4"),
 	uint32("[5] Unknown"),
+]]
 },
 --[[doc
     Message ID:    0x60
@@ -4161,8 +4236,10 @@ SPacketDescription = {
 
 ]]
 [SID_GAMEPLAYERSEARCH] = { -- 0x60
-	uint8("Number of players"),
-	stringz("[] Player names"),
+	uint8{label="Number of players", key="players"},
+	iterator{alias="none", refkey="players", repeated={
+		stringz("Player name"),
+	}},
 },
 --[[doc
     Message ID:    0x65
