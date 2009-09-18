@@ -4298,12 +4298,25 @@ SPacketDescription = {
 
 ]]
 [SID_FRIENDSLIST] = { -- 0x65
-	uint8("Number of Entries"),
-	stringz("Account"),
-	uint8("Status"),
-	uint8("Location"),
-	uint32("ProductID"),
-	stringz("Location name"),
+	uint8{label="Number of Entries", key="friends"},
+	iterator{label="Friend", refkey="friends", repeated={
+		stringz("Account"),
+		flags{of=uint8, label="Status", fields={
+			{sname="Mutual", mask=0x01, desc=Descs.YesNo},
+			{sname="DND", mask=0x02, desc=Descs.YesNo},
+			{sname="Away", mask=0x04, desc=Descs.YesNo} 
+		}},
+		uint8("Location", base.DEC, {
+			[0x00] = "Offline",
+			[0x01] = "Not in chat",
+			[0x02] = "In chat",
+			[0x03] = "In a public game",
+			[0x04] = "In a private game, and you are not that person's friend.",
+			[0x05] = "In a private game, and you are that person's friend.",
+		}),
+		strdw("ProductID"),
+		stringz("Location name"),
+	}},
 },
 --[[doc
     Message ID:    0x66
@@ -4341,10 +4354,21 @@ SPacketDescription = {
 ]]
 [SID_FRIENDSUPDATE] = { -- 0x66
 	uint8("Entry number"),
-	uint8("Friend Location"),
-	uint8("Friend Status"),
-	uint32("ProductID"),
-	stringz("Location"),
+	flags{of=uint8, label="Status", fields={
+		{sname="Mutual", mask=0x01, desc=Descs.YesNo},
+		{sname="DND", mask=0x02, desc=Descs.YesNo},
+		{sname="Away", mask=0x04, desc=Descs.YesNo} 
+	}},
+	uint8("Location", base.DEC, {
+		[0x00] = "Offline",
+		[0x01] = "Not in chat",
+		[0x02] = "In chat",
+		[0x03] = "In a public game",
+		[0x04] = "In a private game, and you are not that person's friend.",
+		[0x05] = "In a private game, and you are that person's friend.",
+	}),
+	strdw("ProductID"),
+	stringz("Location name"),
 },
 --[[doc
     Message ID:    0x67
@@ -4479,10 +4503,17 @@ SPacketDescription = {
 
 ]]
 [SID_CLANFINDCANDIDATES] = { -- 0x70
-	uint32("Cookie"),
-	uint8("Status"),
-	uint8("Number of potential candidates"),
-	stringz("[] Usernames"),
+	uint32("Cookie", base.HEX),
+	uint8("Status", base.DEC, {
+		[0x00] = "Successfully found candidate(s)",
+		[0x01] = "Clan tag already taken",
+		[0x08] = "Already in clan",
+		[0x0a] = "Invalid clan tag specified",
+	}),
+	uint8{label="Number of potential candidates", key="names"},
+	iterator{alias="none", refkey="names", repeted={
+		stringz("Username"),
+	}},
 },
 --[[doc
     Message ID:    0x71
