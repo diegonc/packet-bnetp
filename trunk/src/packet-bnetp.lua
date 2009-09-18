@@ -1128,8 +1128,8 @@ SPacketDescription = {
 [0xFF13] = { 
 },
 [0xFF15] = { 
-	uint32("Ad ID"),
-	uint32("File extension"),
+	uint32("Ad ID", base.HEX),
+	strdw("File extension"),
 	wintime("Local file time"),
 	stringz("Filename"),
 	stringz("Link URL"),
