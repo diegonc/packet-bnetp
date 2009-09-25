@@ -169,7 +169,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_CHANGEPROOF] = { -- 0x06
-	uint32{label="Data from SID_AUTH_ACCOUNTCHANGE", num=16},
+	array{of=uint32, label="Data from SID_AUTH_ACCOUNTCHANGE", num=16},
 },
 --[[doc
     Message ID:      0x07
@@ -302,7 +302,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_CONFIRMLOGON] = { -- 0x0A
-	uint32{label="Password proof from Battle.net.", num=5},
+	array{of=uint32label="Password proof from Battle.net.", num=5},
 },
 --[[doc
     Message ID:      0x0B
@@ -591,7 +591,7 @@ CPacketDescription = {
 ]]
 [BNLS_VERIFYSERVER] = { -- 0x11
 	uint32("Server IP"),
-	uint8{label="Signature", num=128},
+	array{of=uint8label="Signature", num=128},
 },
 --[[doc
     Message ID:      0x12
@@ -659,8 +659,8 @@ CPacketDescription = {
 [BNLS_SERVERLOGONCHALLENGE] = { -- 0x13
 	uint32("Slot index."),
 	uint32("NLS revision number."),
-	uint32{label="Data from", num=16},
-	uint32{label="Data client's SID_AUTH_ACCOUNTLOGON", num=8},
+	array{of=uint32, label="Data from", num=16},
+	array{of=uint32, label="Data client's SID_AUTH_ACCOUNTLOGON", num=8},
 },
 --[[doc
     Message ID:      0x14
@@ -686,7 +686,7 @@ CPacketDescription = {
 ]]
 [BNLS_SERVERLOGONPROOF] = { -- 0x14
 	uint32("Slot index."),
-	uint32{label="Data from client's", num=5},
+	array{of=uint32, label="Data from client's", num=5},
 	stringz("Client's account name."),
 },
 --[[doc

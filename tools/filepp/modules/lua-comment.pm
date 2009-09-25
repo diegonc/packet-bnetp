@@ -49,10 +49,10 @@ sub RemoveComments
 	my $foundcomment = ($string =~ /--/);
 
     # remove all Lua single line comments
-    $string = Comment::RemoveComments("--(?!\\[\\[)", $string);
+    #$string = Comment::RemoveComments("--(?!\\[\\[)", $string);
     
     # remove all Lua block comments
-    my $newstring = Comment::RemoveComments("--\\[\\[", $string);
+    my $newstring = Comment::RemoveComments("--\\[\\[doc", $string);
     while($string =~ /\S/ && $newstring ne $string) {
 	$foundcomment = 1;
 	# remove newline that may have been added by RemoveComments
@@ -89,7 +89,7 @@ sub RemoveComments
 	    #}
 	}
 	# check for more comments on this line
-	$newstring = Comment::RemoveComments("--\\[\\[", $string);
+	$newstring = Comment::RemoveComments("--\\[\\[doc", $string);
     }
 
 	# clear line if there is nothing more than spaces
