@@ -1888,7 +1888,7 @@ CPacketDescription = {
 	stringz("Checksum formula."),
 },
 [0x700A] = { -- 0x0A
-	array{of=uint32label="Password proof from Battle.net.", num=5},
+	array{of=uint32, label="Password proof from Battle.net.", num=5},
 },
 [0x700B] = { -- 0x0B
 	uint32("Size of Data"),
@@ -1920,7 +1920,7 @@ CPacketDescription = {
 },
 [0x7011] = { -- 0x11
 	uint32("Server IP"),
-	array{of=uint8label="Signature", num=128},
+	array{of=uint8, label="Signature", num=128},
 },
 [0x7012] = { -- 0x12
 	uint32("Number of slots to reserve"),
