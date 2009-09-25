@@ -4544,9 +4544,19 @@ SPacketDescription = {
 
 ]]
 [SID_CLANINVITEMULTIPLE] = { -- 0x71
-	uint32("Cookie"),
-	uint8("Result"),
-	stringz("[] Failed account names"),
+	uint32("Cookie", base.HEX),
+	uint8("Result", base.DEC, {
+		[0x00] = "Everyone accepted",
+		[0x04] = "Declined",
+		[0x05] = "Not available",
+	}),
+	iterator{
+		alias="none",
+		condition = function(self, state) return state.packet.acc ~="" end,
+		repeated = {
+			stringz{label="Failed Account", key="acc"},
+		}
+	}
 },
 --[[doc
     Message ID:    0x72
@@ -4571,12 +4581,14 @@ SPacketDescription = {
 
 ]]
 [SID_CLANCREATIONINVITATION] = { -- 0x72
-	uint32("Cookie"),
+	uint32("Cookie", base.HEX),
 	uint32("Clan Tag"),
 	stringz("Clan Name"),
 	stringz("Inviter's username"),
-	uint8("Number of users being invited"),
-	stringz("[] List of users being invited"),
+	uint8{label="Number of users being invited", key="users"},
+	iterator{refkey="users", label="Invited users", repeated={
+		stringz("Name"),
+	}},
 },
 --[[doc
     Message ID:    0x73
