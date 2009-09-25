@@ -8,6 +8,8 @@ FILEPP_FLAGS= \
 	-m lua-comment.pm \
 	-m literal.pm
 
+GCUFLAGS?=-p packet-bnetp -s "packet-bnetp plugin"
+
 PKGNAME=packet-bnetp
 DISTNAME=packet-bnetp-src
 VERSION:=$(shell date +%Y%m%d)
@@ -71,9 +73,10 @@ $(PKGNAME)-$(VERSION).zip: $(PKG)
 pkg: $(PKGNAME)-$(VERSION).zip
 upload: pkg
 	tools/googlecode_upload.py \
-		-p packet-bnetp \
-		-s "packet-bnetp plugin" \
+		$(GCUFLAGS) \
 		$(PKGNAME)-$(VERSION).zip
 
 clean:
 	$(RM) src/packet-bnetp.lua
+
+-include Makefile.local

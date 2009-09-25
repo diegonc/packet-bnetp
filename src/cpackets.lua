@@ -302,7 +302,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_CONFIRMLOGON] = { -- 0x0A
-	array{of=uint32label="Password proof from Battle.net.", num=5},
+	array{of=uint32, label="Password proof from Battle.net.", num=5},
 },
 --[[doc
     Message ID:      0x0B
@@ -591,7 +591,7 @@ CPacketDescription = {
 ]]
 [BNLS_VERIFYSERVER] = { -- 0x11
 	uint32("Server IP"),
-	array{of=uint8label="Signature", num=128},
+	array{of=uint8, label="Signature", num=128},
 },
 --[[doc
     Message ID:      0x12
