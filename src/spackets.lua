@@ -2346,7 +2346,7 @@ SPacketDescription = {
 
 ]]
 [SID_CHATEVENT] = { -- 0x0F
-	uint32("Event ID", base.DEX, {
+	uint32{label="Event ID", key="eid", base.DEX, desc={ -- TODO: hash name for base?
 		[0x01] = "EID_SHOWUSER: User in channel",
 		[0x02] = "EID_JOIN: User joined channel",
 		[0x03] = "EID_LEAVE: User left channel",
@@ -2362,14 +2362,21 @@ SPacketDescription = {
 		[0x12] = "EID_INFO: Information",
 		[0x13] = "EID_ERROR: Error message",
 		[0x17] = "EID_EMOTE: Emote",
-	}),
+	}},
 	uint32("User's Flags", base.HEX),
-	uint32("Ping", base.HEX),
-	uint32("IP Address", base.HEX),
+	uint32("Ping"),
+	ipv4("IP Address"),
 	uint32("Account number", base.HEX),
 	uint32("Registration Authority", base.HEX),
 	stringz("Username"),
-	stringz("Text"),
+	-- stringz("Text"),
+	-- TODO: set compare (in)
+	when{ condition=Cond.equals("eid", 1),
+		block = { stringz("Statstring") },
+		otherwise = { stringz("Text") }
+	}
+
+	
 },
 --[[doc
     Message ID:    0x13
@@ -2416,7 +2423,7 @@ SPacketDescription = {
 ]]
 [SID_CHECKAD] = { -- 0x15
 	uint32("Ad ID", base.HEX),
-	strdw("File extension"),
+	stringz{label="File extension", length=4},
 	wintime("Local file time"),
 	stringz("Filename"),
 	stringz("Link URL"),
@@ -2518,7 +2525,10 @@ SPacketDescription = {
 
 ]]
 [SID_STARTADVEX3] = { -- 0x1C
-	uint32("Status", base.DEC,{[0x00] ="Ok", [0x01] = "Failed"}),
+	uint32("Status", base.DEC, {
+		[0x00] ="Ok", 
+		[0x01] = "Failed",
+	}),
 },
 --[[doc
     Message ID:    0x1D
@@ -2592,14 +2602,17 @@ SPacketDescription = {
 
 ]]
 [SID_READUSERDATA] = { -- 0x26
-	uint32("Number of accounts"),
+	uint32{label="Number of accounts", key="numaccts"},
 	uint32{label="Number of keys", key="numkeys"},
 	uint32("Request ID"),
-	iterator{
-		refkey="numkeys",
-		repeated={stringz("Requested Key Value")},
-		label="Key Values",
-	},
+	-- TODO
+	iterator{label="Requested Account", refkey="numaccts", repeated={
+		iterator{
+			refkey="numkeys",
+			repeated={stringz("Requested Key Value")},
+			label="Key Values",
+		},
+	}},
 },
 --[[doc
     Message ID:    0x28
@@ -3710,18 +3723,17 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_INFO] = { -- 0x50
-	uint32{label="Logon Type", key="type", desc={
+	uint32{label="Logon Type", key="logontype", desc={
 		[0x00] = "Broken SHA-1 (STAR/SEXP/D2DV/D2XP)",
 		[0x01] = "NLS Version 1",
-		[0x02] = "NLS Version 2 (WA3/W3XP)",
+		[0x02] = "NLS Version 2 (WAR3/W3XP)",
 	}},
 	uint32("Server Token", base.HEX),
 	uint32("UDPValue", base.HEX),
 	wintime("MPQ filetime"),
 	stringz("IX86ver filename"),
 	stringz("ValueString"),
-	when{
-		condition = function(self,state) return state.packet.type == 2 end,
+	when{ condition = Cond.equals("logontype", 2),
 		block = { bytes{label="Server signature", length=128}},
 	},
 },
@@ -3790,12 +3802,12 @@ SPacketDescription = {
 		[0x203] = "Wrong product",
 		-- The last 4 codes also apply to the second CDKey, as indicated by a
 		-- bitwise combination with 0x010.
-		[0x210] = "Invalid CD key",
-		[0x211] = "CD key in use",
-		[0x212] = "Banned key",
-		[0x213] = "Wrong product",
+		[0x210] = "Invalid second CD key",
+		[0x211] = "Second CD key in use",
+		[0x212] = "Banned second key",
+		[0x213] = "Wrong product for second CD key",
 	}},
-	when{
+	when{ -- TODO: Cond.in
 		condition=function(self, state)
 			return (state.packet.res == 0x100) or (state.packet.res == 0x102)
 		end,

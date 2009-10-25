@@ -3584,8 +3584,8 @@ CPacketDescription = {
 
 ]]
 [SID_ENTERCHAT] = { -- 0x0A
-	stringz("Username *"),
-	stringz("Statstring **"),
+	stringz("Username"),
+	stringz("Statstring"),
 },
 --[[doc
     Message ID:    0x0B
@@ -3612,7 +3612,7 @@ CPacketDescription = {
 
 ]]
 [SID_GETCHANNELLIST] = { -- 0x0B
-	uint32("Product ID"),
+	strdw("Product ID", nil, Descs.ClientTag),
 },
 --[[doc
     Message ID:    0x0C
@@ -3663,7 +3663,12 @@ CPacketDescription = {
 
 ]]
 [SID_JOINCHANNEL] = { -- 0x0C
-	uint32("Flags"),
+	uint32("Flags", nil, {
+		[0x00] = "NoCreate join",
+		[0x01] = "First join",
+		[0x02] = "Forced join",
+		[0x05] = "D2 first join",
+	}),
 	stringz("Channel"),
 },
 --[[doc
@@ -3775,7 +3780,8 @@ CPacketDescription = {
 
 ]]
 [SID_UDPPINGRESPONSE] = { -- 0x14
-	uint32("UDPCode"),
+	--[[doc or maybe uint32-hex? ]]
+	strdw("UDPCode"),
 },
 --[[doc
     Message ID:    0x15
@@ -3799,10 +3805,10 @@ CPacketDescription = {
 
 ]]
 [SID_CHECKAD] = { -- 0x15
-	uint32("Platform ID"),
-	uint32("Product ID"),
+	strdw("Platform ID"),
+	strdw("Product ID"),
 	uint32("ID of last displayed banner"),
-	uint32("Current time"),
+	posixtime("Current time"),
 },
 --[[doc
     Message ID:    0x16
@@ -3980,12 +3986,29 @@ CPacketDescription = {
 
 ]]
 [SID_STARTADVEX3] = { -- 0x1C
-	uint32("State"),
+	flags{of=uint32, label="State", fields={
+		{sname="Game is private", mask=0x01, desc=Descs.YesNo},
+		{sname="Game is full", mask=0x02, desc=Descs.YesNo},
+		{sname="Game contains players (other than creator)", mask=0x04, desc=Descs.YesNo},
+		{sname="Game is in progress", mask=0x08, desc=Descs.YesNo} 
+	}},
 	uint32("Time since creation"),
-	uint16("Game Type"),
+	uint16("Game Type", nil, {
+		[0x02] = "Melee",
+		[0x03] = "Free for All",
+		[0x04] = "1 vs 1",
+		[0x09] = "Ladder",
+		[0x0A] = "Use Map Settings",
+		[0x0F] = "Top vs Bottom",
+		[0x10] = "Iron Man Ladder (W2BN only)",
+	}),
 	uint16("Parameter"),
 	uint32("Unknown"),
-	uint32("Ladder"),
+	uint32("Ladder", nil, {
+		[0x00] = "NonLadder",
+		[0x01] = "Ladder",
+		[0x03] = "Iron Man Ladder (W2BN only)",
+	}),
 	stringz("Game name"),
 	stringz("Game password"),
 	stringz("Game Statstring"),
@@ -4131,7 +4154,7 @@ CPacketDescription = {
 
 ]]
 [SID_PING] = { -- 0x25
-	uint32("Ping Value"),
+	uint32("Ping Value", base.HEX),
 },
 --[[doc
     Message ID:      0x26
@@ -4231,11 +4254,23 @@ CPacketDescription = {
 
 ]]
 [SID_READUSERDATA] = { -- 0x26
-	uint32("Number of Accounts"),
-	uint32("Number of Keys"),
+	uint32{label="Number of Accounts", key="numaccts"},
+	uint32{label="Number of Keys", key="numkeys"},
 	uint32("Request ID"),
-	stringz("[] Requested Accounts"),
-	stringz("[] Requested Keys"),
+	-- TODO
+	iterator{label="Requested Account", refkey="numaccts", repeated={
+		stringz("Account"),
+		iterator{label="Keys", refkey="numkeys", repeated={
+			stringz("Key"),
+		}}, 
+		
+	}},
+	--[[iterator{label="Keys", refkey="keys", repeated={
+			stringz("Key"),
+	}},--]]
+		
+	--stringz("[] Requested Accounts"),
+	--stringz("[] Requested Keys"),
 },
 --[[doc
     Message ID:    0x27
@@ -4756,9 +4791,9 @@ CPacketDescription = {
 
 ]]
 [SID_LOGONRESPONSE2] = { -- 0x3A
-	uint32("Client Token"),
-	uint32("Server Token"),
-	uint32("[5] Password Hash"),
+	uint32("Client Token", base.HEX),
+	uint32("Server Token", base.HEX),
+	array{label="Password Hash", of=uint32, num=5},
 	stringz("Username"),
 },
 --[[doc
@@ -4930,7 +4965,50 @@ CPacketDescription = {
 
 ]]
 [SID_WARCRAFTGENERAL] = { -- 0x44
-	uint8("Subcommand ID"),
+	uint8{label="Subcommand ID", key="subcommand", desc={
+		[0x02] = "Request ladder map listing",
+		[0x03] = "Cancel ladder game search",
+		[0x04] = "User stats request",
+		[0x08] = "Clan stats request",
+		[0x09] = "Icon list request",
+		[0x0A] = "Change icon",
+	}},
+	when{ condition=Cond.equals("subcommand",0x02),
+		block = {  
+			uint32("Cookie"),
+			uint8{label="Number of types requested",key="num"},
+			iterator{label="Game Information", refkey="num", repeated={
+				strdw("Request data"),
+				-- seems to be dword(0)
+				uint32("Dword(0)"),
+			}},
+		},
+	},
+	when{ condition=Cond.equals("subcommand",0x03),
+		block = {  },
+	},
+	--[[
+	when{ condition=Cond.equals("subcommand",0x04),
+		block = {  
+			uint32("Cookie"),
+			strdw("Clan Tag"),
+			strdw("Product ID", Descs.ClientTag),
+		},
+	}	--]]
+	--[[ error
+	when{ condition=Cond.equals("subcommand",0x08),	block = { 			
+		uint32("Cookie"),
+		stringz("Account name"),
+		-- TODO: "' in strings?
+		strdw("Product ID (WAR3 or W3XP)", Descs.ClientTag), 
+	}}, --]]
+	when{ condition=Cond.equals("subcommand",0x09),	block = { 			
+		uint32("Cookie"),
+	}},
+	when{ condition=Cond.equals("subcommand",0x0A),	block = { 			
+		uint32("Icon"),
+	}},
+	--[[doc DEL
 	uint32("Cookie"),
 	uint8("Number of types requested"),
 	uint32("[] Request data *"),
@@ -4941,7 +5019,7 @@ CPacketDescription = {
 	uint32("Clan Tag"),
 	uint32("Product ID"),
 	uint32("Cookie"),
-	uint32("Icon"),
+	uint32("Icon"), ]]
 },
 --[[doc
     Message ID:    0x45
@@ -5123,14 +5201,14 @@ CPacketDescription = {
 ]]
 [SID_AUTH_INFO] = { -- 0x50
 	uint32("Protocol ID"),
-	uint32("Platform ID"),
-	uint32("Product ID"),
-	uint32("Version Byte"),
-	uint32("Product language"),
-	uint32("Local IP for NAT compatibility*"),
-	uint32("Time zone bias*"),
-	uint32("Locale ID*"),
-	uint32("Language ID*"),
+	strdw("Platform ID"),
+	strdw("Product ID", nil, Descs.ClientTag),
+	uint32("Version Byte", base.HEX),
+	strdw("Product language"),
+	ipv4("Local IP for NAT compatibility"),
+	int32("Time zone bias"),
+	uint32("Locale ID", nil, Descs.LocaleID),
+	uint32("Language ID", nil, Descs.LocaleID),
 	stringz("Country abreviation"),
 	stringz("Country"),
 },
@@ -5151,16 +5229,12 @@ CPacketDescription = {
                    (BOOLEAN) Spawn CD-key
 
                    For Each Key:
-
                    (DWORD) Key Length
-
                    (DWORD) CD-key's product value
-
                    (DWORD) CD-key's public value
-
                    (DWORD) Unknown (0)
-
                    (DWORD) [5] Hashed Key Data
+
                    (STRING) Exe Information
                    (STRING) CD-Key owner name
 
@@ -5189,16 +5263,30 @@ CPacketDescription = {
 	version("EXE Version"),
 	uint32("EXE Hash", base.HEX),
 	uint32{label="Number of CD-keys in this packet", key="cdkeys"},
-	uint32{label="Spawn CD-key", desc=Descs.YesNo},
+	--DEL uint32{label="Spawn CD-key", desc=Descs.YesNo},
+	uint32("Spawn CD-key", nil, Descs.YesNo),
 	iterator{label="CD-Key", refkey="cdkeys", repeated={
 		uint32("Key Length"),
-		uint32("CD-key's product value", base.HEX),
+		uint32("CD-key's product value", base.HEX, {
+				[0x01] = "STAR",
+				[0x02] = "STAR",
+				[0x17] = "STAR (26-character)",
+				[0x06] = "D2DV",
+				[0x18] = "D2DV (26-character)",
+				[0x0A] = "D2XP",
+				[0x19] = "D2XP (26-character)",
+				[0x04] = "W2BN",
+				[0x0E] = "WAR3",
+				[0x12] = "W3XP",
+		}),
 		uint32("CD-key's public value", base.HEX),
 		uint32("Unknown", base.HEX),
 		array{of=uint32, num=5, label="Hashed Key Data"},
-		stringz("Exe Information"),
-		stringz("CD-Key owner name"),
+		-- array("Hashed Key Data", uint32, 5),
 	}},
+	stringz("Exe Information"),
+	stringz("CD-Key owner name"),
+
 },
 --[[doc
     Message ID:    0x52
@@ -5249,7 +5337,7 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTLOGON] = { -- 0x53
-	uint8("[32] Client Key"),
+	array{label="Client Key", of=uint8, num=32},
 	stringz("Username"),
 },
 --[[doc
@@ -5272,7 +5360,7 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTLOGONPROOF] = { -- 0x54
-	uint8("[20] Client Password Proof"),
+	array{label="Client Password Proof", of=uint8, num=20},
 },
 --[[doc
     Message ID:    0x55

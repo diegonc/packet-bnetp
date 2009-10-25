@@ -495,7 +495,12 @@ do
 			args.dissect = function (self, state)
 				local str = ""
 				local isz = args.of:size()
-				local fmt = "%0" .. (isz * 2) .. "X "
+				-- local fmt = "%0" .. (isz * 2) .. "X "
+				local fmt = ""
+				if isz == 1 
+					then fmt = "%02X"
+					else fmt = "%08X "
+				end
 				local tail = state:tail()
 				for i=0, self.num - 1 do
 					str = str .. string.format(fmt,
