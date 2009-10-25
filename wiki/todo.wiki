@@ -1,14 +1,23 @@
 #summary Todo list
 
-data types:
-
-===most important===
-  * ~~array of any basic type (actually, uint32[5] may be enough)~~
-    * ~~display it as one value (e.g. passhash uint32 [5] - 40 char string)~~
   * ~~iterator from 0 to x (cdkey/gamelist)~~
     * Wireshark needs a patch for being able to correctly highlight each element in the hexdump.
       * Still not included in 1.2.2
   * ~~iteration until empty string (S>0x0b getchannellist)~~
+    * don't display last empty entry?
+  * ~~make clienttag a type (so it's no need to write possible values every time)?~~ - need valuemaps for strdw
+  * ~~bitmap decoder (user flag)~~ - displays dword raw value wrong
+  * ~~sid_checkad: extension: string[4]~~
+  * statstring decoder game and user statstrings
+  * "decode as" if both ports not 6112 (e.g. using proxy): can't define who is server and who client
+  * display summary in info field in packet list and in decoder view
+  * dont make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
+
+
+==done==
+===most important===
+  * ~~array of any basic type (actually, uint32[5] may be enough)~~
+    * ~~display it as one value (e.g. passhash uint32 [5] - 40 char string)~~
   * ~~conditions (if..)~~
   * ~~string-dword (swap dword and output as string)~~
   * ~~supress raw values output on custom types (time, dwordstr)~~
@@ -24,5 +33,3 @@ data types:
   * ~~make clienttag a type (so it's no need to write possible values every time)?~~ - valuemaps for strdw
   * ~~bitmap decoder (user flag)~~
   * ~~sid_checkad: extension: string[4]~~
-  * statstring decoder game and user statstrings
-  * "decode as" if both ports not 6112 (e.g. using proxy): can't define who is server and who client
