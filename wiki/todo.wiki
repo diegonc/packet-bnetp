@@ -3,10 +3,11 @@
 data types:
 
 ===most important===
-  * array of any basic type (actually, uint32[5] may be enough)
-    * display it as one value (e.g. passhash uint32 [5] - 40 char string)
+  * ~~array of any basic type (actually, uint32[5] may be enough)~~
+    * ~~display it as one value (e.g. passhash uint32 [5] - 40 char string)~~
   * ~~iterator from 0 to x (cdkey/gamelist)~~
-    * ~~Wireshark needs a patch for being able to correctly highlight each element in the hexdump.~~
+    * Wireshark needs a patch for being able to correctly highlight each element in the hexdump.
+      * Still not included in 1.2.2
   * ~~iteration until empty string (S>0x0b getchannellist)~~
   * ~~conditions (if..)~~
   * ~~string-dword (swap dword and output as string)~~
@@ -19,9 +20,9 @@ data types:
     * $unixtime = $wintime/1E7 - 11644473600
   * ~~unips file time~~
   * ~~exe version decoder (like ip, but in intel order)~~
-  * enclosed iterators (for s>0x26 readuserdata)
-  * make clienttag a type (so it's no need to write possible values every time)?
+  * ~~enclosed iterators (for s>0x26 readuserdata)~~
+  * ~~make clienttag a type (so it's no need to write possible values every time)?~~ - valuemaps for strdw
+  * ~~bitmap decoder (user flag)~~
+  * ~~sid_checkad: extension: string[4]~~
   * statstring decoder game and user statstrings
-  * bitmap decoder (user flag)
-  * sid_checkad: extension: string[4]
   * "decode as" if both ports not 6112 (e.g. using proxy): can't define who is server and who client
