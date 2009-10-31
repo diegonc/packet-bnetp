@@ -1,8 +1,8 @@
 #summary Todo list
 
   * ~~iterator from 0 to x (cdkey/gamelist)~~
-    * Wireshark needs a patch for being able to correctly highlight each element in the hexdump.
-      * Still not included in 1.2.2
+    * Wireshark needs a patch to correctly highlight each element in the hexdump.
+      * [https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=3994 Still not included in 1.2.3]
   * ~~iteration until empty string (S>0x0b getchannellist)~~
     * don't display last empty entry?
   * ~~make clienttag a type (so it's no need to write possible values every time)?~~ - need valuemaps for strdw
