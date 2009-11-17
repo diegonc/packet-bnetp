@@ -13,6 +13,31 @@ do
 	-- the folowing line.
 	--local info = function(...) end
 
+	-- BitOp library replacement for the wireshark's stable version
+	--     http://lua-users.org/wiki/BitUtils
+	-- 32-bit only
+	local bit = bit or {
+		band = function(a, b)
+			local c = 0
+			for i = 0, 31 do
+				if (a % 2 == 1) then
+					if ( b % 2 == 1) then
+						c = c + 2 ^ i
+						b = b - 1
+					end
+					a = a - 1
+				else
+					if (b % 2 == 1) then
+						b = b - 1
+					end
+				end
+				a = a / 2
+				b = b / 2
+			end
+			return c
+		end
+	}
+
 	-- Constants for TCP reassembly and packet rejecting
 	local ENOUGH    = false
 	local NEED_MORE = true
