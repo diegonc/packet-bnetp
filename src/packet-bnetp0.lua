@@ -9,6 +9,8 @@ do
 		SPacketDescription,
 		dissect_packet
 
+	-- To disable debugging output and improve dissector speed uncomment
+	-- the folowing line.
 	--local info = function(...) end
 
 	-- Constants for TCP reassembly and packet rejecting
