@@ -42,13 +42,17 @@ do
 		f_data, -- Generic packet data field
 	}
 
-	local function State()
+	local function State(...)
+		local base = {}
+		if arg and type(arg[1]) == "table" then
+			base = arg[1]
+		end
 		return {
-			["bnet_node"] = nil,
-			["buf"] = nil,
-			["pkt"] = nil,
-			["used"] = 0,
-			["packet"] = {},
+			["bnet_node"] = base.bnet_node or nil,
+			["buf"] =  base.buf or nil,
+			["pkt"] = base.pkt or nil,
+			["used"] = base.used or 0,
+			["packet"] = base.packet or {},
 
 			["peek"] = function(o, count)
 				o:request(count)
@@ -124,6 +128,7 @@ do
 				local thread = coroutine.create(do_dissection)
 				local r, need_more, missing = coroutine.resume(thread, state)
 				if (r and (need_more == NEED_MORE)) then
+					state:error("This is an incomplete packet. Refer to next pdu")
 					if missing then
 						pkt.desegment_len = missing
 					else
@@ -185,6 +190,8 @@ do
 			pidnode:set_text(pid_label(pid,packet_names[type_pid]))
 			-- The size found in the packet includes headers, so consumed bytes
 			-- are substracted when requesting more data.
+			-- todo: packet length is not considered a header field ?
+			--       meanwhile packet.length includes the length field(+2 bytes)
 			state.packet.length = state:peek(2):le_uint() -2
 			-- Record used bytes before dissecting.
 			state.packet.start = state.used
@@ -192,6 +199,12 @@ do
 			state:request(state.packet.length)
 
 			state.bnet_node:add_le(f_plen, state:read(2))
+
+			-- Allocate a new State object to catch invalid package decriptions
+			local substate = State(state)
+			-- Constrain its buffer to the packet area
+			substate.buf = state.buf(state.used, state.packet.length - 2):tvb()
+			substate.used = 0
 
 			local pdesc
 			if state.pkt.src_port == 6112 then
@@ -202,11 +215,24 @@ do
 				pdesc = CPacketDescription[type_pid]
 			end
 
-			if pdesc then
-				dissect_packet(state, pdesc)
-			else
-				state:error("Unssuported packet: " .. packet_names[type_pid])
+			local worker = coroutine.create(function (st, pd)
+				if pd then
+					dissect_packet(st, pd)
+				else
+					st:error("Unssuported packet: " .. packet_names[type_pid])
+				end
+			end)
+
+			-- launch worker in substate and catch its return value
+			local r, need_more, missing = coroutine.resume(worker, substate, pdesc)
+			if (r and (need_more == NEED_MORE)) then
+				state:error("packet is too short to complete dissection.")
+			elseif not r then
+				error(need_more)
 			end
+
+			-- Update the state
+			state.used = state.used + substate.used
 
 			-- Check if any data remains unhandled.
 			local remaining = state.packet.length -
