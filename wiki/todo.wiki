@@ -13,6 +13,7 @@
   * display summary in info field in packet list and in decoder view
   * dont make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
   * Add heading with instructions
+  * Prevent Wireshark from crashing by properly validating the packets' descriptions and give useful feedback in case of errors.
 
 
 ==done==
