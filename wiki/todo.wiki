@@ -12,6 +12,7 @@
   * "decode as" if both ports not 6112 (e.g. using proxy): can't define who is server and who client
   * display summary in info field in packet list and in decoder view
   * dont make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
+  * Add heading with instructions
 
 
 ==done==
