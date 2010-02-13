@@ -16,7 +16,7 @@
   * ~~Add heading with instructions~~
   * Prevent Wireshark from crashing by properly validating the packets' descriptions and give useful feedback in case of errors.
     * Bug of lua interpreter / wireshark lua interface / wireshark itself?
-
+    * Crashed 1.2.3 and [http://www.wireshark.org/download/prerelease/wireshark-win32-1.2.7pre1-31873.exe latest pre-release win32-1.2.7pre1-31873]. I think, we need to report bug. 1.2.6 [https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=4176 didn't even worked on 2000]
 
 ==done==
 ===most important===
