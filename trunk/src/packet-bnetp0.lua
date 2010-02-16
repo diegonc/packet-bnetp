@@ -13,7 +13,7 @@ do
 	-- the folowing line.
 	--local info = function(...) end
 
-	-- BitOp library replacement for the wireshark's stable version
+	-- A BitOp library replacement is needed for the wireshark's stable version
 	--     http://lua-users.org/wiki/BitUtils
 	-- 32-bit only
 	local bit = bit or {
