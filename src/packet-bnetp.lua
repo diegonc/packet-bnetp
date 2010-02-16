@@ -8,12 +8,10 @@ do
 		CPacketDescription,
 		SPacketDescription,
 		dissect_packet
-
 	-- To disable debugging output and improve dissector speed uncomment
 	-- the folowing line.
 	--local info = function(...) end
-
-	-- BitOp library replacement for the wireshark's stable version
+	-- A BitOp library replacement is needed for the wireshark's stable version
 	--     http://lua-users.org/wiki/BitUtils
 	-- 32-bit only
 	local bit = bit or {
@@ -37,15 +35,12 @@ do
 			return c
 		end
 	}
-
 	-- Constants for TCP reassembly and packet rejecting
 	local ENOUGH    = false
 	local NEED_MORE = true
 	local ACCEPTED  = true
 	local REJECTED  = false
-
 	local p_bnetp = Proto("bnetp","Battle.net Protocol");
-
 	local f_type = ProtoField.uint8("bnetp.type","Header Type",base.HEX, {
 		[0x1] = "Game protocol request",
 		[0x2] = "FTP protocol request",
@@ -66,7 +61,6 @@ do
 		f_plen, -- Packet length field
 		f_data, -- Generic packet data field
 	}
-
 	local function State(...)
 		local base = {}
 		if arg and type(arg[1]) == "table" then
@@ -78,7 +72,6 @@ do
 			["pkt"] = base.pkt or nil,
 			["used"] = base.used or 0,
 			["packet"] = base.packet or {},
-
 			["peek"] = function(o, count)
 				o:request(count)
 				return o.buf(o.used, count)
@@ -113,7 +106,6 @@ do
 			end,
 		}
 	end
-
 	local function do_dissection(state)
 		local handler = handlers_by_type[state:peek(1):uint()]
 		if handler then
@@ -125,31 +117,24 @@ do
 			return ENOUGH, REJECTED
 		end
 	end
-
 	function p_bnetp.dissector(buf,pkt,root)
 		if pkt.columns.protocol then
 			pkt.columns.protocol:set("BNETP")
 		end
-
 		if pkt.columns.info then
 			pkt.columns.info:clear()
 		end
-
 		if root then
 			local state = State()
 			local available = buf:len()
-
 			state.buf = buf
 			state.pkt = pkt
 			pkt.desegment_len = 0
-
 			info ("dissector: start to process pdus")
-
 			while state.used < available do
 				-- record offset where pdu starts
 				local pdu_start = state.used
 				state.bnet_node = root:add(p_bnetp, buf(state.used))
-
 				local thread = coroutine.create(do_dissection)
 				local r, need_more, missing = coroutine.resume(thread, state)
 				if (r and (need_more == NEED_MORE)) then
@@ -184,20 +169,15 @@ do
 			return state.used
 		end
 	end
-
 	local udp_encap_table = DissectorTable.get("udp.port")
 	local tcp_encap_table = DissectorTable.get("tcp.port")
 	--udp_encap_table:add(6112,p_bnetp)
 	tcp_encap_table:add(6112,p_bnetp)
-
 	-- Protocol stuff
-
 	noop_handler = function (state) return end
-
 	pid_label = function (pid, name)
 		return string.format("Packet ID: %s (0x%02x)", name, pid)
 	end
-
 	handlers_by_type = {
 		[0x1] = noop_handler,
 		[0x2] = noop_handler,
@@ -222,15 +202,12 @@ do
 			state.packet.start = state.used
 			-- Request at least len extra bytes at once.
 			state:request(state.packet.length)
-
 			state.bnet_node:add_le(f_plen, state:read(2))
-
 			-- Allocate a new State object to catch invalid package decriptions
 			local substate = State(state)
 			-- Constrain its buffer to the packet area
 			substate.buf = state.buf(state.used, state.packet.length - 2):tvb()
 			substate.used = 0
-
 			local pdesc
 			if state.pkt.src_port == 6112 then
 				-- process server packet
@@ -239,7 +216,6 @@ do
 				-- process client packet
 				pdesc = CPacketDescription[type_pid]
 			end
-
 			local worker = coroutine.create(function (st, pd)
 				if pd then
 					dissect_packet(st, pd)
@@ -247,7 +223,6 @@ do
 					st:error("Unssuported packet: " .. packet_names[type_pid])
 				end
 			end)
-
 			-- launch worker in substate and catch its return value
 			local r, need_more, missing = coroutine.resume(worker, substate, pdesc)
 			if (r and (need_more == NEED_MORE)) then
@@ -255,10 +230,8 @@ do
 			elseif not r then
 				error(need_more)
 			end
-
 			-- Update the state
 			state.used = state.used + substate.used
-
 			-- Check if any data remains unhandled.
 			local remaining = state.packet.length -
 				(state.used - state.packet.start)
@@ -267,7 +240,6 @@ do
 			end
 		end,
 	}
-
 	-- Packet dissector
 	function dissect_packet(state, pdesc)
 		for k,v in pairs(pdesc) do
@@ -289,7 +261,6 @@ do
 			end
 		end
 	end
-
 	-- Supported data types
 	local typemap = {
 		["bytes"] = {
@@ -353,11 +324,9 @@ do
 			dissect = function(self, state)
 				local size = self:size(state)
 				local str = state:peek(size):string()
-
 				if self.reversed then
 					str = string.reverse(str)
 				end
-
 				state.bnet_node:add(self.pf, state:read(size), str)
 			end,
 			value = function (self, state)
@@ -445,7 +414,6 @@ do
 			end,
 		},
 	}
-
 	local function make_args_table(args, ...)
 		if type(args) ~= "table" then
 			args = {label=args}
@@ -454,7 +422,6 @@ do
 		end
 		return args
 	end
-
 	-- ProtoField wrapper
 	local WProtoField = {}
 	setmetatable(WProtoField, {
@@ -507,7 +474,6 @@ do
           error("attempt to update a read-only table", 2)
         end
 	})
-
 packet_names = {
 [0x7000] = "BNLS_NULL",
 [0x7001] = "BNLS_CDKEY",
@@ -743,7 +709,6 @@ local Descs = {
 	ClientTag = {
 		["SEXP"] = "S EXP",
 	},
-
 	GameStatus = {
 		[0x00] = "OK",
 		[0x01] = "Game doesn't exist",
@@ -944,7 +909,6 @@ local Descs = {
 		[20490] = "Spanish (Puerto Rico)",
 	},
 }
-
 -- Common condition functions
 local Cond = {
 	equals = function(key, value)
@@ -953,7 +917,6 @@ local Cond = {
 		end
 	end,
 }	
-
 	do
 		local bytes = WProtoField.bytes
 		local uint64 = WProtoField.uint64
@@ -1043,7 +1006,6 @@ local Cond = {
 			end
 			return tmp
 		end
-
 -- Packets from server to client
 SPacketDescription = {
 [0x7001] = { -- 0x01
@@ -1463,7 +1425,6 @@ SPacketDescription = {
 		block = { stringz("Statstring") },
 		otherwise = { stringz("Text") }
 	}
-
 	
 },
 [0xFF13] = { -- 0x13
@@ -2997,7 +2958,6 @@ CPacketDescription = {
 	}},
 	stringz("Exe Information"),
 	stringz("CD-Key owner name"),
-
 },
 [0xFF52] = { -- 0x52
 	uint8("[32] Salt"),
