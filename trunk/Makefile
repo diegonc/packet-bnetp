@@ -54,6 +54,7 @@ PKG = \
 	src/packet-bnetp.lua
 
 SOURCES = \
+	src/banner.lua \
 	src/constants.lua \
 	src/cpackets.lua \
 	src/packet-bnetp0.lua \
