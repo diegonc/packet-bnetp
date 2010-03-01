@@ -1,3 +1,5 @@
+#include "banner.lua"
+
 do
 	-- Forward declarations
 	local
