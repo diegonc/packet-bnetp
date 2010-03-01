@@ -1,6 +1,11 @@
 #include "banner.lua"
-
 do
+	-- Plugin configurable parameters.
+	local Config = {
+		server_port = 6112
+	,	client_port = 6112
+	}
+
 	-- Forward declarations
 	local
 		packet_names,
@@ -117,6 +122,16 @@ do
 	end
 
 	local function do_dissection(state)
+		-- Check port pair
+		if (state.pkt.src_port == Config.server_port) and (state.pkt.dst_port == Config.client_port) then
+			state.isServerPacket = true
+		elseif (state.pkt.dst_port == Config.server_port) and (state.pkt.src_port == Config.client_port) then
+			state.isServerPacket = false
+		else
+			return ENOUGH, REJECTED
+		end
+
+		-- Port pair looks good. Looking up a handler
 		local handler = handlers_by_type[state:peek(1):uint()]
 		if handler then
 			state.bnet_node:add(f_type, state:read(1))
@@ -190,7 +205,10 @@ do
 	local udp_encap_table = DissectorTable.get("udp.port")
 	local tcp_encap_table = DissectorTable.get("tcp.port")
 	--udp_encap_table:add(6112,p_bnetp)
-	tcp_encap_table:add(6112,p_bnetp)
+	tcp_encap_table:add(Config.server_port,p_bnetp)
+	if Config.server_port ~= Config.client_port then
+		tcp_encap_table:add(Config.client_port, p_bnetp)
+	end
 
 	-- Protocol stuff
 
@@ -234,7 +252,7 @@ do
 			substate.used = 0
 
 			local pdesc
-			if state.pkt.src_port == 6112 then
+			if state.isServerPacket then
 				-- process server packet
 				pdesc = SPacketDescription[type_pid]
 			else
