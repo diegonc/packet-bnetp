@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Tue Mar  2 00:49:36 2010
+--[[ packet-bnetp.lua build on Tue Mar  2 17:46:29 2010
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
 Download: http://code.google.com/p/packet-bnetp/downloads/list
@@ -89,6 +89,7 @@ do
 			base = arg[1]
 		end
 		return {
+			["root_node"] = base.root_node or nil,
 			["bnet_node"] = base.bnet_node or nil,
 			["buf"] =  base.buf or nil,
 			["pkt"] = base.pkt or nil,
@@ -140,8 +141,18 @@ do
 		-- Port pair looks good. Looking up a handler
 		local handler = handlers_by_type[state:peek(1):uint()]
 		if handler then
+			-- record offset where pdu starts
+			local pdu_start = state.used
+			-- add protocol node
+			state.bnet_node = state.root_node:add(p_bnetp, state.buf(state.used))
+			-- add packet type field
 			state.bnet_node:add(f_type, state:read(1))
+			-- invoke handler
 			handler(state)
+			-- fix the length of the pdu
+			if state.bnet_node.set_len then
+				state.bnet_node:set_len(state.used - pdu_start)
+			end
 			return ENOUGH, ACCEPTED
 		else
 			-- If no handler is found the packet is rejected.
@@ -149,6 +160,9 @@ do
 		end
 	end
 	function p_bnetp.dissector(buf,pkt,root)
+		-- TODO: right now it is useful for debugging. But columns
+		-- modifications should be moved to the do_dissection function
+		-- as it knows whether this is a BNET packet or not.
 		if pkt.columns.protocol then
 			pkt.columns.protocol:set("BNETP")
 		end
@@ -160,12 +174,10 @@ do
 			local available = buf:len()
 			state.buf = buf
 			state.pkt = pkt
+			state.root_node = root
 			pkt.desegment_len = 0
 			info ("dissector: start to process pdus")
 			while state.used < available do
-				-- record offset where pdu starts
-				local pdu_start = state.used
-				state.bnet_node = root:add(p_bnetp, buf(state.used))
 				local thread = coroutine.create(do_dissection)
 				local r, need_more, missing = coroutine.resume(thread, state)
 				if (r and (need_more == NEED_MORE)) then
@@ -188,16 +200,15 @@ do
 				elseif not r then
 					error(need_more)
 				end
-				-- fix the length of the pdu
-				if state.bnet_node.set_len then
-					state.bnet_node:set_len(state.used - pdu_start)
-				end
 			end
 			if state.used > available then
 				error("Used more data than available.")
 			end
 			info ("dissector: finished processing pdus")
 			return state.used
+		else
+			-- Are we ever called with a nil root?
+			info ("p_bnetp dissector called with a nil root node.")
 		end
 	end
 	local udp_encap_table = DissectorTable.get("udp.port")
