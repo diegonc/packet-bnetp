@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Tue Mar  2 17:49:42 2010
+--[[ packet-bnetp.lua build on Tue Mar  2 18:32:38 2010
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
 Download: http://code.google.com/p/packet-bnetp/downloads/list
@@ -178,6 +178,7 @@ do
 			pkt.desegment_len = 0
 			info ("dissector: start to process pdus")
 			while state.used < available do
+				local pdu_start = state.used
 				local thread = coroutine.create(do_dissection)
 				local r, need_more, missing = coroutine.resume(thread, state)
 				if (r and (need_more == NEED_MORE)) then
@@ -1069,7 +1070,11 @@ local Cond = {
 			tmp.dissect = function(self, state)
 				local infostr = ""
 				local bn = state.bnet_node
-				state.bnet_node = bn:add(self.pf, state:peek(self.size()))
+				if self.big_endian then
+					state.bnet_node = bn:add(self.pf, state:peek(self.size()))
+				else
+					state.bnet_node = bn:add_le(self.pf, state:peek(self.size()))
+				end
 				for k,v in pairs(self.fields) do
 					local tail = state:tail()
 					local block = { v }
