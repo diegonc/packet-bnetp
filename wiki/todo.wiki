@@ -17,6 +17,7 @@
     * Other packet dependent information.
     * Some framework may be needed to specify this in the packet description.
   * dont make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
+    * Workaround: add alias="none" parameter to iterator constructor.
   * ~~Add heading with instructions~~
   * Prevent Wireshark from crashing by properly validating the packets' descriptions and give useful feedback in case of errors.
     * Bug of lua interpreter / wireshark lua interface / wireshark itself?
