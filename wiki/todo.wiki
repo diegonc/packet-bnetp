@@ -10,7 +10,8 @@
   * ~~sid_checkad: extension: string[4]~~
   * statstring decoder game and user statstrings
   * "decode as" if both ports not 6112 (e.g. using proxy): can't define who is server and who client
-    * At least, add config section at the beginning of the file
+    * ~~At least, add config section at the beginning of the file~~
+    * Use Wireshark's "User Preferences" to allow run-time changes in the configuration to take effect immediately.
   * display summary in info field in packet list and in decoder view
   * dont make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
   * ~~Add heading with instructions~~
