@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Tue Mar  2 19:19:48 2010
+--[[ packet-bnetp.lua build on Tue Mar  2 20:26:21 2010
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
 Download: http://code.google.com/p/packet-bnetp/downloads/list
@@ -504,6 +504,26 @@ do
 		end	
 		return args
 	end
+	local function verify_field_args(args)
+		local valid = true
+		local reason
+		if (not args.label) or (type(args.label) ~= "string") then
+			valid = false
+			reason = "Missing or non string label"
+		end
+		if not valid then
+			local str = reason .. " while processing this field description:\n{"
+			for k,v in args do
+				str = str .. "\t"
+				if type(k) ~= "number" then
+					str = str .. tostring(k) .. " = "
+				end
+				str = str .. tostring(v) .. ",\n"
+			end
+			str = str .. "}"
+			error(str)
+		end
+	end
 	-- ProtoField wrapper
 	local WProtoField = {}
 	setmetatable(WProtoField, {
@@ -518,6 +538,7 @@ do
 						-- TODO: some fields do not expect display
 						-- and desc argument
 						if field then
+							verify_field_args(args)
 							tmp.pf = field("",
 								args.label,
 								args.display,

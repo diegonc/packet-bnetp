@@ -214,10 +214,6 @@ do
 		end
 	end
 
-	local udp_encap_table = DissectorTable.get("udp.port")
-	local tcp_encap_table = DissectorTable.get("tcp.port")
-	--udp_encap_table:add(6112,p_bnetp)
-	tcp_encap_table:add(Config.server_port,p_bnetp)
 
 	-- Protocol stuff
 
@@ -523,6 +519,27 @@ do
 		return args
 	end
 
+	local function verify_field_args(args)
+		local valid = true
+		local reason
+		if (not args.label) or (type(args.label) ~= "string") then
+			valid = false
+			reason = "Missing or non string label"
+		end
+		if not valid then
+			local str = reason .. " while processing this field description:\n{"
+			for k,v in args do
+				str = str .. "\t"
+				if type(k) ~= "number" then
+					str = str .. tostring(k) .. " = "
+				end
+				str = str .. tostring(v) .. ",\n"
+			end
+			str = str .. "}"
+			error(str)
+		end
+	end
+
 	-- ProtoField wrapper
 	local WProtoField = {}
 	setmetatable(WProtoField, {
@@ -537,6 +554,7 @@ do
 						-- TODO: some fields do not expect display
 						-- and desc argument
 						if field then
+							verify_field_args(args)
 							tmp.pf = field("",
 								args.label,
 								args.display,
@@ -676,4 +694,11 @@ do
 		#include "spackets.lua"
 		#include "cpackets.lua"
 	end
+
+	-- After all the initialization is finished, register plugin
+	-- to default port.
+	local udp_encap_table = DissectorTable.get("udp.port")
+	local tcp_encap_table = DissectorTable.get("tcp.port")
+	--udp_encap_table:add(6112,p_bnetp)
+	tcp_encap_table:add(Config.server_port,p_bnetp)
 end
