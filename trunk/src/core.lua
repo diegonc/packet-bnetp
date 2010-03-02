@@ -179,6 +179,7 @@ do
 			info ("dissector: start to process pdus")
 
 			while state.used < available do
+				local pdu_start = state.used
 				local thread = coroutine.create(do_dissection)
 				local r, need_more, missing = coroutine.resume(thread, state)
 				if (r and (need_more == NEED_MORE)) then
@@ -649,7 +650,11 @@ do
 			tmp.dissect = function(self, state)
 				local infostr = ""
 				local bn = state.bnet_node
-				state.bnet_node = bn:add(self.pf, state:peek(self.size()))
+				if self.big_endian then
+					state.bnet_node = bn:add(self.pf, state:peek(self.size()))
+				else
+					state.bnet_node = bn:add_le(self.pf, state:peek(self.size()))
+				end
 				for k,v in pairs(self.fields) do
 					local tail = state:tail()
 					local block = { v }
