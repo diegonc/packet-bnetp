@@ -123,9 +123,9 @@ do
 
 	local function do_dissection(state)
 		-- Check port pair
-		if (state.pkt.src_port == Config.server_port) then
+		if (state.pkt.src_port == state.pkt.match) then
 			state.isServerPacket = true
-		elseif (state.pkt.dst_port == Config.server_port) then
+		elseif (state.pkt.dst_port == state.pkt.match) then
 			state.isServerPacket = false
 		else
 			return ENOUGH, REJECTED

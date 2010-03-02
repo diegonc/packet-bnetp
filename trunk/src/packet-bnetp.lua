@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Tue Mar  2 18:32:38 2010
+--[[ packet-bnetp.lua build on Tue Mar  2 19:19:48 2010
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
 Download: http://code.google.com/p/packet-bnetp/downloads/list
@@ -131,9 +131,9 @@ do
 	end
 	local function do_dissection(state)
 		-- Check port pair
-		if (state.pkt.src_port == Config.server_port) then
+		if (state.pkt.src_port == state.pkt.match) then
 			state.isServerPacket = true
-		elseif (state.pkt.dst_port == Config.server_port) then
+		elseif (state.pkt.dst_port == state.pkt.match) then
 			state.isServerPacket = false
 		else
 			return ENOUGH, REJECTED
