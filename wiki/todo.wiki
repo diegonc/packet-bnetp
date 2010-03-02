@@ -13,6 +13,9 @@
     * ~~At least, add config section at the beginning of the file~~
     * Use Wireshark's "User Preferences" to allow run-time changes in the configuration to take effect immediately.
   * display summary in info field in packet list and in decoder view
+    * Packet ID and direction
+    * Other packet dependent information.
+    * Some framework may be needed to specify this in the packet description.
   * dont make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
   * ~~Add heading with instructions~~
   * Prevent Wireshark from crashing by properly validating the packets' descriptions and give useful feedback in case of errors.
