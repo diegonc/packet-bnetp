@@ -27,6 +27,7 @@
     * When defining a field first look in the cache.
       * A field is equal to another if their label, filter, type, etc. are equal.
     * Remember to clean the cache after initialization is done.
+  * Move todo list to the Issues tab.
 
 ==done==
 ===most important===
