@@ -57,11 +57,11 @@ SOURCES = \
 	src/banner.lua \
 	src/constants.lua \
 	src/cpackets.lua \
-	src/packet-bnetp0.lua \
+	src/core.lua \
 	src/spackets.lua
 
 src/packet-bnetp.lua: $(SOURCES)
-	$(FILEPP) $(FILEPP_FLAGS) src/packet-bnetp0.lua > src/packet-bnetp.lua
+	$(FILEPP) $(FILEPP_FLAGS) src/core.lua > src/packet-bnetp.lua
 
 .PHONY: pkg upload clean
 
