@@ -474,12 +474,51 @@ do
 		},
 	}
 
-	local function make_args_table(args, ...)
-		if type(args) ~= "table" then
-			args = {label=args}
-			args.display = arg[1]
-			args.desc = arg[2]
-		end
+	--[[ make_args_table
+	--
+	--	Builds a table to be used by WProtoField.
+	--	Positional parameters are moved to their corresponding named parameter.
+	--
+	--	This should be called in either of the following forms:
+	--		* Positional: make_args_table(arg1,arg2, ... )
+	--		* Mixed: make_args_table { arg1, arg2, name1=value1, ... }
+	--
+	--	They can be diferentiated because arg1 must always be a string
+	--	in the positional form. (field label)
+	--
+	--	In mixed form, named parameters overwrite their corresponding
+	--	positional parameter.
+	--]]
+	local function make_args_table(...)
+		local args = {}
+		local size = table.getn(arg)
+		if size > 0 then
+			local orig = arg
+			if type(arg[1]) == "table"  then
+				-- Mixed
+				orig = arg[1]
+				size = table.getn(orig)
+			elseif type(arg[1]) ~= "string"  then
+				error("make_args_table called with wrong arguments types.")
+			end
+			-- Process positional parameters
+			args.label = orig[1]
+			args.display = orig[2]
+			args.desc = orig[3]
+			if size > 3 then
+				args.params = { n=(size - 3), unpack(orig, 4) }
+			end
+			-- Wipe positional parameters
+			-- for i=1, size do
+			--	orig[i] = nil
+			-- end
+			-- Copy named parameters if any. Avoid positional ones.
+			for k,v in pairs(orig) do
+				if type(k) ~= "number" then
+					args[k] = v
+				end
+			end
+		end	
 		return args
 	end
 
@@ -487,13 +526,11 @@ do
 	local WProtoField = {}
 	setmetatable(WProtoField, {
 		__index = function(t,k)
-				return function (args, ...)
+				return function (...)
 					local typeinfo = typemap[k]
 					
 					if typeinfo then
-						--[[ TODO: remove after changing packets syntax ]]
-						args = make_args_table(args, unpack(arg))
-						-----------------
+						local args = make_args_table(unpack(arg))
 						local tmp = {}
 						local field = ProtoField[args.alias or typeinfo.alias or k]
 						-- TODO: some fields do not expect display
@@ -556,18 +593,19 @@ do
 		local posixtime = WProtoField.posixtime
 		local iterator = WProtoField.iterator
 		local when = WProtoField.when
-		local version = function(args, ...)
-			args = make_args_table(args, unpack(arg))
+		local version = function(...)
+			local args = make_args_table(unpack(arg))
 			args.big_endian = false
 			return ipv4(args)
 		end
-		local strdw = function(args,...)
-			args = make_args_table(args, unpack(arg))
+		local strdw = function(...)
+			local args = make_args_table(unpack(arg))
 			args.reversed = true
 			args.length = 4
 			return stringz(args)
 		end
-		local array = function(args)
+		local array = function(...)
+			local args = make_args_table(unpack(arg))
 			if args.of ~= uint32 and args.of ~= uint8 then
 				error("Arrays of types other than uint32 or uint8 are not supported.")
 			end
@@ -594,7 +632,8 @@ do
 			end
 			return stringz(args)
 		end
-		local flags = function(args)
+		local flags = function(...)
+			local args = make_args_table(unpack(arg))
 			local tmp = args.of(args)
 			local fields = {}
 			
