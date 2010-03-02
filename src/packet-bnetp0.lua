@@ -3,7 +3,6 @@ do
 	-- Plugin configurable parameters.
 	local Config = {
 		server_port = 6112
-	,	client_port = 6112
 	}
 
 	-- Forward declarations
@@ -123,9 +122,9 @@ do
 
 	local function do_dissection(state)
 		-- Check port pair
-		if (state.pkt.src_port == Config.server_port) and (state.pkt.dst_port == Config.client_port) then
+		if (state.pkt.src_port == Config.server_port) then
 			state.isServerPacket = true
-		elseif (state.pkt.dst_port == Config.server_port) and (state.pkt.src_port == Config.client_port) then
+		elseif (state.pkt.dst_port == Config.server_port) then
 			state.isServerPacket = false
 		else
 			return ENOUGH, REJECTED
@@ -206,9 +205,6 @@ do
 	local tcp_encap_table = DissectorTable.get("tcp.port")
 	--udp_encap_table:add(6112,p_bnetp)
 	tcp_encap_table:add(Config.server_port,p_bnetp)
-	if Config.server_port ~= Config.client_port then
-		tcp_encap_table:add(Config.client_port, p_bnetp)
-	end
 
 	-- Protocol stuff
 
