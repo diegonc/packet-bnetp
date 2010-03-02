@@ -11,6 +11,7 @@
   * [http://code.google.com/p/ghostplusplus/source/browse/trunk/ghost/util.cpp?r=321#520 statstring decoder] game and user statstrings
   * ~~"decode as" if both ports not 6112 (e.g. using proxy): can't define who is server and who client~~
     * ~~At least, add config section at the beginning of the file~~
+    * Add lite mode configuration.
     * Use Wireshark's "User Preferences" to allow run-time changes in the configuration to take effect immediately.
   * display summary in info field in packet list and in decoder view
     * Packet ID and direction
