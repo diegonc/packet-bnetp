@@ -6,7 +6,7 @@
   * ~~iteration until empty string (S>0x0b getchannellist)~~
     * don't display last empty entry?
   * ~~make clienttag a type (so it's no need to write possible values every time)?~~ - need valuemaps for strdw
-  * ~~bitmap decoder (user flag)~~ - displays dword raw value wrong
+  * ~~bitmap decoder (user flag)~~ ~~ displays dword raw value wrong~~
   * ~~sid_checkad: extension: string[4]~~
   * statstring decoder game and user statstrings
   * "decode as" if both ports not 6112 (e.g. using proxy): can't define who is server and who client
