@@ -621,6 +621,22 @@ do
 			local args = make_args_table(unpack(arg))
 			args.reversed = true
 			args.length = 4
+			args.priv = { desc = args.desc }
+			args.desc = nil
+			args.dissect = function(self, state)
+				local size = self:size(state)
+				local str = state:peek(size):string()
+
+				if self.reversed then
+					str = string.reverse(str)
+				end
+
+				-- TODO: generalize lua based value/string maps
+				if self.priv.desc and self.priv.desc[str] then
+					str = self.priv.desc[str] .. " (" .. str .. ")"
+				end
+				state.bnet_node:add(self.pf, state:read(size), str)
+			end
 			return stringz(args)
 		end
 		local array = function(...)
