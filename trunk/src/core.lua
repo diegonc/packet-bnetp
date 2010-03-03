@@ -525,18 +525,26 @@ do
 		if (not args.label) or (type(args.label) ~= "string") then
 			valid = false
 			reason = "Missing or non string label"
+		elseif args.label == "" then
+			valid = false
+			reason = "Empty label found"
 		end
+		if args.display and (type(args.display) ~= "number") then
+			valid = false
+			reason = "Display value was found to be an invalid base type"
+		end
+
 		if not valid then
-			local str = reason .. " while processing this field description:\n{"
-			for k,v in args do
+			local str = reason .. " while processing this field description:\n{\n"
+			for k,v in pairs(args) do
 				str = str .. "\t"
 				if type(k) ~= "number" then
 					str = str .. tostring(k) .. " = "
 				end
 				str = str .. tostring(v) .. ",\n"
 			end
-			str = str .. "}"
-			error(str)
+			str = str .. "}\n"
+			error(str .. package.loaded.debug.traceback())
 		end
 	end
 
