@@ -5,7 +5,7 @@
       * [https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=3994 Still not included in 1.2.3]
   * ~~iteration until empty string (S>0x0b getchannellist)~~
     * don't display last empty entry?
-  * ~~make clienttag a type (so it's no need to write possible values every time)?~~ - need valuemaps for strdw
+  * ~~make clienttag a type (so it's no need to write possible values every time)?~~ ~~- need valuemaps for strdw~~
   * ~~bitmap decoder (user flag)~~ ~~ displays dword raw value wrong~~
   * ~~sid_checkad: extension: string[4]~~
   * [http://code.google.com/p/ghostplusplus/source/browse/trunk/ghost/util.cpp?r=321#520 statstring decoder] game and user statstrings
