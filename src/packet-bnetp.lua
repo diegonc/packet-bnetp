@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Tue Mar  2 20:26:21 2010
+--[[ packet-bnetp.lua build on Tue Mar  2 22:23:15 2010
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
 Download: http://code.google.com/p/packet-bnetp/downloads/list
@@ -212,10 +212,6 @@ do
 			info ("p_bnetp dissector called with a nil root node.")
 		end
 	end
-	local udp_encap_table = DissectorTable.get("udp.port")
-	local tcp_encap_table = DissectorTable.get("tcp.port")
-	--udp_encap_table:add(6112,p_bnetp)
-	tcp_encap_table:add(Config.server_port,p_bnetp)
 	-- Protocol stuff
 	noop_handler = function (state) return end
 	pid_label = function (pid, name)
@@ -809,6 +805,7 @@ local Descs = {
 	
 	ClientTag = {
 		["SEXP"] = "S EXP",
+		["W3XP"] = "Warcraft III",
 	},
 	GameStatus = {
 		[0x00] = "OK",
@@ -1044,6 +1041,20 @@ local Cond = {
 			local args = make_args_table(unpack(arg))
 			args.reversed = true
 			args.length = 4
+			args.priv = { desc = args.desc }
+			args.desc = nil
+			args.dissect = function(self, state)
+				local size = self:size(state)
+				local str = state:peek(size):string()
+				if self.reversed then
+					str = string.reverse(str)
+				end
+				-- TODO: generalize lua based value/string maps
+				if self.priv.desc and self.priv.desc[str] then
+					str = self.priv.desc[str] .. " (" .. str .. ")"
+				end
+				state.bnet_node:add(self.pf, state:read(size), str)
+			end
 			return stringz(args)
 		end
 		local array = function(...)
@@ -3197,4 +3208,10 @@ CPacketDescription = {
 },
 }
 	end
+	-- After all the initialization is finished, register plugin
+	-- to default port.
+	local udp_encap_table = DissectorTable.get("udp.port")
+	local tcp_encap_table = DissectorTable.get("tcp.port")
+	--udp_encap_table:add(6112,p_bnetp)
+	tcp_encap_table:add(Config.server_port,p_bnetp)
 end

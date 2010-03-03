@@ -8,6 +8,7 @@ local Descs = {
 	
 	ClientTag = {
 		["SEXP"] = "S EXP",
+		["W3XP"] = "Warcraft III",
 	},
 
 	GameStatus = {

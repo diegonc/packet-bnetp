@@ -58,7 +58,8 @@ SOURCES = \
 	src/constants.lua \
 	src/cpackets.lua \
 	src/core.lua \
-	src/spackets.lua
+	src/spackets.lua \
+	src/valuemaps.lua
 
 src/packet-bnetp.lua: $(SOURCES)
 	$(FILEPP) $(FILEPP_FLAGS) src/core.lua > src/packet-bnetp.lua
