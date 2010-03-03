@@ -7,8 +7,17 @@ local Descs = {
 	},
 	
 	ClientTag = {
-		["SEXP"] = "S EXP",
-		["W3XP"] = "Warcraft III",
+		["DSHR"] = "Diablo 1 Shareware",
+		["DRTL"] = "Diablo 1 (Retail)",
+		["SSHR"] = "Starcraft Shareware",
+		["STAR"] = "Starcraft",
+		["SEXP"] = "Starcraft: Broodwar",
+		["JSTR"] = "Starcraft Japanese",
+		["W2BN"] = "Warcraft II Battle.Net Edition",
+		["D2DV"] = "Diablo 2",
+		["D2XP"] = "Diablo 2: Lord Of Destruction",
+		["WAR3"] = "Warcraft III (Reign Of Chaos)",
+		["W3XP"] = "Warcraft III: The Frozen Throne",
 	},
 
 	GameStatus = {
