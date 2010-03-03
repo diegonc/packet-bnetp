@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Wed Mar  3 17:37:01 2010
+--[[ packet-bnetp.lua build on Wed Mar  3 20:19:07 2010
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
 Download: http://code.google.com/p/packet-bnetp/downloads/list
@@ -19,7 +19,8 @@ at the end of the file.
 do
 	-- Plugin configurable parameters.
 	local Config = {
-		server_port = 6112
+		server_port = 6112,
+		lite = false,
 	}
 	-- Forward declarations
 	local
@@ -232,6 +233,17 @@ do
 			local type_pid = ((0xFF * 256) + pid)
 			local pidnode = state.bnet_node:add(f_pid, state:read(1))
 			pidnode:set_text(pid_label(pid,packet_names[type_pid]))
+			
+			if state.isServerPacket then
+				state.bnet_node:append_text(" S>C")
+				state.pkt.columns.info:append(" S>C")
+			else
+				state.bnet_node:append_text(" S>C")
+				state.pkt.columns.info:append(" C>S")
+			end
+			state.bnet_node:append_text(" " .. packet_names[type_pid])
+			state.pkt.columns.info:append(" " .. packet_names[type_pid])
+			
 			-- The size found in the packet includes headers, so consumed bytes
 			-- are substracted when requesting more data.
 			-- todo: packet length is not considered a header field ?
@@ -256,6 +268,7 @@ do
 				pdesc = CPacketDescription[type_pid]
 			end
 			local worker = coroutine.create(function (st, pd)
+				if Config.lite then return end
 				if pd then
 					dissect_packet(st, pd)
 				else
