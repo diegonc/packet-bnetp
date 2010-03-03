@@ -31,6 +31,9 @@
       * A field is equal to another if their label, filter, type, etc. are equal.
     * Remember to clean the cache after initialization is done.
   * Move todo list to the Issues tab.
+  * Define useful positional parameters for each primitive
+    * array(label, base_type, size)
+  * More Documentation?
 
 ==done==
 ===most important===
