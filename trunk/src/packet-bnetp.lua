@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on %time%
+--[[ packet-bnetp.lua build on Thu Mar  4 03:52:54 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
