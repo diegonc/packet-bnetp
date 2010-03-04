@@ -19,6 +19,10 @@ local Descs = {
 		["WAR3"] = "Warcraft III (Reign Of Chaos)",
 		["W3XP"] = "Warcraft III: The Frozen Throne",
 	},
+	
+	PlatformID = {
+		["IX86"] = "Intel x86",
+	},
 
 	GameStatus = {
 		[0x00] = "OK",

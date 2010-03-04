@@ -43,7 +43,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_LOGONCHALLENGE] = { -- 0x02
-	uint32("[8] Data for SID_AUTH_ACCOUNTLOGON"),
+	array{label="Data for SID_AUTH_ACCOUNTLOGON", of=uint32, num=8},
 },
 --[[doc
     Message ID:    0x03
@@ -63,7 +63,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_LOGONPROOF] = { -- 0x03
-	uint32("[5] Data for SID_AUTH_ACCOUNTLOGONPROOF"),
+	array{label="Data for SID_AUTH_ACCOUNTLOGONPROOF", of=uint32, num=5},
 },
 --[[doc
     Message ID:      0x04
@@ -151,7 +151,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_UPGRADECHALLENGE] = { -- 0x07
-	uint32{label="Success code.", desc=Descs.YesNo},
+	uint32{label="Success code", desc=Descs.YesNo},
 },
 --[[doc
     Message ID:      0x08
@@ -197,9 +197,9 @@ SPacketDescription = {
 ]]
 [BNLS_VERSIONCHECK] = { -- 0x09
 	uint32{label="Success If Success is TRUE:", desc=Descs.YesNo},
-	uint32("Version."),
-	uint32("Checksum."),
-	stringz("Version check stat string."),
+	uint32("Version"),
+	uint32("Checksum"),
+	stringz("Version check stat string"),
 },
 --[[doc
     Message ID:      0x0A
@@ -272,12 +272,13 @@ SPacketDescription = {
 
 ]]
 [BNLS_CDKEY_EX] = { -- 0x0C
-	uint32("Cookie."),
-	uint8("Number of CD-keys requested."),
-	uint8("Number of"),
-	uint32("Bit mask .For each successful"),
-	uint32("Client session key."),
-	array{label="CD-key data.", of=uint32, num=9},
+	uint32("Cookie"),
+	uint8("Number of CD-keys requested"),
+	uint8("Number of successfully ecrypted CD-keys"),
+	uint32("Bit mask"),
+	-- For each successful CD Key:
+	uint32("Client session key"),
+	array{label="CD-key data", of=uint32, num=9},
 },
 --[[doc
     Message ID:      0x0D
@@ -302,7 +303,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_CHOOSENLSREVISION] = { -- 0x0D
-	uint32{label="Success code.", desc=Descs.YesNo},
+	uint32{label="Success code", desc=Descs.YesNo},
 },
 --[[doc
     Message ID:      0x0E
@@ -328,7 +329,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_AUTHORIZE] = { -- 0x0E
-	uint32("Server code."),
+	uint32("Server code"),
 },
 --[[doc
     Message ID:      0x0F
@@ -362,7 +363,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_AUTHORIZEPROOF] = { -- 0x0F
-	uint32("Status code."),
+	uint32("Status code"),
 },
 --[[doc
     Message ID:      0x10
@@ -412,7 +413,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_VERIFYSERVER] = { -- 0x11
-	uint32{label="Success.", desc=Descs.YesNo},
+	uint32{label="Success", desc=Descs.YesNo},
 },
 --[[doc
     Message ID:      0x12
@@ -466,7 +467,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_SERVERLOGONCHALLENGE] = { -- 0x13
-	uint32("Slot index."),
+	uint32("Slot index"),
 	array{label="Data for server's SID_AUTH_ACCOUNTLOGON", of=uint32, num=16},
 },
 --[[doc
@@ -498,9 +499,9 @@ SPacketDescription = {
 
 ]]
 [BNLS_SERVERLOGONPROOF] = { -- 0x14
-	uint32("Slot index."),
-	uint32{label="Success.", desc=Descs.YesNo},
-	array{label="Data server's", of=uint32, num=5},
+	uint32("Slot index"),
+	uint32{label="Success", desc=Descs.YesNo},
+	array{label="Data server's SID_AUTH_ACCOUNTLOGONPROOF (0x54) response", of=uint32, num=5},
 },
 --[[doc
     Message ID:      0x18
@@ -523,11 +524,11 @@ SPacketDescription = {
 
 ]]
 [BNLS_VERSIONCHECKEX] = { -- 0x18
-	uint32{label="Success*", desc=Descs.YesNo},
-	uint32("Version."),
-	uint32("Checksum."),
+	uint32{label="Success", desc=Descs.YesNo},
+	uint32("Version"),
+	uint32("Checksum"),
 	stringz("Version check"),
-	uint32("Cookie."),
+	uint32("Cookie"),
 	uint32("The latest version code for this"),
 },
 --[[doc
@@ -554,12 +555,12 @@ SPacketDescription = {
 
 ]]
 [BNLS_VERSIONCHECKEX2] = { -- 0x1A
-	uint32{label="Success*", desc=Descs.YesNo},
-	version("Version."),
-	uint32("Checksum.", base.HEX),
-	stringz("Version check stat string."),
-	uint32("Cookie.", base.HEX),
-	uint32("The latest version code for this product.", base.HEX),
+	uint32{label="Success", desc=Descs.YesNo},
+	version("Version"),
+	uint32("Checksum", base.HEX),
+	stringz("Version check stat string"),
+	uint32("Cookie", base.HEX),
+	uint32("The latest version code for this product", base.HEX),
 },
 --[[doc
     Message ID:    0x10
@@ -797,7 +798,7 @@ SPacketDescription = {
 	uint16("Object unique code"),
 	uint16("X Coordinate"),
 	uint16("Y Coordinate"),
-	uint8("State *"),
+	uint8("State"),
 	uint8("Interaction Condition"),
 },
 --[[doc
@@ -1089,18 +1090,18 @@ SPacketDescription = {
 	ipv4("IP of D2GS Server"),
 	uint32("Game hash"),
 	uint32("Result", base.HEX, {
-		[0x00] = "Game joining succeeded.",
-		[0x29] = "Password incorrect.",
-		[0x2A] = "Game does not exist.",
-		[0x2B] = "Game is full.",
-		[0x2C] = "You do not meet the level requirements for this game.",
-		[0x6E] = "A dead hardcore character cannot join a game.",
-		[0x71] = "A non-hardcore character cannot join a game created by a Hardcore character.",
-		[0x73] = "Unable to join a Nightmare game.",
-		[0x74] = "Unable to join a Hell game.",
-		[0x78] = "A non-expansion character cannot join a game created by an Expansion character.",
-		[0x79] = "A Expansion character cannot join a game created by a non-expansion character.",
-		[0x7D] = "A non-ladder character cannot join a game created by a Ladder character.",
+		[0x00] = "Game joining succeeded",
+		[0x29] = "Password incorrect",
+		[0x2A] = "Game does not exist",
+		[0x2B] = "Game is full",
+		[0x2C] = "You do not meet the level requirements for this game",
+		[0x6E] = "A dead hardcore character cannot join a game",
+		[0x71] = "A non-hardcore character cannot join a game created by a Hardcore character",
+		[0x73] = "Unable to join a Nightmare game",
+		[0x74] = "Unable to join a Hell game",
+		[0x78] = "A non-expansion character cannot join a game created by an Expansion character",
+		[0x79] = "A Expansion character cannot join a game created by a non-expansion character",
+		[0x7D] = "A non-ladder character cannot join a game created by a Ladder character",
 	}),
 },
 --[[doc
@@ -1187,15 +1188,15 @@ SPacketDescription = {
 ]]
 [MCP_GAMEINFO] = { -- 0x06
 	uint16("Request ID"),
-	uint32("Status *"),
+	uint32("Status"),
 	uint32("Game Uptime"),
 	uint16("Unknown"),
 	uint8("Maximum players allowed"),
 	uint8("Number of characters in the game"),
-	uint8("[16] Classes of ingame characters **"),
-	uint8("[16] Levels of ingame characters **"),
+	array{label="Classes of ingame characters", of=uint8, num=16},
+	array{label="Levels of ingame characters", of=uint8, num=16},
 	uint8("Unused"),
-	stringz("[16] Character names **"),
+	stringz("[16] Character names"),
 },
 --[[doc
     Message ID:    0x07
@@ -1375,7 +1376,7 @@ SPacketDescription = {
 	uint8("Character Flags"),
 	uint8("Character title"),
 	uint16("Character level"),
-	uint8("[16] Character name"),
+	array{label="Character name", of=uint8, num=16},
 },
 --[[doc
     Message ID:    0x12
@@ -2365,9 +2366,9 @@ SPacketDescription = {
 	}},
 	uint32("User's Flags", base.HEX),
 	uint32("Ping"),
-	ipv4("IP Address"),
-	uint32("Account number", base.HEX),
-	uint32("Registration Authority", base.HEX),
+	ipv4("IP Address (Defunct)"),
+	uint32("Account number (Defunct)", base.HEX),
+	uint32("Registration Authority (Defunct)", base.HEX),
 	stringz("Username"),
 	-- stringz("Text"),
 	-- TODO: set compare (in)
@@ -2605,7 +2606,7 @@ SPacketDescription = {
 	uint32{label="Number of accounts", key="numaccts"},
 	uint32{label="Number of keys", key="numkeys"},
 	uint32("Request ID"),
-	-- TODO
+	-- TODO: DONE
 	iterator{label="Requested Account", refkey="numaccts", repeated={
 		iterator{
 			refkey="numkeys",
@@ -2826,7 +2827,7 @@ SPacketDescription = {
 
 ]]
 [SID_FINDLADDERUSER] = { -- 0x2F
-	uint32("Rank. Zero-based. 0xFFFFFFFF == Not ranked."),
+	uint32("Rank. Zero-based. 0xFFFFFFFF == Not ranked"),
 },
 --[[doc
     Message ID:    0x30
@@ -3807,6 +3808,8 @@ SPacketDescription = {
 		[0x212] = "Banned second key",
 		[0x213] = "Wrong product for second CD key",
 	}},
+	stringz("Additional Information"),
+	--[[
 	when{ -- TODO: Cond.in
 		condition=function(self, state)
 			return (state.packet.res == 0x100) or (state.packet.res == 0x102)
@@ -3819,6 +3822,7 @@ SPacketDescription = {
 		end,
 		block = { stringz("Username") },
 	},
+	]]
 },
 --[[doc
     Message ID:    0x52
@@ -3859,14 +3863,14 @@ SPacketDescription = {
 ]]
 [SID_AUTH_ACCOUNTCREATE] = { -- 0x52
 	uint32("Status", base.DEC, {
-		[0x00] = "Successfully created account name.",
-		[0x04] = "Name already exists.",
-		[0x07] = "Name is too short/blank.",
-		[0x08] = "Name contains an illegal character.",
-		[0x09] = "Name contains an illegal word.",
-		[0x0a] = "Name contains too few alphanumeric characters.",
-		[0x0b] = "Name contains adjacent punctuation characters.",
-		[0x0c] = "Name contains too many punctuation characters.",
+		[0x00] = "Successfully created account name",
+		[0x04] = "Name already exists",
+		[0x07] = "Name is too short/blank",
+		[0x08] = "Name contains an illegal character",
+		[0x09] = "Name contains an illegal word",
+		[0x0a] = "Name contains too few alphanumeric characters",
+		[0x0b] = "Name contains adjacent punctuation characters",
+		[0x0c] = "Name contains too many punctuation characters",
 	}),
 },
 --[[doc
@@ -3900,9 +3904,9 @@ SPacketDescription = {
 ]]
 [SID_AUTH_ACCOUNTLOGON] = { -- 0x53
 	uint32("Status", base.HEX, {
-		[0x00] = "Logon accepted, requires proof.",
-		[0x01] = "Account doesn't exist.",
-		[0x05] = "Account requires upgrade.",
+		[0x00] = "Logon accepted, requires proof",
+		[0x01] = "Account doesn't exist",
+		[0x05] = "Account requires upgrade",
 	}),
 	array{of=uint8, num=32, label="Salt"},
 	array{of=uint8, num=32, label="Server Key"},
@@ -3937,10 +3941,10 @@ SPacketDescription = {
 ]]
 [SID_AUTH_ACCOUNTLOGONPROOF] = { -- 0x54
 	uint32{label="Status", display=base.DEC, desc={
-		[0x00] = "Logon successful.",
-		[0x02] = "Incorrect password.",
-		[0x0E] = "An email address should be registered for this account.",
-		[0x0F] = "Custom error. A string at the end of this message contains the error.",
+		[0x00] = "Logon successful",
+		[0x02] = "Incorrect password",
+		[0x0E] = "An email address should be registered for this account",
+		[0x0F] = "Custom error. A string at the end of this message contains the error",
 	}, key="status"},
 	array{of=uint8, num=20, label="Server Password Proof"},
 	when{condition=Cond.equals("status", 0x0F), block={
@@ -3979,8 +3983,8 @@ SPacketDescription = {
 ]]
 [SID_AUTH_ACCOUNTCHANGE] = { -- 0x55
 	uint32("Status", base.DEC, {
-		[0x00] = "Change accepted, requires proof.",
-		[0x01] = "Account doesn't exist.",
+		[0x00] = "Change accepted, requires proof",
+		[0x01] = "Account doesn't exist",
 		[0x05] = "Account requires upgrade",
 	}),
 	array{of=uint8, num=32, label="Salt"},
@@ -4012,8 +4016,8 @@ SPacketDescription = {
 ]]
 [SID_AUTH_ACCOUNTCHANGEPROOF] = { -- 0x56
 	uint32("Status code", base.DEC, {
-		[0x00] = "Password changed.",
-		[0x02] = "Incorrect old password.",
+		[0x00] = "Password changed",
+		[0x02] = "Incorrect old password",
 	}),
 	array{of=uint8, num=20, label="Server password proof for old password"},
 },
@@ -4076,8 +4080,8 @@ SPacketDescription = {
 ]]
 [SID_AUTH_ACCOUNTUPGRADEPROOF] = { -- 0x58
 	uint32("Status", base.DEC, {
-		[0x00] = "Password changed.",
-		[0x02] = "Incorrect old password.",
+		[0x00] = "Password changed",
+		[0x02] = "Incorrect old password",
 	}),
 	array{of=uint32, num=5, label="Password proof"},
 },
@@ -4323,10 +4327,10 @@ SPacketDescription = {
 			[0x01] = "Not in chat",
 			[0x02] = "In chat",
 			[0x03] = "In a public game",
-			[0x04] = "In a private game, and you are not that person's friend.",
-			[0x05] = "In a private game, and you are that person's friend.",
+			[0x04] = "In a private game, and you are not that person's friend",
+			[0x05] = "In a private game, and you are that person's friend",
 		}),
-		strdw("ProductID"),
+		strdw("ProductID", nil, Descs.ClientTag),
 		stringz("Location name"),
 	}},
 },
@@ -4376,10 +4380,10 @@ SPacketDescription = {
 		[0x01] = "Not in chat",
 		[0x02] = "In chat",
 		[0x03] = "In a public game",
-		[0x04] = "In a private game, and you are not that person's friend.",
-		[0x05] = "In a private game, and you are that person's friend.",
+		[0x04] = "In a private game, and you are not that person's friend",
+		[0x05] = "In a private game, and you are that person's friend",
 	}),
-	strdw("ProductID"),
+	strdw("ProductID", nil, Descs.ClientTag),
 	stringz("Location name"),
 },
 --[[doc
@@ -4438,7 +4442,7 @@ SPacketDescription = {
 		[0x03] = "In public game",
 		[0x05] = "In private game",
 	}),
-	uint32("ProductID", base.HEX),
+	strdw("ProductID", nil, Descs.ClientTag),
 	stringz("Location"),
 },
 --[[doc
