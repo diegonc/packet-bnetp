@@ -1,30 +1,15 @@
 #summary Todo list
 
-  * ~~iterator from 0 to x (cdkey/gamelist)~~
-    * Wireshark needs a patch to correctly highlight each element in the hexdump.
-      * [https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=3994 Still not included in 1.2.3]
-  * ~~iteration until empty string (S>0x0b getchannellist)~~
-    * don't display last empty entry?
-  * ~~make clienttag a type (so it's no need to write possible values every time)?~~ ~~- need valuemaps for strdw~~
-  * ~~bitmap decoder (user flag)~~ ~~ displays dword raw value wrong~~
-  * ~~sid_checkad: extension: string[4]~~
-  * [http://code.google.com/p/ghostplusplus/source/browse/trunk/ghost/util.cpp?r=321#520 statstring decoder] game and user statstrings
-    * Client dependent data types.
-    * Add Config.client value to decide how to decode the raw data.
-  * ~~"decode as" if both ports not 6112 (e.g. using proxy): can't define who is server and who client~~
-    * ~~At least, add config section at the beginning of the file~~
-    * ~~Add lite mode configuration.~~
-    * Use Wireshark's "User Preferences" to allow run-time changes in the configuration to take effect immediately.
   * display summary in info field in packet list and in decoder view
     * ~~Packet ID and direction~~
     * Other packet dependent information.
     * Some framework may be needed to specify this in the packet description.
+  * [http://code.google.com/p/ghostplusplus/source/browse/trunk/ghost/util.cpp?r=321#520 statstring decoder] game and user statstrings
+    * Client dependent data types.
+  * Add Config.client value to decide how to decode the raw data.
+      * http dissector remembers that a connect proxy was used in previous packets, maybe our plugin can the same, remember it's client since login?
   * dont make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
     * Workaround: add alias="none" parameter to iterator constructor.
-  * ~~Add heading with instructions~~
-  * Prevent Wireshark from crashing by properly validating the packets' descriptions and give useful feedback in case of errors.
-    * Bug of lua interpreter / wireshark lua interface / wireshark itself?
-    * Crashed 1.2.3 and [http://www.wireshark.org/download/prerelease/wireshark-win32-1.2.7pre1-31873.exe latest pre-release win32-1.2.7pre1-31873]. I think, we need to report bug. 1.2.6 [https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=4176 didn't even worked on 2000]
   * Allow field reuse
     * Keep a cache of fields used by packet descriptions.
     * When defining a field first look in the cache.
@@ -35,7 +20,11 @@
     * `[u]intX`(label, base, value_string_map)
     * array(label, type, size)
     * strdw(label, value_string_map)
+  * Mixed parameter form in function call, like in python
   * More Documentation?
+    * Document API (data decoder API, like uint32())
+
+
 
 ==done==
 ===most important===
@@ -44,6 +33,11 @@
   * ~~conditions (if..)~~
   * ~~string-dword (swap dword and output as string)~~
   * ~~supress raw values output on custom types (time, dwordstr)~~
+  * ~~iterator from 0 to x (cdkey/gamelist)~~
+    * Wireshark needs a patch to correctly highlight each element in the hexdump.
+      * [https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=3994 Still not included in 1.2.3]
+  * ~~iteration until empty string (S>0x0b getchannellist)~~
+    * don't display last empty entry?
 
 ===less important===
   * ~~ip (network byte order, opposite to intel). For some reason lua's built-in ipv4 uses inter order (lol?)~~
@@ -56,3 +50,12 @@
   * ~~make clienttag a type (so it's no need to write possible values every time)?~~ - valuemaps for strdw
   * ~~bitmap decoder (user flag)~~
   * ~~sid_checkad: extension: string[4]~~
+  * ~~"decode as" if both ports not 6112 (e.g. using proxy): can't define who is server and who client~~
+    * ~~At least, add config section at the beginning of the file~~
+    * ~~Add lite mode configuration.~~
+    * Use Wireshark's "User Preferences" to allow run-time changes in the configuration to take effect immediately.
+  * ~~Add heading with instructions~~
+  * Prevent Wireshark from crashing by properly validating the packets' descriptions and give useful feedback in case of errors.
+    * Bug of lua interpreter / wireshark lua interface / wireshark itself?
+      * Crashed, if hash and usual forms were mixed in function call.
+    * Crashed 1.2.3 and [http://www.wireshark.org/download/prerelease/wireshark-win32-1.2.7pre1-31873.exe latest pre-release win32-1.2.7pre1-31873]. I think, we need to report bug. 1.2.6 [https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=4176 didn't even worked on 2000]
