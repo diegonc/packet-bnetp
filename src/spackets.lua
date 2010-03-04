@@ -2093,7 +2093,9 @@ SPacketDescription = {
 			uint32("Status", base.DEC, Descs.GameStatus)
 		},
 		otherwise = {
+			-- error in description?
 			iterator{label="Game Information", refkey="games", repeated={
+				uint32("Unknown"),
 				uint16("Game Type", base.HEX, {
 					[0x02] = "Melee",
 					[0x03] = "Free for all",
@@ -2111,7 +2113,7 @@ SPacketDescription = {
 					[0x0F] = "Top vs Bottom",
 				}),
 				uint16("Parameter", base.HEX),
-				uint32("Language ID", base.HEX),
+				-- uint32("Language ID", base.HEX),
 				uint16("Address Family", base.DEC, {[2]="AF_INET"}),
 				uint16{label="Port", big_endian=true},
 				ipv4("Host's IP"),

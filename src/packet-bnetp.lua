@@ -149,15 +149,6 @@ do
 	end
 
 	local function do_dissection(state)
-		-- Check port pair
-		if (state.pkt.src_port == state.pkt.match) then
-			state.isServerPacket = true
-		elseif (state.pkt.dst_port == state.pkt.match) then
-			state.isServerPacket = false
-		else
-			return ENOUGH, REJECTED
-		end
-
 		-- Port pair looks good. Looking up a handler
 		local handler = handlers_by_type[state:peek(1):uint()]
 		if handler then
@@ -183,13 +174,13 @@ do
 	end
 
 	function p_bnetp.dissector(buf,pkt,root)
-		-- TODO: right now it is useful for debugging. But columns
-		-- modifications should be moved to the do_dissection function
-		-- as it knows whether this is a BNET packet or not.
-		if pkt.columns.protocol then
-			pkt.columns.protocol:set("BNETP")
-		end
+		local rejected = false
 
+		-- Column's text cannot be queried, only written.
+		-- It is cleared here to avoid keeping data from previous
+		-- dissector in case it is written by this one.
+		-- Ideally it should be retored to the old value if it is
+		-- not used by this dissector.
 		if pkt.columns.info then
 			pkt.columns.info:clear()
 		end
@@ -202,6 +193,15 @@ do
 			state.pkt = pkt
 			state.root_node = root
 			pkt.desegment_len = 0
+
+			-- Check port pair
+			if (state.pkt.src_port == state.pkt.match) then
+				state.isServerPacket = true
+			elseif (state.pkt.dst_port == state.pkt.match) then
+				state.isServerPacket = false
+			else -- is this ever executed?
+				return 0
+			end
 
 			info ("dissector: start to process pdus")
 
@@ -222,9 +222,11 @@ do
 							.. " need_more: " .. tostring(need_more)
 							.. " missing: " .. tostring(missing)
 							.. " deseg_len: " .. tostring(pkt.desegment_len))
-					return
+					available  = pdu_start
+					state.used = pdu_start
 				elseif r and (need_more==ENOUGH) and (missing==REJECTED) then
 					-- Packet was rejected. Make the loop end.
+					rejected = true
 					available = state.used
 				elseif not r then
 					error(need_more)
@@ -234,6 +236,20 @@ do
 				error("Used more data than available.")
 			end
 			info ("dissector: finished processing pdus")
+
+			-- Set columns text
+			if not rejected then
+				if pkt.columns.protocol then
+					pkt.columns.protocol:set("BNETP")
+				end
+				if pkt.columns.info then
+					if state.isServerPacket then
+						pkt.columns.info:preppend("S>")
+					else
+						pkt.columns.info:preppend("C>")
+					end
+				end
+			end
 			return state.used
 		else
 			-- Are we ever called with a nil root?
@@ -267,14 +283,15 @@ do
 			pidnode:set_text(pid_label(pid,packet_names[type_pid]))
 			
 			if state.isServerPacket then
-				state.bnet_node:append_text(" S>C")
-				state.pkt.columns.info:append(" S>C")
+				state.bnet_node:append_text(" S>")
 			else
-				state.bnet_node:append_text(" S>C")
-				state.pkt.columns.info:append(" C>S")
+				state.bnet_node:append_text(" C>")
 			end
-			state.bnet_node:append_text(" " .. packet_names[type_pid])
-			state.pkt.columns.info:append(" " .. packet_names[type_pid])
+			do
+				local infomsg =  string.format(" %s (0x%02x)", packet_names[type_pid],  pid)
+				state.bnet_node:append_text(infomsg)
+				state.pkt.columns.info:append(infomsg)
+			end
 			
 			-- The size found in the packet includes headers, so consumed bytes
 			-- are substracted when requesting more data.
@@ -1553,7 +1570,9 @@ SPacketDescription = {
 			uint32("Status", base.DEC, Descs.GameStatus)
 		},
 		otherwise = {
+			-- error in description?
 			iterator{label="Game Information", refkey="games", repeated={
+				uint32("Unknown"),
 				uint16("Game Type", base.HEX, {
 					[0x02] = "Melee",
 					[0x03] = "Free for all",
@@ -1571,7 +1590,7 @@ SPacketDescription = {
 					[0x0F] = "Top vs Bottom",
 				}),
 				uint16("Parameter", base.HEX),
-				uint32("Language ID", base.HEX),
+				-- uint32("Language ID", base.HEX),
 				uint16("Address Family", base.DEC, {[2]="AF_INET"}),
 				uint16{label="Port", big_endian=true},
 				ipv4("Host's IP"),
