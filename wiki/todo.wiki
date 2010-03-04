@@ -7,7 +7,7 @@
   * [http://code.google.com/p/ghostplusplus/source/browse/trunk/ghost/util.cpp?r=321#520 statstring decoder] game and user statstrings
     * Client dependent data types.
   * Add Config.client value to decide how to decode the raw data.
-      * http dissector remembers that a connect proxy was used in previous packets, maybe our plugin can the same, remember it's client since login?
+      * http dissector remembers that a connect proxy was used in previous packets, maybe our plugin can the same, remember clienttag since login?
   * dont make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
     * Workaround: add alias="none" parameter to iterator constructor.
   * Allow field reuse
