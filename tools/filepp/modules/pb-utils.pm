@@ -48,10 +48,8 @@ sub ReplaceTime
 	my $newstring = "";
 	my $datestr = localtime();
 
-	foreach (split(/\n/, $string)) {
-		s/%time%/$datestr/g;
-		$newstring .= $_ . "\n";
-	}
+	$newstring = $string;
+	$newstring =~ s/%time%/$datestr/g;
 	return $newstring;
 }
 
