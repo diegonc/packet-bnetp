@@ -232,4 +232,29 @@ local Cond = {
 			return state.packet[key] == value
 		end
 	end,
-}	
+	nequals = function(key, value)
+		return function(self, state)
+			return state.packet[key] ~= value
+		end
+	end,
+	neg = function(fun, ...)
+		local func = fun
+		if type(fun) == "string" then
+			func = Cond[fun](unpack(arg))
+		end
+		return function(self, state)
+			return not func(self, state)
+		end
+	end,
+	inlist = function(key, arr)
+		return function(self, state)
+			local val = state.packet[key]
+			for i in arr do
+				if i == val then
+					return true
+				end
+			end
+			return false
+		end
+	end,
+}
