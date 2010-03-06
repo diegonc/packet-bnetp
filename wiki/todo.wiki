@@ -23,7 +23,7 @@
   * Mixed parameter form in function call, like in python
   * More Documentation?
     * Document API (data decoder API, like uint32())
-
+  * Supress double value output in ipv4() and version()
 
 
 ==done==
