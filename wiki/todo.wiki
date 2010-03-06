@@ -25,7 +25,8 @@
   * More Documentation?
     * Document API (data decoder API, like uint32())
   * Supress double value output in ipv4() and version()
-  * Use Wireshark's "User Preferences" to allow run-time changes in the configuration 
+  * Use Wireshark's "User Preferences" to allow run-time changes in the configuration.
+  * Investigate GeoIP.
 
 ==done==
 ===most important===
