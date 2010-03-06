@@ -331,15 +331,15 @@ do
 				state:error(v.key .. " key creation requested on a field type "
 					.. "without a value method.")
 			end
-			if not v.dissect then
-				local size = v:size(state)
+			if v.dissect then
+				v:dissect(state)
+			elseif v.pf then -- XXX: getvalueonly: the cursor is advanced only
+				local size = v:size(state)      -- if a field was created.
 				if v.big_endian then
 					state.bnet_node:add(v.pf, state:read(size))
 				else
 					state.bnet_node:add_le(v.pf, state:read(size))
 				end
-			else
-				v:dissect(state)
 			end
 		end
 	end
@@ -587,7 +587,13 @@ do
 					if typeinfo then
 						local args = make_args_table(unpack(arg))
 						local tmp = {}
-						local field = ProtoField[args.alias or typeinfo.alias or k]
+						local field = nil
+						-- XXX: this getvalueonly thing is pretty hackish
+						--      no node is added to the tree unless an alias is
+						--      explicitly given.
+						if (not args.getvalueonly) or args.alias then
+							field = ProtoField[args.alias or typeinfo.alias or k]
+						end
 						-- TODO: some fields do not expect display
 						-- and desc argument
 						if field then
