@@ -25,7 +25,7 @@
   * More Documentation?
     * Document API (data decoder API, like uint32())
   * Supress double value output in ipv4() and version()
-
+  * Use Wireshark's "User Preferences" to allow run-time changes in the configuration 
 
 ==done==
 ===most important===
@@ -54,7 +54,7 @@
   * ~~"decode as" if both ports not 6112 (e.g. using proxy): can't define who is server and who client~~
     * ~~At least, add config section at the beginning of the file~~
     * ~~Add lite mode configuration.~~
-    * Use Wireshark's "User Preferences" to allow run-time changes in the configuration to take effect immediately.
+to take effect immediately.
   * ~~Add heading with instructions~~
   * Prevent Wireshark from crashing by properly validating the packets' descriptions and give useful feedback in case of errors.
     * Bug of lua interpreter / wireshark lua interface / wireshark itself?
