@@ -17,10 +17,11 @@
     * Remember to clean the cache after initialization is done.
   * Move todo list to the Issues tab.
   * Define useful positional parameters for each primitive
-    * `[u]intX`(label, base, value_string_map)
-    * array(label, type, size)
-    * strdw(label, value_string_map)
-  * Mixed parameter form in function call, like in python
+    * ~~`[`u`]`intX(label, base, value_string_map)~~
+    * ~~array(label, type, size)~~
+    * ~~strdw(label, value_string_map)~~
+  * ~~Mixed parameter form in function call, like in python~~
+    * Done. Does it work?
   * More Documentation?
     * Document API (data decoder API, like uint32())
   * Supress double value output in ipv4() and version()
