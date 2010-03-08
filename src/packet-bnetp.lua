@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Thu Mar  4 03:56:42 2010
+--[[ packet-bnetp.lua build on Sun Mar  7 22:19:23 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -357,15 +357,15 @@ do
 				state:error(v.key .. " key creation requested on a field type "
 					.. "without a value method.")
 			end
-			if not v.dissect then
-				local size = v:size(state)
+			if v.dissect then
+				v:dissect(state)
+			elseif v.pf then -- XXX: getvalueonly: the cursor is advanced only
+				local size = v:size(state)      -- if a field was created.
 				if v.big_endian then
 					state.bnet_node:add(v.pf, state:read(size))
 				else
 					state.bnet_node:add_le(v.pf, state:read(size))
 				end
-			else
-				v:dissect(state)
 			end
 		end
 	end
@@ -542,6 +542,13 @@ do
 	--	positional parameter.
 	--]]
 	local function make_args_table(...)
+		return make_args_table_with_positional_map({
+			"label",
+			"display",
+			"desc",
+			["unpacked"] = "params",}, unpack(arg))
+	end
+	local function make_args_table_with_positional_map(pmap, ...)
 		local args = {}
 		local size = table.getn(arg)
 		if size > 0 then
@@ -554,11 +561,11 @@ do
 				error("make_args_table called with wrong arguments types.")
 			end
 			-- Process positional parameters
-			args.label = orig[1]
-			args.display = orig[2]
-			args.desc = orig[3]
-			if size > 3 then
-				args.params = { n=(size - 3), unpack(orig, 4) }
+			for i=1, table.getn(pmap) then
+				args[pmap[i]] = orig[i]
+			end
+			if size > table.getn(pmap) then
+				args[pmap.unpacked or "params"] = { n=(size - table.getn(pmap)), unpack(orig, table.getn(pmap)) }
 			end
 			-- Wipe positional parameters
 			-- for i=1, size do
@@ -613,7 +620,13 @@ do
 					if typeinfo then
 						local args = make_args_table(unpack(arg))
 						local tmp = {}
-						local field = ProtoField[args.alias or typeinfo.alias or k]
+						local field = nil
+						-- XXX: this getvalueonly thing is pretty hackish
+						--      no node is added to the tree unless an alias is
+						--      explicitly given.
+						if (not args.getvalueonly) or args.alias then
+							field = ProtoField[args.alias or typeinfo.alias or k]
+						end
 						-- TODO: some fields do not expect display
 						-- and desc argument
 						if field then
@@ -1113,7 +1126,32 @@ local Cond = {
 			return state.packet[key] == value
 		end
 	end,
-}	
+	nequals = function(key, value)
+		return function(self, state)
+			return state.packet[key] ~= value
+		end
+	end,
+	neg = function(fun, ...)
+		local func = fun
+		if type(fun) == "string" then
+			func = Cond[fun](unpack(arg))
+		end
+		return function(self, state)
+			return not func(self, state)
+		end
+	end,
+	inlist = function(key, arr)
+		return function(self, state)
+			local val = state.packet[key]
+			for i, v in ipairs(arr) do
+				if v == val then
+					return true
+				end
+			end
+			return false
+		end
+	end,
+}
 
 	do
 		local bytes = WProtoField.bytes
@@ -1138,7 +1176,8 @@ local Cond = {
 			return ipv4(args)
 		end
 		local strdw = function(...)
-			local args = make_args_table(unpack(arg))
+			local args = make_args_table_with_positional_map
+				({"label", "desc"}, unpack(arg))
 			args.reversed = true
 			args.length = 4
 			args.priv = { desc = args.desc }
@@ -1160,7 +1199,8 @@ local Cond = {
 			return stringz(args)
 		end
 		local array = function(...)
-			local args = make_args_table(unpack(arg))
+			local args = make_args_table_with_positional_map
+				({"label", "of", "num"}, unpack(arg))
 			if args.of ~= uint32 and args.of ~= uint8 then
 				error("Arrays of types other than uint32 or uint8 are not supported.")
 			end

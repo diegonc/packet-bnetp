@@ -249,8 +249,8 @@ local Cond = {
 	inlist = function(key, arr)
 		return function(self, state)
 			local val = state.packet[key]
-			for i in arr do
-				if i == val then
+			for i, v in ipairs(arr) do
+				if v == val then
 					return true
 				end
 			end
