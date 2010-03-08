@@ -8,6 +8,11 @@
     * Client dependent data types.
   * Add Config.client value to decide how to decode the raw data.
       * http dissector remembers that a connect proxy was used in previous packets, maybe our plugin can the same, remember clienttag since login?
+  * Support different sessions of the protocol in the same capture file.
+     * Conversation API is no available in lua.
+     * The init entry point is called when Wiresharks is going to load a new file. The structures to store the sessions' properties should be initialized.
+     * New functions should allow a packet description to read or write those structures.
+     * Existing functions that rely on keys (iterator, when) may need to be improved to support session's properties to be used.
   * dont make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
     * Workaround: add alias="none" parameter to iterator constructor.
   * Allow field reuse
