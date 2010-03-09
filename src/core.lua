@@ -515,13 +515,6 @@ do
 	--	In mixed form, named parameters overwrite their corresponding
 	--	positional parameter.
 	--]]
-	local function make_args_table(...)
-		return make_args_table_with_positional_map({
-			"label",
-			"display",
-			"desc",
-			["unpacked"] = "params",}, unpack(arg))
-	end
 	local function make_args_table_with_positional_map(pmap, ...)
 		local args = {}
 		local size = table.getn(arg)
@@ -535,7 +528,7 @@ do
 				error("make_args_table called with wrong arguments types.")
 			end
 			-- Process positional parameters
-			for i=1, table.getn(pmap) then
+			for i=1, table.getn(pmap) do
 				args[pmap[i]] = orig[i]
 			end
 			if size > table.getn(pmap) then
@@ -553,6 +546,14 @@ do
 			end
 		end	
 		return args
+	end
+	
+	local function make_args_table(...)
+		return make_args_table_with_positional_map({
+			"label",
+			"display",
+			"desc",
+			["unpacked"] = "params",}, unpack(arg))
 	end
 
 	local function verify_field_args(args)
@@ -668,8 +669,8 @@ do
 			return ipv4(args)
 		end
 		local strdw = function(...)
-			local args = make_args_table_with_positional_map
-				({"label", "desc"}, unpack(arg))
+			local args = make_args_table_with_positional_map(
+				{"label", "desc"}, unpack(arg))
 			args.reversed = true
 			args.length = 4
 			args.priv = { desc = args.desc }
@@ -691,8 +692,8 @@ do
 			return stringz(args)
 		end
 		local array = function(...)
-			local args = make_args_table_with_positional_map
-				({"label", "of", "num"}, unpack(arg))
+			local args = make_args_table_with_positional_map(
+				{"label", "of", "num"}, unpack(arg))
 			if args.of ~= uint32 and args.of ~= uint8 then
 				error("Arrays of types other than uint32 or uint8 are not supported.")
 			end
