@@ -1,3 +1,5 @@
+#summary Design and Implementation
+
 == Objective ==
 
 The main design requirement was that the only knowledge to write the protocol
@@ -66,7 +68,7 @@ A Server region with only one block that prints a greeting message when
 called, assuming its id is 1, may thus look like this:
 
 	SPacketDescription = {
-		[1] = { dissect = function (self, context) info("Hello World!") end }
+		`[`1`]` = { dissect = function (self, context) info("Hello World!") end }
 	}
 
 Due to the dynamic nature of the Lua language the _instruction set_ is not
@@ -83,4 +85,3 @@ http://packet-bnetp.googlecode.com/svn/resources/images/instruction-set.png
 
 Only leaf nodes in the inheritance tree are real objects and their constructor
 function is named after its class name.
-
