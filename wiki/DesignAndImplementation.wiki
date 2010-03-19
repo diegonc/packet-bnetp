@@ -1,6 +1,8 @@
 #summary Design and Implementation
 
-== Objective ==
+<wiki:gadget border="0" width="100%" url="http://packet-bnetp.googlecode.com/svn/resources/gadgets/message.xml" up_class="noteimportant" up_message="This document is not complete."/>
+
+== Requirements ==
 
 The main design requirement was that the only knowledge to write the protocol
 format specification should be the knowdlege about the protocol itself.
