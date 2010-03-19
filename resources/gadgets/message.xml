@@ -2,6 +2,7 @@
 <Module>
 	<ModulePrefs title="Message" />
 	<UserPref name="message" required="true" />
+	<UserPref name="class" default_value="noteimportant" />
 	<Content type="html">
 		<![CDATA[
 			<style type="text/css">
@@ -40,7 +41,7 @@
 					background-image:url(http://packet-bnetp.googlecode.com/svn/resources/images/tip.png);
 				}
 			</style>
-			<div class="message noteimportant">
+			<div class="message __UP_class__">
 				<div class="image"></div>
 				<div class="text">
 					__UP_message__	
