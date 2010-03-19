@@ -85,5 +85,34 @@ figure:
 
 http://packet-bnetp.googlecode.com/svn/resources/images/instruction-set.png
 
-Only leaf nodes in the inheritance tree are real objects and their constructor
-function is named after its class name.
+Instruction's constructors are named after its class name. The specification
+of a packet format then looks like the following example:
+
+<pre>
+--[[
+    Message ID:    0x72
+    Message Name:  SID_CLANCREATIONINVITATION
+    Direction:     Server -> Client (Received)
+    Used By:       Warcraft III: The Frozen Throne, Warcraft III
+    Format:        (DWORD) Cookie
+                   (DWORD) Clan Tag
+                   (STRING) Clan Name
+                   (STRING) Inviter's username
+                   (BYTE) Number of users being invited
+                   (STRING) `[]` List of users being invited
+    Remarks:       Received when a user is inviting you to create a new clan on
+                   Battle.net.
+    Related:       `[`0x72`]` SID_CLANCREATIONINVITATION (C->S)
+]]
+#define SID_CLANCREATIONINVITATION 0xFF72
+`[`SID_CLANCREATIONINVITATION`]` = { -- 0x72
+	uint32("Cookie", base.HEX),
+	uint32("Clan Tag"),
+	stringz("Clan Name"),
+	stringz("Inviter's username"),
+	uint8{label="Number of users being invited", key="users"},
+	iterator{refkey="users", label="Invited users", repeated={
+		stringz("Name"),
+	}},
+}
+</pre>
