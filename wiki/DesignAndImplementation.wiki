@@ -66,11 +66,11 @@ beginning to end.
 
 A Server region with only one block that prints a greeting message when
 called, assuming its id is 1, may thus look like this:
-
+{{{
 	SPacketDescription = {
-		`[`1`]` = { dissect = function (self, context) info("Hello World!") end }
+		[1] = { dissect = function (self, context) info("Hello World!") end }
 	}
-
+}}}
 Due to the dynamic nature of the Lua language the _instruction set_ is not
 fixed and new instructions suitable to the needs of the protocol being 
 dissected  may be created. However for easy of use it is recommended to
