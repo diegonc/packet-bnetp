@@ -46,11 +46,11 @@ limited control flow:
 
 Instructions are implemented as an object that provides the IInstruction
 interface:
-
-	IInstruction {
-		dissect (c: Context)
-	}
-
+<pre>
+    IInstruction {
+        dissect (c: Context)
+    }
+</pre>
 where the _dissect_ method implements the desired effect of the instruction.
 
 Memory regions are implemented as a table of blocks of instructions indexed
