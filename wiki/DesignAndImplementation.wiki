@@ -79,7 +79,7 @@ dissected  may be created. However for easy of use it is recommended to
 define constructor functions that return an instance of a predefined type
 of instruction.
 
-The predefined set of instructions available in _packet-bnetp_ that
+The [PredefinedInstructions predefined set of instructions] available in _packet-bnetp_ that
 implements field description and control flow is shown in the following
 figure:
 
