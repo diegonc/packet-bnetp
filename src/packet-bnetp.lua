@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Tue Mar  9 00:19:05 2010
+--[[ packet-bnetp.lua build on Tue Mar 23 17:24:01 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -390,6 +390,10 @@ do
 		},
 		["uint16"] = {
 			["size"] = function(...) return 2 end,
+			value = function (self, state)
+				local val = state:peek(self.size())
+				return val:le_uint()
+			end,
 		},
 		["uint8"]  = {
 			["size"] = function(...) return 1 end,
@@ -1121,14 +1125,24 @@ local Descs = {
 }
 
 -- Common condition functions
-local Cond = {
+local Cond
+Cond = {
+	assert_key = function (state, key)
+		if state.packet[key] == nil then
+			state:error("The key " .. key .. "is used before being defined.")
+			return false
+		end
+		return true
+	end,
 	equals = function(key, value)
 		return function(self, state)
+			Cond.assert_key(state, key)
 			return state.packet[key] == value
 		end
 	end,
 	nequals = function(key, value)
 		return function(self, state)
+			Cond.assert_key(state, key)
 			return state.packet[key] ~= value
 		end
 	end,
@@ -1143,6 +1157,7 @@ local Cond = {
 	end,
 	inlist = function(key, arr)
 		return function(self, state)
+			Cond.assert_key(state, key)
 			local val = state.packet[key]
 			for i, v in ipairs(arr) do
 				if v == val then
