@@ -364,6 +364,10 @@ do
 		},
 		["uint16"] = {
 			["size"] = function(...) return 2 end,
+			value = function (self, state)
+				local val = state:peek(self.size())
+				return val:le_uint()
+			end,
 		},
 		["uint8"]  = {
 			["size"] = function(...) return 1 end,
