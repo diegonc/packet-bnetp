@@ -226,23 +226,24 @@ local Descs = {
 }
 
 -- Common condition functions
-local Cond = {
+local Cond
+Cond = {
 	assert_key = function (state, key)
 		if state.packet[key] == nil then
-			state:error("The key " .. key .. "is used before being defined.")
+			state:error("The key " .. key .. " is used before being defined.")
 			return false
 		end
 		return true
 	end,
 	equals = function(key, value)
 		return function(self, state)
-			Cond.assert_key(key)
+			Cond.assert_key(state, key)
 			return state.packet[key] == value
 		end
 	end,
 	nequals = function(key, value)
 		return function(self, state)
-			Cond.assert_key(key)
+			Cond.assert_key(state, key)
 			return state.packet[key] ~= value
 		end
 	end,
@@ -257,7 +258,7 @@ local Cond = {
 	end,
 	inlist = function(key, arr)
 		return function(self, state)
-			Cond.assert_key(key)
+			Cond.assert_key(state, key)
 			local val = state.packet[key]
 			for i, v in ipairs(arr) do
 				if v == val then

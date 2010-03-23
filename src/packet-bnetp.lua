@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Tue Mar 23 17:24:01 2010
+--[[ packet-bnetp.lua build on Tue Mar 23 17:41:25 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -1129,7 +1129,7 @@ local Cond
 Cond = {
 	assert_key = function (state, key)
 		if state.packet[key] == nil then
-			state:error("The key " .. key .. "is used before being defined.")
+			state:error("The key " .. key .. " is used before being defined.")
 			return false
 		end
 		return true
