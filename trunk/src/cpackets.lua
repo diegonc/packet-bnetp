@@ -96,7 +96,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_LOGONPROOF] = { -- 0x03
-	array{label="Data from SID_AUTH_ACCOUNTLOGON", of=uint32, num=16},
+	array("Data from SID_AUTH_ACCOUNTLOGON", uint32, 16),
 },
 --[[doc
     Message ID:      0x04
@@ -169,7 +169,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_CHANGEPROOF] = { -- 0x06
-	array{of=uint32, label="Data from SID_AUTH_ACCOUNTCHANGE", num=16},
+	array("Data from SID_AUTH_ACCOUNTCHANGE", uint32, 16),
 },
 --[[doc
     Message ID:      0x07
@@ -276,7 +276,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_VERSIONCHECK] = { -- 0x09
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Version DLL digit"),
 	stringz("Checksum formula"),
 },
@@ -302,7 +302,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_CONFIRMLOGON] = { -- 0x0A
-	array{of=uint32, label="Password proof from Battle.net", num=5},
+	array("Password proof from Battle.net", uint32, 5),
 },
 --[[doc
     Message ID:      0x0B
@@ -370,10 +370,12 @@ CPacketDescription = {
 
     Used By:         Diablo, Diablo II
 
-    Format:          (DWORD) Cookie. (BYTE) Number of CD-keys to encrypt.(DWORD)
-                     Flags.(DWORD[]) Server session key(s), depending on flags.(DWORD[])
-                     Client session key(s), depending on flags.(STRING[]) CD-keys. No
-                     dashes or spaces.
+    Format:          (DWORD) Cookie. 
+					 (BYTE) Number of CD-keys to encrypt.
+					 (DWORD) Flags.
+					 (DWORD[]) Server session key(s), depending on flags.
+					 (DWORD[]) Client session key(s), depending on flags.
+					 (STRING[]) CD-keys. No dashes or spaces.
 
     Remarks:         The Cookie has no special meaning to the server and will simply be
                      echoed to the client in the response. The client can use multiple
@@ -438,9 +440,9 @@ CPacketDescription = {
 	uint32("Cookie"),
 	uint8("Number of CD-keys to encrypt"),
 	uint32("Flags"),
-	uint32{label="Server session key", todo="verify array length"},
-	uint32{label="Client session key", todo="verify array length"},
-	stringz("CD-keys No"), -- todo: verify array length
+	uint32("Server session key"), 		-- todo: verify array length
+	uint32("Client session key"), -- todo: verify array length
+	stringz("CD-keys No"), 				-- todo: verify array length
 },
 --[[doc
     Message ID:      0x0D
@@ -568,7 +570,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_REQUESTVERSIONBYTE] = { -- 0x10
-	strdw("ProductID", nil, Descs.ClientTag),
+	strdw("ProductID", Descs.ClientTag),
 },
 --[[doc
     Message ID:    0x11
@@ -591,7 +593,7 @@ CPacketDescription = {
 ]]
 [BNLS_VERIFYSERVER] = { -- 0x11
 	uint32("Server IP"),
-	array{of=uint8, label="Signature", num=128},
+	array("Signature", uint8, 128),
 },
 --[[doc
     Message ID:      0x12
@@ -659,8 +661,8 @@ CPacketDescription = {
 [BNLS_SERVERLOGONCHALLENGE] = { -- 0x13
 	uint32("Slot index"),
 	uint32("NLS revision number"),
-	array{of=uint32, label="Data from", num=16},
-	array{of=uint32, label="Data client's SID_AUTH_ACCOUNTLOGON", num=8},
+	array("Data from account database", uint32, 16),
+	array("Data client's SID_AUTH_ACCOUNTLOGON", uint32, 8),
 },
 --[[doc
     Message ID:      0x14
@@ -673,8 +675,9 @@ CPacketDescription = {
 
     Used By:         All Products
 
-    Format:          (DWORD) Slot index.(DWORD[5]) Data from client's
-                     SID_AUTH_ACCOUNTLOGONPROOF (0x54).(STRING) Client's account name.
+    Format:          (DWORD) Slot index.
+					 (DWORD[5]) Data from client's SID_AUTH_ACCOUNTLOGONPROOF (0x54).
+					 (STRING) Client's account name.
 
     Remarks:         This message performs two operations. First, it checks if the client's
                      logon was successful. Second, it calculates the data for the server's
@@ -686,7 +689,7 @@ CPacketDescription = {
 ]]
 [BNLS_SERVERLOGONPROOF] = { -- 0x14
 	uint32("Slot index"),
-	array{of=uint32, label="Data from client's", num=5},
+	array("Data from client's SID_AUTH_ACCOUNTLOGONPROOF (0x54)", uint32, 5),
 	stringz("Client's account name"),
 },
 --[[doc
@@ -726,7 +729,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_VERSIONCHECKEX] = { -- 0x18
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Version DLL digit"),
 	uint32("Flags"),
 	uint32("Cookie"),
@@ -773,7 +776,7 @@ CPacketDescription = {
 
 ]]
 [BNLS_VERSIONCHECKEX2] = { -- 0x1A
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Flags"),
 	uint32("Cookie"),
 	uint64("Timestamp for version check archive"),
@@ -2407,8 +2410,8 @@ CPacketDescription = {
 [MCP_STARTUP] = { -- 0x01
 	uint32("MCP Cookie"),
 	uint32("MCP Status"),
-	array{label="MCP Chunk 1", of=uint32, num=2},
-	array{label="MCP Chunk 2", of=uint32, num=12},
+	array("MCP Chunk 1", uint32, 2),
+	array("MCP Chunk 2", uint32, 12),
 	stringz("Battle.net Unique Name"),
 },
 --[[doc
@@ -3379,7 +3382,7 @@ CPacketDescription = {
 ]]
 [SID_STARTVERSIONING] = { -- 0x06
 	strdw("Platform ID"),
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Version Byte"),
 	uint32("Unknown"),
 },
@@ -3407,7 +3410,7 @@ CPacketDescription = {
 ]]
 [SID_REPORTVERSION] = { -- 0x07
 	strdw("Platform ID"),
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Version Byte"),
 	uint32("EXE Version"),
 	uint32("EXE Hash"),
@@ -3441,7 +3444,7 @@ CPacketDescription = {
 
 ]]
 [SID_STARTADVEX] = { -- 0x08
-	uint32{label="Password protected", desc=Descs.YesNo},
+	uint32{"Password protected", nil, Descs.YesNo},
 	uint32("Unknown"),
 	uint32("Unknown"),
 	uint32("Unknown"),
@@ -3664,7 +3667,7 @@ CPacketDescription = {
 
 ]]
 [SID_GETCHANNELLIST] = { -- 0x0B
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 },
 --[[doc
     Message ID:    0x0C
@@ -3858,7 +3861,7 @@ CPacketDescription = {
 ]]
 [SID_CHECKAD] = { -- 0x15
 	strdw("Platform ID"),
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("ID of last displayed banner"),
 	posixtime("Current time"),
 },
@@ -4152,7 +4155,7 @@ CPacketDescription = {
 ]]
 [SID_DISPLAYAD] = { -- 0x21
 	strdw("Platform ID"),
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Ad ID"),
 	stringz("Filename"),
 	stringz("URL"),
@@ -4184,7 +4187,7 @@ CPacketDescription = {
 
 ]]
 [SID_NOTIFYJOIN] = { -- 0x22
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Product version"),
 	stringz("Game Name"),
 	stringz("Game Password"),
@@ -4399,7 +4402,7 @@ CPacketDescription = {
 [SID_LOGONRESPONSE] = { -- 0x29
 	uint32("Client Token"),
 	uint32("Server Token"),
-	array{label="Password Hash", of=uint32, num=5},
+	array("Password Hash", uint32, 5),
 	stringz("Username"),
 },
 --[[doc
@@ -4433,7 +4436,7 @@ CPacketDescription = {
 
 ]]
 [SID_CREATEACCOUNT] = { -- 0x2A
-	array{label="Hashed password", of=uint32, num=5},
+	array("Hashed password", uint32, 5),
 	stringz("Username"),
 },
 --[[doc
@@ -4582,7 +4585,7 @@ CPacketDescription = {
 
 ]]
 [SID_GETLADDERDATA] = { -- 0x2E
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("League"),
 	uint32("Sort method", nil, {
 		[0x00] = "Highest rating",
@@ -4680,8 +4683,8 @@ CPacketDescription = {
 [SID_CHANGEPASSWORD] = { -- 0x31
 	uint32("Client Token"),
 	uint32("Server Token"),
-	array{label="Old hashed password", of=uint32, num=5},
-	array{label="New password hash", of=uint32, num=5},
+	array("Old hashed password", uint32, 5),
+	array("New password hash", uint32, 5),
 	stringz("Account name"),
 },
 --[[doc
@@ -4711,7 +4714,7 @@ CPacketDescription = {
 
 ]]
 [SID_CHECKDATAFILE] = { -- 0x32
-	array{label="File checksum", of=uint32, num=5},
+	array("File checksum", uint32, 5),
 	stringz("File name"),
 },
 --[[doc
@@ -4850,7 +4853,7 @@ CPacketDescription = {
 	uint32("CDKey Value1"),
 	uint32("Server Token"),
 	uint32("Client Token"),
-	array{label="Hashed Data", of=uint32, num=5},
+	array("Hashed Data", uint32, 5),
 	stringz("Key owner"),
 },
 --[[doc
@@ -4876,7 +4879,7 @@ CPacketDescription = {
 [SID_LOGONRESPONSE2] = { -- 0x3A
 	uint32("Client Token", base.HEX),
 	uint32("Server Token", base.HEX),
-	array{label="Password Hash", of=uint32, num=5},
+	array("Password Hash", uint32, 5),
 	stringz("Username"),
 },
 --[[doc
@@ -4906,7 +4909,7 @@ CPacketDescription = {
 ]]
 [SID_CHECKDATAFILE2] = { -- 0x3C
 	uint32("File size in bytes"),
-	array{label="File hash", of=uint32, num=5},
+	array("File hash", uint32, 5),
 	stringz("Filename"),
 },
 --[[doc
@@ -4932,7 +4935,7 @@ CPacketDescription = {
 
 ]]
 [SID_CREATEACCOUNT2] = { -- 0x3D
-	array{label="Password hash", of=uint32, num=5},
+	array("Password hash", uint32, 5),
 	stringz("Username"),
 },
 --[[doc
@@ -4956,7 +4959,7 @@ CPacketDescription = {
 ]]
 [SID_LOGONREALMEX] = { -- 0x3E
 	uint32("Client Token"),
-	array{label="Hashed realm password", of=uint32, num=5},
+	array("Hashed realm password", uint32, 5),
 	stringz("Realm title"),
 },
 --[[doc
@@ -5073,13 +5076,13 @@ CPacketDescription = {
 	when{ condition=Cond.equals("subcommand",0x04),	block = {  
 		uint32("Cookie"),
 		strdw("Clan Tag"),
-		strdw("Product ID", nil, Descs.ClientTag),
+		strdw("Product ID", Descs.ClientTag),
 	}},
 	when{ condition=Cond.equals("subcommand",0x08),	block = { 			
 		uint32("Cookie"),
 		stringz("Account name"),
 		-- TODO: "' in strings?
-		strdw("Product ID (WAR3 or W3XP)", nil, Descs.ClientTag), 
+		strdw("Product ID (WAR3 or W3XP)", Descs.ClientTag), 
 	}}, 
 	when{ condition=Cond.equals("subcommand",0x09),	block = { 			
 		uint32("Cookie"),
@@ -5281,7 +5284,7 @@ CPacketDescription = {
 [SID_AUTH_INFO] = { -- 0x50
 	uint32("Protocol ID"),
 	strdw("Platform ID"),
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Version Byte", base.HEX),
 	strdw("Product language"),
 	ipv4("Local IP for NAT compatibility"),
@@ -5359,8 +5362,7 @@ CPacketDescription = {
 		}),
 		uint32("CD-key's public value", base.HEX),
 		uint32("Unknown", base.HEX),
-		array{of=uint32, num=5, label="Hashed Key Data"},
-		--DEL array("Hashed Key Data", uint32, 5),
+		array("Hashed Key Data", uint32, 5),
 	}},
 	stringz("Exe Information"),
 	stringz("CD-Key owner name"),
@@ -5389,8 +5391,8 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCREATE] = { -- 0x52
-	array{label="Salt", of=uint8, num=32},
-	array{label="Verifier", of=uint8, num=32},
+	array("Salt", uint8, 32),
+	array("Verifier", uint8, 32),
 	stringz("Username"),
 },
 --[[doc
@@ -5415,7 +5417,7 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTLOGON] = { -- 0x53
-	array{label="Client Key", of=uint8, num=32},
+	array("Client Key", uint8, 32),
 	stringz("Username"),
 },
 --[[doc
@@ -5438,7 +5440,7 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTLOGONPROOF] = { -- 0x54
-	array{label="Client Password Proof", of=uint8, num=20},
+	array("Client Password Proof", uint8, 20),
 },
 --[[doc
     Message ID:    0x55
@@ -5458,7 +5460,7 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCHANGE] = { -- 0x55
-	array{label="Client key", of=uint8, num=32},
+	array("Client key", uint8, 32),
 	stringz("Username"),
 },
 --[[doc
@@ -5485,9 +5487,9 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCHANGEPROOF] = { -- 0x56
-	array{label="Old password proof", of=uint8, num=20},
-	array{label="New password's salt", of=uint8, num=32},
-	array{label="New password's verifier", of=uint8, num=32},
+	array("Old password proof", uint8, 20),
+	array("New password's salt", uint8, 32),
+	array("New password's verifier", uint8, 32),
 },
 --[[doc
     Message ID:      0x57
@@ -5555,9 +5557,9 @@ CPacketDescription = {
 ]]
 [SID_AUTH_ACCOUNTUPGRADEPROOF] = { -- 0x58
 	uint32("Client Token"),
-	array{label="Old Password Hash", of=uint32, num=5},
-	array{label="New Password Salt", of=uint8, num=32},
-	array{label="New Password Verifier", of=uint8, num=32},
+	array("Old Password Hash", uint32, 5),
+	array("New Password Salt", uint8, 32),
+	array("New Password Verifier", uint8, 32),
 },
 --[[doc
     Message ID:    0x59
@@ -5667,7 +5669,7 @@ CPacketDescription = {
 
 ]]
 [SID_SWITCHPRODUCT] = { -- 0x5C
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 },
 --[[doc
     Message ID:      0x5D
@@ -5769,7 +5771,7 @@ CPacketDescription = {
 	bytes("Data"),
 	uint8("Success"),
 	uint8("IDXor"),
-	array{label="Unknown", of=uint32, num=4},
+	array("Unknown", uint32, 4),
 },
 --[[doc
     Message ID:    0x60

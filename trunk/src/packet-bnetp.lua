@@ -1,6 +1,6 @@
---[[ packet-bnetp.lua build on Tue Mar 23 17:41:25 2010
+--[[ packet-bnetp.lua build on %time%
 
-packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
+packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.netÂ® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
 Download: http://code.google.com/p/packet-bnetp/downloads/list
 Latest version from SVN: http://packet-bnetp.googlecode.com/svn/trunk/src/packet-bnetp.lua
@@ -1288,28 +1288,28 @@ SPacketDescription = {
 [0x7001] = { -- 0x01
 	uint32{label="Result", desc=Descs.YesNo},
 	uint32("Client Token", base.HEX),
-	array{label="CD key data for SID_AUTH_CHECK", of=uint32, num=9},
+	array("CD key data for SID_AUTH_CHECK", uint32, 9),
 },
 [0x7002] = { -- 0x02
-	array{label="Data for SID_AUTH_ACCOUNTLOGON", of=uint32, num=8},
+	array("Data for SID_AUTH_ACCOUNTLOGON", uint32, 8),
 },
 [0x7003] = { -- 0x03
-	array{label="Data for SID_AUTH_ACCOUNTLOGONPROOF", of=uint32, num=5},
+	array("Data for SID_AUTH_ACCOUNTLOGONPROOF", uint32, 5),
 },
 [0x7004] = { -- 0x04
-	array{label="Data for Data for SID_AUTH_ACCOUNTCREATE", of=uint32, num=16},
+	array("Data for Data for SID_AUTH_ACCOUNTCREATE", uint32, 16),
 },
 [0x7005] = { -- 0x05
-	array{label="Data for SID_AUTH_ACCOUNTCHANGE", of=uint32, num=8},
+	array("Data for SID_AUTH_ACCOUNTCHANGE", uint32, 8),
 },
 [0x7006] = { -- 0x06
-	array{label="Data for SID_AUTH_ACCOUNTCHANGEPROOF", of=uint32, num=21},
+	array("Data for SID_AUTH_ACCOUNTCHANGEPROOF", uint32, 21),
 },
 [0x7007] = { -- 0x07
 	uint32{label="Success code", desc=Descs.YesNo},
 },
 [0x7008] = { -- 0x08
-	array{label="Data for SID_AUTH_ACCOUNTUPGRADEPROOF", of=uint32, num=22},
+	array("Data for SID_AUTH_ACCOUNTUPGRADEPROOF", uint32, 22),
 },
 [0x7009] = { -- 0x09
 	uint32{label="Success If Success is TRUE:", desc=Descs.YesNo},
@@ -1321,7 +1321,7 @@ SPacketDescription = {
 	uint32{label="Success", desc=Descs.YesNo},
 },
 [0x700B] = { -- 0x0B
-	array{label="The data hash.Optional:", of=uint32, num=5},
+	array("The data hash.Optional:", uint32, 5),
 	uint32("Cookie. Same as the cookie"),
 },
 [0x700C] = { -- 0x0C
@@ -1331,7 +1331,7 @@ SPacketDescription = {
 	uint32("Bit mask"),
 	-- For each successful CD Key:
 	uint32("Client session key"),
-	array{label="CD-key data", of=uint32, num=9},
+	array("CD-key data", uint32, 9),
 },
 [0x700D] = { -- 0x0D
 	uint32{label="Success code", desc=Descs.YesNo},
@@ -1357,12 +1357,12 @@ SPacketDescription = {
 },
 [0x7013] = { -- 0x13
 	uint32("Slot index"),
-	array{label="Data for server's SID_AUTH_ACCOUNTLOGON", of=uint32, num=16},
+	array("Data for server's SID_AUTH_ACCOUNTLOGON", uint32, 16),
 },
 [0x7014] = { -- 0x14
 	uint32("Slot index"),
 	uint32{label="Success", desc=Descs.YesNo},
-	array{label="Data server's SID_AUTH_ACCOUNTLOGONPROOF (0x54) response", of=uint32, num=5},
+	array("Data server's SID_AUTH_ACCOUNTLOGONPROOF (0x54) response", uint32, 5),
 },
 [0x7018] = { -- 0x18
 	uint32{label="Success", desc=Descs.YesNo},
@@ -1474,8 +1474,8 @@ SPacketDescription = {
 	uint16("Unknown"),
 	uint8("Maximum players allowed"),
 	uint8("Number of characters in the game"),
-	array{label="Classes of ingame characters", of=uint8, num=16},
-	array{label="Levels of ingame characters", of=uint8, num=16},
+	array("Classes of ingame characters", uint8, 16),
+	array("Levels of ingame characters", uint8, 16),
 	uint8("Unused"),
 	stringz("[16] Character names"),
 },
@@ -1498,7 +1498,7 @@ SPacketDescription = {
 	uint8("Character Flags"),
 	uint8("Character title"),
 	uint16("Character level"),
-	array{label="Character name", of=uint8, num=16},
+	array("Character name", uint8, 16),
 },
 [0x9012] = { -- 0x12
 	uint8("Unknown"),
@@ -1627,9 +1627,10 @@ SPacketDescription = {
 		},
 		otherwise = {
 			-- error in description?
+			-- pvpgn sux? but how starcraft handles both formats?
 			iterator{label="Game Information", refkey="games", repeated={
-				uint32("Unknown"),
-				uint16("Game Type", base.HEX, {
+				--uint32("Unknown"), -- seems to be bool32 - only on pvpgn
+				uint16{"Game Type", base.HEX, {
 					[0x02] = "Melee",
 					[0x03] = "Free for all",
 					[0x04] = "one vs one",
@@ -1638,15 +1639,92 @@ SPacketDescription = {
 					[0x07] = "Slaughter",
 					[0x08] = "Sudden Death",
 					[0x09] = "Ladder",
-					[0x10] = "Iron man ladder",
 					[0x0A] = "Use Map Settings",
 					[0x0B] = "Team Melee",
 					[0x0C] = "Team FFA",
 					[0x0D] = "Team CTF",
 					[0x0F] = "Top vs Bottom",
-				}),
-				uint16("Parameter", base.HEX),
-				-- uint32("Language ID", base.HEX),
+					[0x10] = "Iron man ladder",
+				}, key = "gametype"},
+				-- uint16("Parameter", base.HEX),
+				-- [[ source:unverified
+				when{ 
+					condition=Cond.inlist("gametype", {2, 3, 4, 5, 8}), -- melee / ffa / 1 on 1 / CTF / suddenDeath
+					block = {
+						uint16("Penalty", nil, {
+							[1] = "Melee Disc",
+							[2] = "Loss",
+						})
+					},
+				},
+				when{ 
+					condition=Cond.equals("gametype", 6), -- Greed
+					block = {
+						uint16("Resources", nil, {
+							[1] = 2500,
+							[2] = 5000,
+							[3] = 7500,
+							[4] = 10000,
+						})
+					},
+				},
+				when{ 
+					condition=Cond.equals("gametype", 7), -- Slaughter
+					block = {
+						uint16("Minutes", nil, {
+							[1] = 15,
+							[2] = 30,
+							[3] = 45,
+							[4] = 60,
+							-- ["default"] = "Unlimited",
+						})
+					},
+				},
+				when{ 
+					condition=Cond.equals("gametype", 9), -- Ladder
+					block = {
+						uint16("Penalty", nil, {
+							[1] = "Ladder Disc",
+							[2] = "Ladder Loss + Disc",
+						})
+					},
+				},
+				when{ 
+					condition=Cond.equals("gametype", 0xA), -- UMS
+					block = {
+						uint16("Penalty", nil, {
+							[1] = "Draw",
+							[2] = "Draw",
+						})
+					},
+				},
+				when{ 
+					condition=Cond.inlist("gametype", {0xB,0xC,0xD}), -- Team melee / team FFA / team CTF
+					block = {
+						uint16("Teams", nil, {
+							[1] = 2,
+							[2] = 3,
+							[3] = 4,
+						})
+					},
+				},
+				when{ 
+					condition=Cond.equals("gametype", 0xF), -- Top vs Bottom
+					block = {
+						uint16("Teams", nil, { -- TODO: x vs the rest?
+							[1] = "1 vs 7",
+							[2] = "2 vs 6",
+							[3] = "3 vs 5",
+							[4] = "4 vs 4",
+							[5] = "5 vs 3",
+							[6] = "6 vs 2",
+							[7] = "7 vs 1",
+						})
+					},
+				},
+				-- else: uint16("Parameter", base.HEX),
+			--]]
+				uint32("Language ID", base.HEX, Descs.LocaleID), -- only on bnet - comment out for pvpgn
 				uint16("Address Family", base.DEC, {[2]="AF_INET"}),
 				uint16{label="Port", big_endian=true},
 				ipv4("Host's IP"),
@@ -1903,11 +1981,11 @@ SPacketDescription = {
 	uint32("MCP Cookie", base.HEX),
 	uint32{label="MCP Status", key="status"},
 	when{condition=Cond.equals("status", 0), block={
-		array{of=uint32, label="MCP Chunk 1", num=2},
+		array("MCP Chunk 1", uint32, 2),
 		ipv4("IP"),
 		uint16{label="Port", big_endian=true},
 		bytes{label="Padding", length=2},
-		array{of=uint32, label="MCP Chunk 2", num=12},
+		array("MCP Chunk 2", uint32, 12),
 		stringz("Battle.net unique name"),
 	}},
 },
@@ -2028,7 +2106,7 @@ SPacketDescription = {
 	stringz("Unknown"),
 	stringz("Unknown"),
 	stringz("Unknown"),
-	array{label="Unknown", of=uint32, num=5},
+	array("Unknown", uint32, 5),
 },
 [0xFF50] = { -- 0x50
 	uint32{label="Logon Type", key="logontype", desc={
@@ -2098,8 +2176,8 @@ SPacketDescription = {
 		[0x01] = "Account doesn't exist",
 		[0x05] = "Account requires upgrade",
 	}),
-	array{of=uint8, num=32, label="Salt"},
-	array{of=uint8, num=32, label="Server Key"},
+	array("Salt", uint8, 32),
+	array("Server Key", uint8, 32),
 },
 [0xFF54] = { -- 0x54
 	uint32{label="Status", display=base.DEC, desc={
@@ -2108,7 +2186,7 @@ SPacketDescription = {
 		[0x0E] = "An email address should be registered for this account",
 		[0x0F] = "Custom error. A string at the end of this message contains the error",
 	}, key="status"},
-	array{of=uint8, num=20, label="Server Password Proof"},
+	array("Server Password Proof", uint8, 20),
 	when{condition=Cond.equals("status", 0x0F), block={
 		stringz("Additional information")
 	}},
@@ -2119,15 +2197,15 @@ SPacketDescription = {
 		[0x01] = "Account doesn't exist",
 		[0x05] = "Account requires upgrade",
 	}),
-	array{of=uint8, num=32, label="Salt"},
-	array{of=uint8, num=32, label="Server Key"}
+	array("Salt", uint8, 32),
+	array("Server Key", uint8, 32),
 },
 [0xFF56] = { -- 0x56
 	uint32("Status code", base.DEC, {
 		[0x00] = "Password changed",
 		[0x02] = "Incorrect old password",
 	}),
-	array{of=uint8, num=20, label="Server password proof for old password"},
+	array("Server password proof for old password", uint8, 20),
 },
 [0xFF57] = { -- 0x57
 	uint32("Status", base.DEC, {
@@ -2141,7 +2219,7 @@ SPacketDescription = {
 		[0x00] = "Password changed",
 		[0x02] = "Incorrect old password",
 	}),
-	array{of=uint32, num=5, label="Password proof"},
+	array("Password proof", uint32, 5),
 },
 [0xFF59] = { -- 0x59
 },
@@ -2383,7 +2461,7 @@ CPacketDescription = {
 	stringz("Password"),
 },
 [0x7003] = { -- 0x03
-	array{label="Data from SID_AUTH_ACCOUNTLOGON", of=uint32, num=16},
+	array("Data from SID_AUTH_ACCOUNTLOGON", uint32, 16),
 },
 [0x7004] = { -- 0x04
 	stringz("Account name"),
@@ -2395,7 +2473,7 @@ CPacketDescription = {
 	stringz("Account"),
 },
 [0x7006] = { -- 0x06
-	array{of=uint32, label="Data from SID_AUTH_ACCOUNTCHANGE", num=16},
+	array("Data from SID_AUTH_ACCOUNTCHANGE", uint32, 16),
 },
 [0x7007] = { -- 0x07
 	stringz("Account name"),
@@ -2406,12 +2484,12 @@ CPacketDescription = {
 	uint32("Session key from SID_AUTH_ACCOUNTUPGRADE"),
 },
 [0x7009] = { -- 0x09
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Version DLL digit"),
 	stringz("Checksum formula"),
 },
 [0x700A] = { -- 0x0A
-	array{of=uint32, label="Password proof from Battle.net", num=5},
+	array("Password proof from Battle.net", uint32, 5),
 },
 [0x700B] = { -- 0x0B
 	uint32("Size of Data"),
@@ -2425,9 +2503,9 @@ CPacketDescription = {
 	uint32("Cookie"),
 	uint8("Number of CD-keys to encrypt"),
 	uint32("Flags"),
-	uint32{label="Server session key", todo="verify array length"},
-	uint32{label="Client session key", todo="verify array length"},
-	stringz("CD-keys No"), -- todo: verify array length
+	uint32("Server session key"), 		-- todo: verify array length
+	uint32("Client session key"), -- todo: verify array length
+	stringz("CD-keys No"), 				-- todo: verify array length
 },
 [0x700D] = { -- 0x0D
 	uint32("NLS revision number"),
@@ -2439,11 +2517,11 @@ CPacketDescription = {
 	uint32("Checksum"),
 },
 [0x7010] = { -- 0x10
-	strdw("ProductID", nil, Descs.ClientTag),
+	strdw("ProductID", Descs.ClientTag),
 },
 [0x7011] = { -- 0x11
 	uint32("Server IP"),
-	array{of=uint8, label="Signature", num=128},
+	array("Signature", uint8, 128),
 },
 [0x7012] = { -- 0x12
 	uint32("Number of slots to reserve"),
@@ -2451,23 +2529,23 @@ CPacketDescription = {
 [0x7013] = { -- 0x13
 	uint32("Slot index"),
 	uint32("NLS revision number"),
-	array{of=uint32, label="Data from", num=16},
-	array{of=uint32, label="Data client's SID_AUTH_ACCOUNTLOGON", num=8},
+	array("Data from account database", uint32, 16),
+	array("Data client's SID_AUTH_ACCOUNTLOGON", uint32, 8),
 },
 [0x7014] = { -- 0x14
 	uint32("Slot index"),
-	array{of=uint32, label="Data from client's", num=5},
+	array("Data from client's SID_AUTH_ACCOUNTLOGONPROOF (0x54)", uint32, 5),
 	stringz("Client's account name"),
 },
 [0x7018] = { -- 0x18
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Version DLL digit"),
 	uint32("Flags"),
 	uint32("Cookie"),
 	stringz("Checksum formula"),
 },
 [0x701A] = { -- 0x1A
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Flags"),
 	uint32("Cookie"),
 	uint64("Timestamp for version check archive"),
@@ -2708,8 +2786,8 @@ CPacketDescription = {
 [0x9001] = { -- 0x01
 	uint32("MCP Cookie"),
 	uint32("MCP Status"),
-	array{label="MCP Chunk 1", of=uint32, num=2},
-	array{label="MCP Chunk 2", of=uint32, num=12},
+	array("MCP Chunk 1", uint32, 2),
+	array("MCP Chunk 2", uint32, 12),
 	stringz("Battle.net Unique Name"),
 },
 [0x9002] = { -- 0x02
@@ -2865,20 +2943,20 @@ CPacketDescription = {
 },
 [0xFF06] = { -- 0x06
 	strdw("Platform ID"),
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Version Byte"),
 	uint32("Unknown"),
 },
 [0xFF07] = { -- 0x07
 	strdw("Platform ID"),
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Version Byte"),
 	uint32("EXE Version"),
 	uint32("EXE Hash"),
 	stringz("EXE Information"),
 },
 [0xFF08] = { -- 0x08
-	uint32{label="Password protected", desc=Descs.YesNo},
+	uint32{"Password protected", nil, Descs.YesNo},
 	uint32("Unknown"),
 	uint32("Unknown"),
 	uint32("Unknown"),
@@ -2937,7 +3015,7 @@ CPacketDescription = {
 	stringz("Statstring"),
 },
 [0xFF0B] = { -- 0x0B
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 },
 [0xFF0C] = { -- 0x0C
 	uint32("Flags", nil, {
@@ -2970,7 +3048,7 @@ CPacketDescription = {
 },
 [0xFF15] = { -- 0x15
 	strdw("Platform ID"),
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("ID of last displayed banner"),
 	posixtime("Current time"),
 },
@@ -3043,13 +3121,13 @@ CPacketDescription = {
 },
 [0xFF21] = { -- 0x21
 	strdw("Platform ID"),
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Ad ID"),
 	stringz("Filename"),
 	stringz("URL"),
 },
 [0xFF22] = { -- 0x22
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Product version"),
 	stringz("Game Name"),
 	stringz("Game Password"),
@@ -3091,11 +3169,11 @@ CPacketDescription = {
 [0xFF29] = { -- 0x29
 	uint32("Client Token"),
 	uint32("Server Token"),
-	array{label="Password Hash", of=uint32, num=5},
+	array("Password Hash", uint32, 5),
 	stringz("Username"),
 },
 [0xFF2A] = { -- 0x2A
-	array{label="Hashed password", of=uint32, num=5},
+	array("Hashed password", uint32, 5),
 	stringz("Username"),
 },
 [0xFF2B] = { -- 0x2B
@@ -3131,7 +3209,7 @@ CPacketDescription = {
 [0xFF2D] = { -- 0x2D
 },
 [0xFF2E] = { -- 0x2E
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("League"),
 	uint32("Sort method", nil, {
 		[0x00] = "Highest rating",
@@ -3160,12 +3238,12 @@ CPacketDescription = {
 [0xFF31] = { -- 0x31
 	uint32("Client Token"),
 	uint32("Server Token"),
-	array{label="Old hashed password", of=uint32, num=5},
-	array{label="New password hash", of=uint32, num=5},
+	array("Old hashed password", uint32, 5),
+	array("New password hash", uint32, 5),
 	stringz("Account name"),
 },
 [0xFF32] = { -- 0x32
-	array{label="File checksum", of=uint32, num=5},
+	array("File checksum", uint32, 5),
 	stringz("File name"),
 },
 [0xFF33] = { -- 0x33
@@ -3189,27 +3267,27 @@ CPacketDescription = {
 	uint32("CDKey Value1"),
 	uint32("Server Token"),
 	uint32("Client Token"),
-	array{label="Hashed Data", of=uint32, num=5},
+	array("Hashed Data", uint32, 5),
 	stringz("Key owner"),
 },
 [0xFF3A] = { -- 0x3A
 	uint32("Client Token", base.HEX),
 	uint32("Server Token", base.HEX),
-	array{label="Password Hash", of=uint32, num=5},
+	array("Password Hash", uint32, 5),
 	stringz("Username"),
 },
 [0xFF3C] = { -- 0x3C
 	uint32("File size in bytes"),
-	array{label="File hash", of=uint32, num=5},
+	array("File hash", uint32, 5),
 	stringz("Filename"),
 },
 [0xFF3D] = { -- 0x3D
-	array{label="Password hash", of=uint32, num=5},
+	array("Password hash", uint32, 5),
 	stringz("Username"),
 },
 [0xFF3E] = { -- 0x3E
 	uint32("Client Token"),
-	array{label="Hashed realm password", of=uint32, num=5},
+	array("Hashed realm password", uint32, 5),
 	stringz("Realm title"),
 },
 [0xFF40] = { -- 0x40
@@ -3243,13 +3321,13 @@ CPacketDescription = {
 	when{ condition=Cond.equals("subcommand",0x04),	block = {  
 		uint32("Cookie"),
 		strdw("Clan Tag"),
-		strdw("Product ID", nil, Descs.ClientTag),
+		strdw("Product ID", Descs.ClientTag),
 	}},
 	when{ condition=Cond.equals("subcommand",0x08),	block = { 			
 		uint32("Cookie"),
 		stringz("Account name"),
 		-- TODO: "' in strings?
-		strdw("Product ID (WAR3 or W3XP)", nil, Descs.ClientTag), 
+		strdw("Product ID (WAR3 or W3XP)", Descs.ClientTag), 
 	}}, 
 	when{ condition=Cond.equals("subcommand",0x09),	block = { 			
 		uint32("Cookie"),
@@ -3272,7 +3350,7 @@ CPacketDescription = {
 [0xFF50] = { -- 0x50
 	uint32("Protocol ID"),
 	strdw("Platform ID"),
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 	uint32("Version Byte", base.HEX),
 	strdw("Product language"),
 	ipv4("Local IP for NAT compatibility"),
@@ -3304,41 +3382,40 @@ CPacketDescription = {
 		}),
 		uint32("CD-key's public value", base.HEX),
 		uint32("Unknown", base.HEX),
-		array{of=uint32, num=5, label="Hashed Key Data"},
-		--DEL array("Hashed Key Data", uint32, 5),
+		array("Hashed Key Data", uint32, 5),
 	}},
 	stringz("Exe Information"),
 	stringz("CD-Key owner name"),
 
 },
 [0xFF52] = { -- 0x52
-	array{label="Salt", of=uint8, num=32},
-	array{label="Verifier", of=uint8, num=32},
+	array("Salt", uint8, 32),
+	array("Verifier", uint8, 32),
 	stringz("Username"),
 },
 [0xFF53] = { -- 0x53
-	array{label="Client Key", of=uint8, num=32},
+	array("Client Key", uint8, 32),
 	stringz("Username"),
 },
 [0xFF54] = { -- 0x54
-	array{label="Client Password Proof", of=uint8, num=20},
+	array("Client Password Proof", uint8, 20),
 },
 [0xFF55] = { -- 0x55
-	array{label="Client key", of=uint8, num=32},
+	array("Client key", uint8, 32),
 	stringz("Username"),
 },
 [0xFF56] = { -- 0x56
-	array{label="Old password proof", of=uint8, num=20},
-	array{label="New password's salt", of=uint8, num=32},
-	array{label="New password's verifier", of=uint8, num=32},
+	array("Old password proof", uint8, 20),
+	array("New password's salt", uint8, 32),
+	array("New password's verifier", uint8, 32),
 },
 [0xFF57] = { -- 0x57
 },
 [0xFF58] = { -- 0x58
 	uint32("Client Token"),
-	array{label="Old Password Hash", of=uint32, num=5},
-	array{label="New Password Salt", of=uint8, num=32},
-	array{label="New Password Verifier", of=uint8, num=32},
+	array("Old Password Hash", uint32, 5),
+	array("New Password Salt", uint8, 32),
+	array("New Password Verifier", uint8, 32),
 },
 [0xFF59] = { -- 0x59
 	stringz("Email Address"),
@@ -3353,7 +3430,7 @@ CPacketDescription = {
 	stringz("New Email Address"),
 },
 [0xFF5C] = { -- 0x5C
-	strdw("Product ID", nil, Descs.ClientTag),
+	strdw("Product ID", Descs.ClientTag),
 },
 [0xFF5D] = { -- 0x5D
 	uint32("0x10A0027"),
@@ -3373,7 +3450,7 @@ CPacketDescription = {
 	bytes("Data"),
 	uint8("Success"),
 	uint8("IDXor"),
-	array{label="Unknown", of=uint32, num=4},
+	array("Unknown", uint32, 4),
 },
 [0xFF60] = { -- 0x60
 },
