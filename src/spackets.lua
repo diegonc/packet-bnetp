@@ -23,7 +23,7 @@ SPacketDescription = {
 [BNLS_CDKEY] = { -- 0x01
 	uint32{label="Result", desc=Descs.YesNo},
 	uint32("Client Token", base.HEX),
-	array{label="CD key data for SID_AUTH_CHECK", of=uint32, num=9},
+	array("CD key data for SID_AUTH_CHECK", uint32, 9),
 },
 --[[doc
     Message ID:    0x02
@@ -43,7 +43,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_LOGONCHALLENGE] = { -- 0x02
-	array{label="Data for SID_AUTH_ACCOUNTLOGON", of=uint32, num=8},
+	array("Data for SID_AUTH_ACCOUNTLOGON", uint32, 8),
 },
 --[[doc
     Message ID:    0x03
@@ -63,7 +63,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_LOGONPROOF] = { -- 0x03
-	array{label="Data for SID_AUTH_ACCOUNTLOGONPROOF", of=uint32, num=5},
+	array("Data for SID_AUTH_ACCOUNTLOGONPROOF", uint32, 5),
 },
 --[[doc
     Message ID:      0x04
@@ -85,7 +85,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_CREATEACCOUNT] = { -- 0x04
-	array{label="Data for Data for SID_AUTH_ACCOUNTCREATE", of=uint32, num=16},
+	array("Data for Data for SID_AUTH_ACCOUNTCREATE", uint32, 16),
 },
 --[[doc
     Message ID:      0x05
@@ -106,7 +106,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_CHANGECHALLENGE] = { -- 0x05
-	array{label="Data for SID_AUTH_ACCOUNTCHANGE", of=uint32, num=8},
+	array("Data for SID_AUTH_ACCOUNTCHANGE", uint32, 8),
 },
 --[[doc
     Message ID:      0x06
@@ -127,7 +127,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_CHANGEPROOF] = { -- 0x06
-	array{label="Data for SID_AUTH_ACCOUNTCHANGEPROOF", of=uint32, num=21},
+	array("Data for SID_AUTH_ACCOUNTCHANGEPROOF", uint32, 21),
 },
 --[[doc
     Message ID:      0x07
@@ -171,7 +171,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_UPGRADEPROOF] = { -- 0x08
-	array{label="Data for SID_AUTH_ACCOUNTUPGRADEPROOF", of=uint32, num=22},
+	array("Data for SID_AUTH_ACCOUNTUPGRADEPROOF", uint32, 22),
 },
 --[[doc
     Message ID:      0x09
@@ -241,7 +241,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_HASHDATA] = { -- 0x0B
-	array{label="The data hash.Optional:", of=uint32, num=5},
+	array("The data hash.Optional:", uint32, 5),
 	uint32("Cookie. Same as the cookie"),
 },
 --[[doc
@@ -278,7 +278,7 @@ SPacketDescription = {
 	uint32("Bit mask"),
 	-- For each successful CD Key:
 	uint32("Client session key"),
-	array{label="CD-key data", of=uint32, num=9},
+	array("CD-key data", uint32, 9),
 },
 --[[doc
     Message ID:      0x0D
@@ -468,7 +468,7 @@ SPacketDescription = {
 ]]
 [BNLS_SERVERLOGONCHALLENGE] = { -- 0x13
 	uint32("Slot index"),
-	array{label="Data for server's SID_AUTH_ACCOUNTLOGON", of=uint32, num=16},
+	array("Data for server's SID_AUTH_ACCOUNTLOGON", uint32, 16),
 },
 --[[doc
     Message ID:      0x14
@@ -501,7 +501,7 @@ SPacketDescription = {
 [BNLS_SERVERLOGONPROOF] = { -- 0x14
 	uint32("Slot index"),
 	uint32{label="Success", desc=Descs.YesNo},
-	array{label="Data server's SID_AUTH_ACCOUNTLOGONPROOF (0x54) response", of=uint32, num=5},
+	array("Data server's SID_AUTH_ACCOUNTLOGONPROOF (0x54) response", uint32, 5),
 },
 --[[doc
     Message ID:      0x18
@@ -1193,8 +1193,8 @@ SPacketDescription = {
 	uint16("Unknown"),
 	uint8("Maximum players allowed"),
 	uint8("Number of characters in the game"),
-	array{label="Classes of ingame characters", of=uint8, num=16},
-	array{label="Levels of ingame characters", of=uint8, num=16},
+	array("Classes of ingame characters", uint8, 16),
+	array("Levels of ingame characters", uint8, 16),
 	uint8("Unused"),
 	stringz("[16] Character names"),
 },
@@ -1376,7 +1376,7 @@ SPacketDescription = {
 	uint8("Character Flags"),
 	uint8("Character title"),
 	uint16("Character level"),
-	array{label="Character name", of=uint8, num=16},
+	array("Character name", uint8, 16),
 },
 --[[doc
     Message ID:    0x12
@@ -2094,9 +2094,10 @@ SPacketDescription = {
 		},
 		otherwise = {
 			-- error in description?
+			-- pvpgn sux? but how starcraft handles both formats?
 			iterator{label="Game Information", refkey="games", repeated={
-				uint32("Unknown"),
-				uint16("Game Type", base.HEX, {
+				--uint32("Unknown"), -- seems to be bool32 - only on pvpgn
+				uint16{"Game Type", base.HEX, {
 					[0x02] = "Melee",
 					[0x03] = "Free for all",
 					[0x04] = "one vs one",
@@ -2105,15 +2106,149 @@ SPacketDescription = {
 					[0x07] = "Slaughter",
 					[0x08] = "Sudden Death",
 					[0x09] = "Ladder",
-					[0x10] = "Iron man ladder",
 					[0x0A] = "Use Map Settings",
 					[0x0B] = "Team Melee",
 					[0x0C] = "Team FFA",
 					[0x0D] = "Team CTF",
 					[0x0F] = "Top vs Bottom",
-				}),
-				uint16("Parameter", base.HEX),
-				-- uint32("Language ID", base.HEX),
+					[0x10] = "Iron man ladder",
+				}, key = "gametype"},
+				-- uint16("Parameter", base.HEX),
+				-- [[ source:unverified
+				when{ 
+					condition=Cond.inlist("gametype", {2, 3, 4, 5, 8}), -- melee / ffa / 1 on 1 / CTF / suddenDeath
+					block = {
+						uint16("Penalty", nil, {
+							[1] = "Melee Disc",
+							[2] = "Loss",
+						})
+					},
+				},
+				when{ 
+					condition=Cond.equals("gametype", 6), -- Greed
+					block = {
+						uint16("Resources", nil, {
+							[1] = 2500,
+							[2] = 5000,
+							[3] = 7500,
+							[4] = 10000,
+						})
+					},
+				},
+				when{ 
+					condition=Cond.equals("gametype", 7), -- Slaughter
+					block = {
+						uint16("Minutes", nil, {
+							[1] = 15,
+							[2] = 30,
+							[3] = 45,
+							[4] = 60,
+							-- ["default"] = "Unlimited",
+						})
+					},
+				},
+				when{ 
+					condition=Cond.equals("gametype", 9), -- Ladder
+					block = {
+						uint16("Penalty", nil, {
+							[1] = "Ladder Disc",
+							[2] = "Ladder Loss + Disc",
+						})
+					},
+				},
+				when{ 
+					condition=Cond.equals("gametype", 0xA), -- UMS
+					block = {
+						uint16("Penalty", nil, {
+							[1] = "Draw",
+							[2] = "Draw",
+						})
+					},
+				},
+				when{ 
+					condition=Cond.inlist("gametype", {0xB,0xC,0xD}), -- Team melee / team FFA / team CTF
+					block = {
+						uint16("Teams", nil, {
+							[1] = 2,
+							[2] = 3,
+							[3] = 4,
+						})
+					},
+				},
+				when{ 
+					condition=Cond.equals("gametype", 0xF), -- Top vs Bottom
+					block = {
+						uint16("Teams", nil, { -- TODO: x vs the rest?
+							[1] = "1 vs 7",
+							[2] = "2 vs 6",
+							[3] = "3 vs 5",
+							[4] = "4 vs 4",
+							[5] = "5 vs 3",
+							[6] = "6 vs 2",
+							[7] = "7 vs 1",
+						})
+					},
+				},
+				-- else: uint16("Parameter", base.HEX),
+			--]]
+				--[[doc
+	Select Case m_Game(i).GameType
+        Case 2, 3, 4, 5, 8 'melee / ffa / 1 on 1 / CTF / suddenDeath
+            Select Case m_Game(i).Penalty
+                Case 1:     m_InfoB(8) = "Melee Disc"
+                Case 2:     m_InfoB(8) = "Loss"
+            End Select
+        Case 6 'Greed
+            m_InfoA(8) = "Resources:"
+            Select Case m_Game(i).Penalty
+                Case 1:     m_InfoB(8) = 2500
+                Case 2:     m_InfoB(8) = 5000
+                Case 3:     m_InfoB(8) = 7500
+                Case 4:     m_InfoB(8) = 10000
+            End Select
+        Case 7 'Slaughter
+            m_InfoA(8) = "Minutes:"
+            Select Case m_Game(i).Penalty
+                Case 1:     m_InfoB(8) = 15
+                Case 2:     m_InfoB(8) = 30
+                Case 3:     m_InfoB(8) = 45
+                Case 4:     m_InfoB(8) = 60
+                Case Else:  m_InfoB(8) = "Unlimited"
+            End Select
+        Case 9 'Ladder
+            Select Case m_Game(i).Penalty
+                Case 1:     m_InfoB(8) = "Ladder Disc"
+                Case 2:     m_InfoB(8) = "Ladder Loss + Disc"
+            End Select
+        Case &HA 'UMS
+            Select Case m_Game(i).Penalty
+                Case 1, 2:  m_InfoB(8) = "Draw"
+            End Select
+        Case &HB, &HC, &HD 'Team melee / team FFA / team CTF
+            m_InfoA(8) = "Teams:"
+            Select Case m_Game(i).Penalty
+                Case 1:     m_InfoB(8) = 2
+                Case 2:     m_InfoB(8) = 3
+                Case 3:     m_InfoB(8) = 4
+            End Select
+        Case &HF 'Top vs Bottom
+            m_InfoA(8) = "Teams:"
+            If (m_InfoB(9) = "?") Then
+                i2 = 8
+            Else
+                i2 = CInt(m_InfoB(9))
+            End If
+            If (m_Game(i).Penalty < 1) Or (m_Game(i).Penalty > 7) Then
+                m_InfoB(8) = "? vs ?"
+            Else
+                m_InfoB(8) = m_Game(i).Penalty & " vs " & (i2 - m_Game(i).Penalty)
+            End If
+        Case Else 'Unknown
+            m_InfoA(8) = "???????:"
+            m_InfoB(8) = "?"
+    End Select
+				--]]
+				uint32("Language ID", base.HEX, Descs.LocaleID), -- only on bnet - comment out for pvpgn
 				uint16("Address Family", base.DEC, {[2]="AF_INET"}),
 				uint16{label="Port", big_endian=true},
 				ipv4("Host's IP"),
@@ -3223,11 +3358,11 @@ SPacketDescription = {
 	uint32("MCP Cookie", base.HEX),
 	uint32{label="MCP Status", key="status"},
 	when{condition=Cond.equals("status", 0), block={
-		array{of=uint32, label="MCP Chunk 1", num=2},
+		array("MCP Chunk 1", uint32, 2),
 		ipv4("IP"),
 		uint16{label="Port", big_endian=true},
 		bytes{label="Padding", length=2},
-		array{of=uint32, label="MCP Chunk 2", num=12},
+		array("MCP Chunk 2", uint32, 12),
 		stringz("Battle.net unique name"),
 	}},
 },
@@ -3685,7 +3820,7 @@ SPacketDescription = {
 	stringz("Unknown"),
 	stringz("Unknown"),
 	stringz("Unknown"),
-	array{label="Unknown", of=uint32, num=5},
+	array("Unknown", uint32, 5),
 },
 --[[doc
     Message ID:    0x50
@@ -3910,8 +4045,8 @@ SPacketDescription = {
 		[0x01] = "Account doesn't exist",
 		[0x05] = "Account requires upgrade",
 	}),
-	array{of=uint8, num=32, label="Salt"},
-	array{of=uint8, num=32, label="Server Key"},
+	array("Salt", uint8, 32),
+	array("Server Key", uint8, 32),
 },
 --[[doc
     Message ID:    0x54
@@ -3948,7 +4083,7 @@ SPacketDescription = {
 		[0x0E] = "An email address should be registered for this account",
 		[0x0F] = "Custom error. A string at the end of this message contains the error",
 	}, key="status"},
-	array{of=uint8, num=20, label="Server Password Proof"},
+	array("Server Password Proof", uint8, 20),
 	when{condition=Cond.equals("status", 0x0F), block={
 		stringz("Additional information")
 	}},
@@ -3989,8 +4124,8 @@ SPacketDescription = {
 		[0x01] = "Account doesn't exist",
 		[0x05] = "Account requires upgrade",
 	}),
-	array{of=uint8, num=32, label="Salt"},
-	array{of=uint8, num=32, label="Server Key"}
+	array("Salt", uint8, 32),
+	array("Server Key", uint8, 32),
 },
 --[[doc
     Message ID:    0x56
@@ -4021,7 +4156,7 @@ SPacketDescription = {
 		[0x00] = "Password changed",
 		[0x02] = "Incorrect old password",
 	}),
-	array{of=uint8, num=20, label="Server password proof for old password"},
+	array("Server password proof for old password", uint8, 20),
 },
 --[[doc
     Message ID:      0x57
@@ -4085,7 +4220,7 @@ SPacketDescription = {
 		[0x00] = "Password changed",
 		[0x02] = "Incorrect old password",
 	}),
-	array{of=uint32, num=5, label="Password proof"},
+	array("Password proof", uint32, 5),
 },
 --[[doc
     Message ID:    0x59
