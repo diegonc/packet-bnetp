@@ -33,6 +33,8 @@
   * Supress double value output in ipv4() and version()
   * Use Wireshark's "User Preferences" to allow run-time changes in the configuration.
   * Investigate GeoIP.
+  * [http://code.google.com/p/llvm-lua/ llvm-lua]: JIT/Static compiler for Lua using LLVM on the backend.
+    * It may be worth to try to integrate a JIT compiler into Wireshark's Lua based plugins :)
 
 ==done==
 ===most important===
