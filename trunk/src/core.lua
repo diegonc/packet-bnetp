@@ -354,11 +354,21 @@ do
 		},
 		["uint64"] = {
 			["size"] = function(...) return 8 end,
+			value = function (self, state)
+				local val = state:peek(self.size())
+				if self.big_endian then
+					return val:uint64()
+				end
+				return val:le_uint64()
+			end,
 		},
 		["uint32"] = {
 			size = function(...) return 4 end,
 			value = function (self, state)
 				local val = state:peek(self.size())
+				if self.big_endian then
+					return val:uint()
+				end
 				return val:le_uint()
 			end,
 		},
@@ -366,6 +376,9 @@ do
 			["size"] = function(...) return 2 end,
 			value = function (self, state)
 				local val = state:peek(self.size())
+				if self.big_endian then
+					return val:uint()
+				end
 				return val:le_uint()
 			end,
 		},
@@ -373,20 +386,51 @@ do
 			["size"] = function(...) return 1 end,
 			value = function (self, state)
 				local val = state:peek(self.size())
+				if self.big_endian then
+					return val:uint()
+				end
 				return val:le_uint()
 			end,
 		},
 		["int64"]  = {
 			["size"] = function(...) return 8 end,
+			value = function (self, state)
+				local val = state:peek(self.size())
+				if self.big_endian then
+					return val:int64()
+				end
+				return val:le_int64()
+			end,
 		},
 		["int32"]  = {
 			["size"] = function(...) return 4 end,
+			value = function (self, state)
+				local val = state:peek(self.size())
+				if self.big_endian then
+					return val:int()
+				end
+				return val:le_int()
+			end,
 		},
 		["int16"]  = {
 			["size"] = function(...) return 2 end,
+			value = function (self, state)
+				local val = state:peek(self.size())
+				if self.big_endian then
+					return val:int()
+				end
+				return val:le_int()
+			end,
 		},
 		["int8"]   = {
 			["size"] = function(...) return 1 end,
+			value = function (self, state)
+				local val = state:peek(self.size())
+				if self.big_endian then
+					return val:int()
+				end
+				return val:le_int()
+			end,
 		},
 		["ipv4"]   = {
 			["size"] = function(...) return 4 end,
