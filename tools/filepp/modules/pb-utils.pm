@@ -40,6 +40,7 @@ use strict;
 my $VERSION = '1.2.0';
 
 require "lua-comment.pm";
+require "literal.pm";
 
 # remove all comments from string
 sub ReplaceTime
