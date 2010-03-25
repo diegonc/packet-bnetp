@@ -539,10 +539,11 @@ do
 		when = {
 			alias = "none",
 			dissect = function(self, state)
-				if self:condition(state) then
-					dissect_packet(state, self.block)
-				elseif self.otherwise then
-					dissect_packet(state, self.otherwise)
+				for _, v in ipairs(self.tests) do
+					if v.condition(self, state) then
+						dissect_packet(state, v.block)
+						break
+					end
 				end
 			end,
 		},
@@ -710,7 +711,30 @@ do
 		local wintime = WProtoField.filetime
 		local posixtime = WProtoField.posixtime
 		local iterator = WProtoField.iterator
-		local when = WProtoField.when
+		local when = function(...)
+			local tmp = WProtoField.when {}
+			if (#arg == 1) and arg[1].tests then
+				tmp.tests = arg[1].tests
+			else
+				tmp.tests = {}
+				-- XXX: little hack to allow both syntax for calling a function
+				--      ( f() y f {} )
+				if #arg == 1 and type(arg[1][1])=="table" then arg = arg[1] end
+				for k, v in ipairs(arg) do
+					local test = make_args_table_with_positional_map(
+						{"condition", "block"}, v)
+					tmp.tests[k] = test
+				end
+			end
+			return tmp
+		end
+		local oldwhen = function(...)
+			local par = { { arg[1].condition, arg[1].block } }
+			if arg[1].otherwise then
+				par[2] = { function() return true end, arg[1].otherwise }
+			end
+			return when (unpack(par))
+		end
 		local version = function(...)
 			local args = make_args_table(unpack(arg))
 			args.big_endian = false

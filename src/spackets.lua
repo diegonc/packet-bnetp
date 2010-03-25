@@ -390,7 +390,7 @@ SPacketDescription = {
 ]]
 [BNLS_REQUESTVERSIONBYTE] = { -- 0x10
 	uint32{label="Product", key="prod"},
-	when{
+	oldwhen{
 		condition=function(...) return arg[2].packet.prod ~= 0 end,
 		block = {uint32("Version byte", base.HEX)},
 	}
@@ -2088,7 +2088,7 @@ SPacketDescription = {
 ]]
 [SID_GETADVLISTEX] = { -- 0x09
 	uint32{label="Number of games", key="games"},
-	when{condition=Cond.equals("games", 0),
+	oldwhen{condition=Cond.equals("games", 0),
 		block = {
 			uint32("Status", base.DEC, Descs.GameStatus)
 		},
@@ -2116,28 +2116,26 @@ SPacketDescription = {
 				-- uint16("Parameter", base.HEX),
 				-- [[ source:unverified
 				when{ 
-					condition=Cond.inlist("gametype", {2, 3, 4, 5, 8}), -- melee / ffa / 1 on 1 / CTF / suddenDeath
-					block = {
+				{Cond.inlist("gametype", {2, 3, 4, 5, 8}), -- melee / ffa / 1 on 1 / CTF / suddenDeath
+					{
 						uint16("Penalty", nil, {
 							[1] = "Melee Disc",
 							[2] = "Loss",
 						})
-					},
+					}
 				},
-				when{ 
-					condition=Cond.equals("gametype", 6), -- Greed
-					block = {
+				{Cond.equals("gametype", 6), -- Greed
+					{
 						uint16("Resources", nil, {
 							[1] = 2500,
 							[2] = 5000,
 							[3] = 7500,
 							[4] = 10000,
 						})
-					},
+					}
 				},
-				when{ 
-					condition=Cond.equals("gametype", 7), -- Slaughter
-					block = {
+				{Cond.equals("gametype", 7), -- Slaughter
+					{
 						uint16("Minutes", nil, {
 							[1] = 15,
 							[2] = 30,
@@ -2147,27 +2145,24 @@ SPacketDescription = {
 						})
 					},
 				},
-				when{ 
-					condition=Cond.equals("gametype", 9), -- Ladder
-					block = {
+				{Cond.equals("gametype", 9), -- Ladder
+					{
 						uint16("Penalty", nil, {
 							[1] = "Ladder Disc",
 							[2] = "Ladder Loss + Disc",
 						})
 					},
 				},
-				when{ 
-					condition=Cond.equals("gametype", 0xA), -- UMS
-					block = {
+				{Cond.equals("gametype", 0xA), -- UMS
+					{
 						uint16("Penalty", nil, {
 							[1] = "Draw",
 							[2] = "Draw",
 						})
 					},
 				},
-				when{ 
-					condition=Cond.inlist("gametype", {0xB,0xC,0xD}), -- Team melee / team FFA / team CTF
-					block = {
+				{Cond.inlist("gametype", {0xB,0xC,0xD}), -- Team melee / team FFA / team CTF
+					{
 						uint16("Teams", nil, {
 							[1] = 2,
 							[2] = 3,
@@ -2175,9 +2170,8 @@ SPacketDescription = {
 						})
 					},
 				},
-				when{ 
-					condition=Cond.equals("gametype", 0xF), -- Top vs Bottom
-					block = {
+				{Cond.equals("gametype", 0xF), -- Top vs Bottom
+					{
 						uint16("Teams", nil, { -- TODO: x vs the rest?
 							[1] = "1 vs 7",
 							[2] = "2 vs 6",
@@ -2189,7 +2183,9 @@ SPacketDescription = {
 						})
 					},
 				},
-				-- else: uint16("Parameter", base.HEX),
+				-- default block
+				{Cond.always(), { uint16("Parameter", base.HEX) }}
+				},
 			--]]
 				--[[doc
 	Select Case m_Game(i).GameType
@@ -2509,7 +2505,7 @@ SPacketDescription = {
 	stringz("Username"),
 	-- stringz("Text"),
 	-- TODO: set compare (in)
-	when{ condition=Cond.equals("eid", 1),
+	oldwhen{ condition=Cond.equals("eid", 1),
 		block = { stringz("Statstring") },
 		otherwise = { stringz("Text") }
 	}
@@ -3159,7 +3155,7 @@ SPacketDescription = {
 [SID_PROFILE] = { -- 0x35
 	uint32("Cookie", base.HEX),
 	uint8{label="Success", key="status"},
-	when{condition=Cond.equals("status", 0), block={
+	oldwhen{condition=Cond.equals("status", 0), block={
 		stringz("Profile\\Description value"),
 		stringz("Profile\\Location value"),
 		uint32("Clan Tag"),
@@ -3241,7 +3237,7 @@ SPacketDescription = {
 		[0x02] = "Invalid Password",
 		[0x06] = "Account Closed",
 	}, key="res"},
-	when{condition=Cond.equals("res", 6), block={
+	oldwhen{condition=Cond.equals("res", 6), block={
 		stringz("Reason"),
 	}},
 },
@@ -3357,7 +3353,7 @@ SPacketDescription = {
 [SID_LOGONREALMEX] = { -- 0x3E
 	uint32("MCP Cookie", base.HEX),
 	uint32{label="MCP Status", key="status"},
-	when{condition=Cond.equals("status", 0), block={
+	oldwhen{condition=Cond.equals("status", 0), block={
 		array("MCP Chunk 1", uint32, 2),
 		ipv4("IP"),
 		uint16{label="Port", big_endian=true},
@@ -3584,7 +3580,7 @@ SPacketDescription = {
 ]]
 [SID_WARCRAFTGENERAL] = { -- 0x44
 	uint8{label="Subcommand ID", display=base.HEX, key="subcommand"},
-	when{condition=Cond.equals("subcommand", 0x4), block = {
+	oldwhen{condition=Cond.equals("subcommand", 0x4), block = {
 		uint32("Cookie", base.HEX),
 		stringz{label="Icon ID", length=4},
 		uint8{label="Number of ladder records", key="ladders"},
@@ -3618,7 +3614,7 @@ SPacketDescription = {
 			}},
 		}},
 	}},
-	when{condition=Cond.equals("subcommand", 0x8), block={
+	oldwhen{condition=Cond.equals("subcommand", 0x8), block={
 		uint32("Cookie", base.HEX),
 		uint8{label="Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
@@ -3636,7 +3632,7 @@ SPacketDescription = {
 			uint16("Losses"),
 		}},
 	}},
-	when{condition=Cond.equals("subcommand", 0x9), block={
+	oldwhen{condition=Cond.equals("subcommand", 0x9), block={
 		uint32("Cookie", base.HEX),
 		uint32("Unknown", base.HEX),
 		uint8("Tiers"),
@@ -3689,7 +3685,7 @@ SPacketDescription = {
 	posixtime("Newest news timestamp"),
 	iterator{label="News", refkey="news", repeated={
 		posixtime{label="Timestamp", key="stamp"},
-		when{
+		oldwhen{
 			condition=function(self, state) return state.packet.stamp == 0 end,
 			block = { stringz("MOTD") },
 			otherwise = {stringz("News")},
@@ -3871,7 +3867,7 @@ SPacketDescription = {
 	wintime("MPQ filetime"),
 	stringz("IX86ver filename"),
 	stringz("ValueString"),
-	when{ condition = Cond.equals("logontype", 2),
+	oldwhen{ condition = Cond.equals("logontype", 2),
 		block = { bytes{label="Server signature", length=128}},
 	},
 },
@@ -3947,13 +3943,13 @@ SPacketDescription = {
 	}},
 	stringz("Additional Information"),
 	--[[
-	when{ -- TODO: Cond.in
+	oldwhen{ -- TODO: Cond.in
 		condition=function(self, state)
 			return (state.packet.res == 0x100) or (state.packet.res == 0x102)
 		end,
 		block = { stringz("MPQ Filename") },
 	},
-	when{
+	oldwhen{
 		condition=function(self, state)
 			return bit.band(state.packet.res, 0x201) == 0x201
 		end,
@@ -4084,7 +4080,7 @@ SPacketDescription = {
 		[0x0F] = "Custom error. A string at the end of this message contains the error",
 	}, key="status"},
 	array("Server Password Proof", uint8, 20),
-	when{condition=Cond.equals("status", 0x0F), block={
+	oldwhen{condition=Cond.equals("status", 0x0F), block={
 		stringz("Additional information")
 	}},
 },
