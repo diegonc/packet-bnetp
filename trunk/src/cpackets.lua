@@ -5059,7 +5059,7 @@ CPacketDescription = {
 		[0x09] = "Icon list request",
 		[0x0A] = "Change icon",
 	}},
-	when{ condition=Cond.equals("subcommand",0x02),
+	oldwhen{ condition=Cond.equals("subcommand",0x02),
 		block = {  
 			uint32("Cookie"),
 			uint8{label="Number of types requested",key="num"},
@@ -5070,24 +5070,24 @@ CPacketDescription = {
 			}},
 		},
 	},
-	when{ condition=Cond.equals("subcommand",0x03),
+	oldwhen{ condition=Cond.equals("subcommand",0x03),
 		block = {  },
 	},
-	when{ condition=Cond.equals("subcommand",0x04),	block = {  
+	oldwhen{ condition=Cond.equals("subcommand",0x04),	block = {  
 		uint32("Cookie"),
 		strdw("Clan Tag"),
 		strdw("Product ID", Descs.ClientTag),
 	}},
-	when{ condition=Cond.equals("subcommand",0x08),	block = { 			
+	oldwhen{ condition=Cond.equals("subcommand",0x08),	block = { 			
 		uint32("Cookie"),
 		stringz("Account name"),
 		-- TODO: "' in strings?
 		strdw("Product ID (WAR3 or W3XP)", Descs.ClientTag), 
 	}}, 
-	when{ condition=Cond.equals("subcommand",0x09),	block = { 			
+	oldwhen{ condition=Cond.equals("subcommand",0x09),	block = { 			
 		uint32("Cookie"),
 	}},
-	when{ condition=Cond.equals("subcommand",0x0A),	block = { 			
+	oldwhen{ condition=Cond.equals("subcommand",0x0A),	block = { 			
 		uint32("Icon"),
 	}},
 	--[[doc DEL

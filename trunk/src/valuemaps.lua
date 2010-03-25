@@ -235,6 +235,7 @@ Cond = {
 		end
 		return true
 	end,
+	always = function() return function() return true end end,
 	equals = function(key, value)
 		return function(self, state)
 			Cond.assert_key(state, key)
