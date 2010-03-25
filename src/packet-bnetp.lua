@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Wed Mar 24 18:52:52 2010
+--[[ packet-bnetp.lua build on Wed Mar 24 21:50:09 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -680,7 +680,7 @@ do
 						-- and desc argument
 						if field then
 							verify_field_args(args)
-							tmp.pf = field("",
+							tmp.pf = field(args.filter or "",
 								args.label,
 								args.display,
 								args.desc,
@@ -1288,16 +1288,23 @@ Cond = {
 			return stringz(args)
 		end
 		local flags = function(...)
-			local args = make_args_table(unpack(arg))
+			local args = make_args_table_with_positional_map(
+				{"label", "of", "fields"}, unpack(arg))
+			args.filter = "hasflags"
 			local tmp = args.of(args)
 			local fields = {}
 			
 			for k,v in pairs(tmp.fields) do
-				local pfarg = {}
-				pfarg.label = v.label or v.sname
-				pfarg.display = v.display
-				pfarg.desc = v.desc
-				pfarg.params = { v.mask }
+				local pfarg = make_args_table_with_positional_map(
+					{"label", "mask", "desc", "sname"}, v)
+				pfarg.label = pfarg.label or pfarg.sname
+				pfarg.params = { pfarg.mask }
+				pfarg.active = pfarg.active or function (self, state)
+					if bit.band(self:value(state), self.mask) ~= 0 then
+						return true
+					end
+					return false
+				end
 				fields[k] = tmp.of(pfarg)
 			end
 			tmp.fields = fields
@@ -1312,8 +1319,9 @@ Cond = {
 				for k,v in pairs(self.fields) do
 					local tail = state:tail()
 					local block = { v }
+					local active = v:active(tail)
 					dissect_packet(tail, block)
-					if v.sname and v.sname ~= "" then
+					if v.sname and v.sname ~= "" and active then
 						infostr = infostr .. v.sname .. ", "
 					end
 				end
