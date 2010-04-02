@@ -46,7 +46,7 @@
   * ~~iterator from 0 to x (cdkey/gamelist)~~
     * Wireshark needs a patch to correctly highlight each element in the hexdump.
       * [https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=3994 Still not included in 1.2.3]
-      * [http://alien.luaforge.net/ Alien: Lua's FFI. The patch may not be needed after all :) (at the cost of an extra dependency)
+      * [http://alien.luaforge.net/ Alien]: Lua's FFI. The patch may not be needed after all :) (at the cost of an extra dependency)
   * ~~iteration until empty string (S>0x0b getchannellist)~~
     * don't display last empty entry?
 
