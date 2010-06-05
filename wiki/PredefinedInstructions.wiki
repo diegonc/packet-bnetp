@@ -1,3 +1,5 @@
+<wiki:toc max_depth="2" />
+
 =Constructor functions=
 
 Constructor functions encapsulate the initialization of commonly used instruction objects in a way they become easier to type an read.
@@ -18,6 +20,9 @@ Copy-constructors receive a template of the instruction object as its only param
 =Field Description=
 
 ----
+
+== uint ==
+
 <pre>
  _uint8  ( label, base, string-map )
  uint16 ( label, base, string-map )
@@ -30,7 +35,7 @@ These functions create a field for an unsigned integer of the specified size. Th
     base.DEC <br/>
     base.OCT <br/>
 
-The label argument must a non-empty string.
+The label argument must be a non-empty string.
 
 The string-map argument maps integer values to meaningful strings. It must be given as a lua table where the strings are stored using its corresponding integer value as a key. For example:
 {{{
