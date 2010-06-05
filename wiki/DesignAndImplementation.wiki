@@ -25,8 +25,7 @@ by general purpose processors. When Wireshark calls the dissect entry point
 the plugin runs some bootstrapping code and starts executing instructions.
 
 Instuctions may be fetched from three memory regions:
-  * Header: contains instructions to decode the header of each packet and jump
-to the appropiate block of instructions to decode the rest of the packet.
+  * Header: contains instructions to decode the header of each packet and jump to the appropiate block of instructions to decode the rest of the packet.
   * Server: contains instructions to decode packets originated at the server.
   * Client: contains instructions to decode packets originated at the client.
 
