@@ -30,7 +30,7 @@ Instuctions may be fetched from three memory regions:
   * Client: contains instructions to decode packets originated at the client.
 
 Each instruction in a block has access to a sequential buffer where the raw
-packet is stored and an associative temporal memory form where it can read data
+packet is stored and an associative temporal memory from where it can read data
 stored by previous instructions or write data which will be used later. The
 execution of an instruction may advance the buffer's cursor or it may only look
 at the data without advancing it.
