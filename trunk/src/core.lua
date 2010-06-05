@@ -434,6 +434,10 @@ do
 		},
 		["ipv4"]   = {
 			["size"] = function(...) return 4 end,
+			value = function (self, state)
+				local val = state:peek(self.size())
+				return tostring(val:ipv4())
+			end,
 			big_endian = true,
 		},
 		["stringz"] = {
@@ -466,10 +470,6 @@ do
 				local val = state:peek(self:size(state))
 				return val:string()
 			end,
-		},
-		["sockaddr"] = {
-			["size"] = function(...) return 16 end,
-			["alias"] = "bytes",
 		},
 		["filetime"] = {
 			["size"] = function(...) return 8 end,
@@ -707,7 +707,6 @@ do
 		local int8 = WProtoField.int8
 		local ipv4 = WProtoField.ipv4
 		local stringz = WProtoField.stringz
-		local sockaddr = WProtoField.sockaddr
 		local wintime = WProtoField.filetime
 		local posixtime = WProtoField.posixtime
 		local iterator = WProtoField.iterator
@@ -838,6 +837,43 @@ do
 				end
 			end
 			return tmp
+		end
+
+		local sockaddr = function(...)
+			local args = make_args_table_with_positional_map(
+				{"label"}, unpack(arg))
+
+			args.pf = bytes(args.label)
+			args.imp = {
+				uint16{"Address Family", nil, {[2]="AF_INET"}, key="af"},
+				uint16{"Port", big_endian=true, key="port"},
+				ipv4{"Host's IP", key="ip"},
+				uint32{"sin_zero", key="sz1"},
+				uint32{"sin_zero", key="sz2"},
+			}
+			
+			function args:size()
+				return 16
+			end
+
+			function args:dissect(state)
+				local bn = state.bnet_node
+				if self.big_endian then
+					state.bnet_node = bn:add(self.pf, state:peek(self:size()))
+				else
+					state.bnet_node = bn:add_le(self.pf, state:peek(self:size()))
+				end
+				disect_packet(state, self.imp)
+				if state.packet.sz1 != 0 or state.packet.sz2 != 0 then
+					state:error("sin_zero is not zero.");
+				end
+				if state.packet.af != 2 then
+					state:error("Adress Family is not AF_INET.")
+				end
+				state.bnet_node:append_text(string.format("IP: %s, Port: %d",state.packet.ip,state.packet.port))
+				state.bnet_node = bn
+			end
+			return args
 		end
 
 		#include "spackets.lua"
