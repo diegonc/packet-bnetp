@@ -2245,11 +2245,7 @@ SPacketDescription = {
     End Select
 				--]]
 				uint32("Language ID", base.HEX, Descs.LocaleID), -- only on bnet - comment out for pvpgn
-				uint16("Address Family", base.DEC, {[2]="AF_INET"}),
-				uint16{label="Port", big_endian=true},
-				ipv4("Host's IP"),
-				uint32("sin_zero"),
-				uint32("sin_zero"),
+				sockaddr("Game Host"),
 				uint32("Status", base.DEC, Descs.GameStatus),
 				uint32("Elapsed time"),
 				stringz("Game name"),
