@@ -843,7 +843,7 @@ do
 			local args = make_args_table_with_positional_map(
 				{"label"}, unpack(arg))
 
-			args.pf = bytes(args.label)
+			args.pf = bytes(args.label).pf
 			args.imp = {
 				uint16{"Address Family", nil, {[2]="AF_INET"}, key="af"},
 				uint16{"Port", big_endian=true, key="port"},
@@ -863,14 +863,15 @@ do
 				else
 					state.bnet_node = bn:add_le(self.pf, state:peek(self:size()))
 				end
-				disect_packet(state, self.imp)
+				dissect_packet(state, self.imp)
 				if state.packet.sz1 ~= 0 or state.packet.sz2 ~= 0 then
 					state:error("sin_zero is not zero.");
 				end
 				if state.packet.af ~= 2 then
 					state:error("Adress Family is not AF_INET.")
 				end
-				state.bnet_node:append_text(string.format("IP: %s, Port: %d",state.packet.ip,state.packet.port))
+				state.bnet_node:set_text(string.format("%s: IP: %s, Port: %d", self.label,
+					state.packet.ip,state.packet.port))
 				state.bnet_node = bn
 			end
 			return args
