@@ -864,10 +864,10 @@ do
 					state.bnet_node = bn:add_le(self.pf, state:peek(self:size()))
 				end
 				disect_packet(state, self.imp)
-				if state.packet.sz1 != 0 or state.packet.sz2 != 0 then
+				if state.packet.sz1 ~= 0 or state.packet.sz2 ~= 0 then
 					state:error("sin_zero is not zero.");
 				end
-				if state.packet.af != 2 then
+				if state.packet.af ~= 2 then
 					state:error("Adress Family is not AF_INET.")
 				end
 				state.bnet_node:append_text(string.format("IP: %s, Port: %d",state.packet.ip,state.packet.port))
