@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on %time%
+--[[ packet-bnetp.lua build on Thu Jun 24 22:38:59 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -1363,7 +1363,7 @@ Cond = {
 			local args = make_args_table_with_positional_map(
 				{"label"}, unpack(arg))
 
-			args.pf = bytes(args.label)
+			args.pf = bytes(args.label).pf
 			args.imp = {
 				uint16{"Address Family", nil, {[2]="AF_INET"}, key="af"},
 				uint16{"Port", big_endian=true, key="port"},
@@ -1383,14 +1383,15 @@ Cond = {
 				else
 					state.bnet_node = bn:add_le(self.pf, state:peek(self:size()))
 				end
-				disect_packet(state, self.imp)
+				dissect_packet(state, self.imp)
 				if state.packet.sz1 ~= 0 or state.packet.sz2 ~= 0 then
 					state:error("sin_zero is not zero.");
 				end
 				if state.packet.af ~= 2 then
 					state:error("Adress Family is not AF_INET.")
 				end
-				state.bnet_node:append_text(string.format("IP: %s, Port: %d",state.packet.ip,state.packet.port))
+				state.bnet_node:set_text(string.format("%s: IP: %s, Port: %d", self.label,
+					state.packet.ip,state.packet.port))
 				state.bnet_node = bn
 			end
 			return args
@@ -1834,11 +1835,7 @@ SPacketDescription = {
 				},
 			--]]
 				uint32("Language ID", base.HEX, Descs.LocaleID), -- only on bnet - comment out for pvpgn
-				uint16("Address Family", base.DEC, {[2]="AF_INET"}),
-				uint16{label="Port", big_endian=true},
-				ipv4("Host's IP"),
-				uint32("sin_zero"),
-				uint32("sin_zero"),
+				sockaddr("Game Host"),
 				uint32("Status", base.DEC, Descs.GameStatus),
 				uint32("Elapsed time"),
 				stringz("Game name"),
