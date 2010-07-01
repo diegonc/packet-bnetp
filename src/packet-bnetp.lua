@@ -1377,7 +1377,9 @@ Cond = {
 			local args = make_args_table_with_positional_map(
 				{"label"}, unpack(arg))
 
-			args.pf = bytes(args.label).pf
+			--args.pf = bytes(args.label).pf
+			args.pf = "dummy string"
+			
 			args.imp = {
 				uint16{"Address Family", nil, {[2]="AF_INET"}, key="af"},
 				uint16{"Port", big_endian=true, key="port"},
@@ -1854,8 +1856,8 @@ SPacketDescription = {
 				},
 			--]]
 				uint32("Language ID", base.HEX, Descs.LocaleID), -- only on bnet - comment out for pvpgn
-				sockaddr("Game Host"),
-				--sockaddr(""),
+				--sockaddr("Game Host"),
+				sockaddr(),
 				uint32("Status", base.DEC, Descs.GameStatus),
 				uint32("Elapsed time"),
 				stringz("Game name"),

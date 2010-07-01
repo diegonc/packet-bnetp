@@ -857,7 +857,9 @@ do
 			local args = make_args_table_with_positional_map(
 				{"label"}, unpack(arg))
 
-			args.pf = bytes(args.label).pf
+			--args.pf = bytes(args.label).pf
+			args.pf = "dummy string"
+			
 			args.imp = {
 				uint16{"Address Family", nil, {[2]="AF_INET"}, key="af"},
 				uint16{"Port", big_endian=true, key="port"},
