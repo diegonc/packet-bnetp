@@ -2246,6 +2246,7 @@ SPacketDescription = {
 				--]]
 				uint32("Language ID", base.HEX, Descs.LocaleID), -- only on bnet - comment out for pvpgn
 				sockaddr("Game Host"),
+				--sockaddr(""),
 				uint32("Status", base.DEC, Descs.GameStatus),
 				uint32("Elapsed time"),
 				stringz("Game name"),

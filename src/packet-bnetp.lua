@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Thu Jun 24 22:38:59 2010
+--[[ packet-bnetp.lua build on %time%
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -1358,7 +1358,21 @@ Cond = {
 			end
 			return tmp
 		end
-
+		
+		--[[ sockaddr([label])
+		--
+		--	Displays sockaddr struct.
+		--	Is equals to the sequence
+		--
+		--		uint16("Address Family", nil, {[2]="AF_INET"}),
+		--		uint16("Port", big_endian=true},
+		--		ipv4("Host's IP"},
+		--		uint32("sin_zero"),
+		--		uint32("sin_zero"),
+		--
+		--	with some summary.
+		--
+		--]]
 		local sockaddr = function(...)
 			local args = make_args_table_with_positional_map(
 				{"label"}, unpack(arg))
@@ -1390,8 +1404,13 @@ Cond = {
 				if state.packet.af ~= 2 then
 					state:error("Adress Family is not AF_INET.")
 				end
-				state.bnet_node:set_text(string.format("%s: IP: %s, Port: %d", self.label,
-					state.packet.ip,state.packet.port))
+				local summary = string.format("IP: %s, Port: %d", state.packet.ip, state.packet.port)
+				if self.label ~= nil then
+					summary = self.label .. ": " .. summary 
+				end
+				state.bnet_node:set_text(summary)
+				--state.bnet_node:set_text(string.format("%s: IP: %s, Port: %d", self.label,
+				--	state.packet.ip,state.packet.port))
 				state.bnet_node = bn
 			end
 			return args
@@ -1836,6 +1855,7 @@ SPacketDescription = {
 			--]]
 				uint32("Language ID", base.HEX, Descs.LocaleID), -- only on bnet - comment out for pvpgn
 				sockaddr("Game Host"),
+				--sockaddr(""),
 				uint32("Status", base.DEC, Descs.GameStatus),
 				uint32("Elapsed time"),
 				stringz("Game name"),
