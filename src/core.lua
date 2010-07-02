@@ -858,7 +858,8 @@ do
 				{"label"}, unpack(arg))
 
 			--args.pf = bytes(args.label).pf
-			args.pf = "dummy string"
+			--args.pf = "dummy string"
+			args.pf = bytes("dummy string").pf
 			
 			args.imp = {
 				uint16{"Address Family", nil, {[2]="AF_INET"}, key="af"},
