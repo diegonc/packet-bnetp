@@ -26,15 +26,23 @@
     * ~~`[`u`]`intX(label, base, value_string_map)~~
     * ~~array(label, type, size)~~
     * ~~strdw(label, value_string_map)~~
+    * iterator
+    * flags
   * ~~Mixed parameter form in function call, like in python~~
     * Done. Does it work?
+      * Yes, it does.
   * More Documentation?
     * Document API (data decoder API, like uint32())
+    * LuaDoc
   * Supress double value output in ipv4() and version()
+    * In ipv4, one of the values got replaced with DNS if DNS resolving is turned on
   * Use Wireshark's "User Preferences" to allow run-time changes in the configuration.
   * Investigate GeoIP.
+    * It only shows something in IPv4 Tree.
   * [http://code.google.com/p/llvm-lua/ llvm-lua]: JIT/Static compiler for Lua using LLVM on the backend.
     * It may be worth to try to integrate a JIT compiler into Wireshark's Lua based plugins :)
+  * Non-existing desc table in strdw(): no error message
+  * Specify length as key in array()
 
 ==done==
 ===most important===
