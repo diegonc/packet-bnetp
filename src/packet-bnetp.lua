@@ -1203,27 +1203,131 @@ local Descs = {
 		["LADR"] = "LADR",
 	},
 	
-	W3Race = {
-		[0x01] = "",
-		[0x02] = "Request ladder map listing",
-		[0x03] = "Cancel ladder game search",
-		[0x04] = "User stats request",
-		[0x05] = "",
-		[0x06] = "",
-		[0x07] = "WID_TOURNAMENT",
-		[0x08] = "Clan stats request",
-		[0x09] = "Icon list request",
-		[0x0A] = "Change icon",
+
+	W3IconNames = {
+		-- Random
+		--NULL
+		["ngrd"] = "Green Dragon Whelp",
+		["nadr"] = "Azure Dragon (Blue Dragon)",
+		["nrdr"] = "Red Dragon",
+		["nbwm"] = "Deathwing",
+		--NULL
+
+		-- Humans
+		["hpea"] = "Peasant",
+		["hfoo"] = "Footman",
+		["hkni"] = "Knight",
+		["Hamg"] = "Archmage",
+		["nmed"] = "Medivh",
+		--NULL
+
+		-- Orcs
+		["opeo"] = "Peon",
+		["ogru"] = "Grunt",
+		["otau"] = "Tauren",
+		["Ofar"] = "Far Seer",
+		["Othr"] = "Thrall",
+		--NULL
+
+		-- Undead
+		["uaco"] = "Acolyle",
+		["ugho"] = "Ghoul",
+		["uabo"] = "Abomination",
+		["Ulic"] = "Lich",
+		["Utic"] = "Tichondrius",
+		--NULL
+
+		-- Night Elves
+		["ewsp"] = "Wisp",
+		["earc"] = "Archer",
+		["edoc"] = "Druid of the Claw",
+		["Emoo"] = "Priestess of the Moon",
+		["Efur"] = "Furion Stormrage",
+		--NULL
+
+		-- Demons
+		--NULL
+		["nfng"] = "dunno",
+		["ninf"] = "Infernal",
+		["nbal"] = "Doom Guard",
+		["Nplh"] = "Pit Lord/Manaroth",
+		["Uwar"] = "Archimonde",
+		--/* not used by RoC */
+
+		-- Random
+		--NULL
+		["nmyr"] = "Naga Myrmidon",
+		["nnsw"] = "Naga Siren",
+		["nhyc"] = "Dragon Turtle",
+		["Hvsh"] = "Lady Vashj",
+		["Eevm"] = "Illidan (Morphed 2)",
+		
+		-- Humans
+		["hpea"] = "Peasant",
+		["hrif"] = "Rifleman",
+		["hsor"] = "Sorceress",
+		["hspt"] = "Spellbreaker",
+		["Hblm"] = "Blood Mage",
+		["Hjai"] = "Jaina",
+
+		-- Orcs
+		["opeo"] = "Peon",
+		["ohun"] = "Troll Headhunter",
+		["oshm"] = "Shaman",
+		["ospw"] = "Spirit Walker",
+		["Oshd"] = "Shadow Hunter",
+		["Orex"] = "Rexxar",
+
+		-- Undead
+		["uaco"] = "Acolyle",
+		["ucry"] = "Crypt Fiend",
+		["uban"] = "Banshee",
+		["uobs"] = "Destroyer",
+		["Ucrl"] = "Crypt Lord",
+		["Usyl"] = "Sylvanas",
+
+		-- Night Elves
+		["ewsp"] = "Wisp",
+		["esen"] = "Huntress",
+		["edot"] = "Druid of the Talon",
+		["edry"] = "Dryad",
+		["Ekee"] = "Keeper of the Grove",
+		["Ewrd"] = "Maiev",
+
+		-- Tournament
+		--NULL
+		["nfgu"] = "Felguard",
+		["ninf"] = "Infernal",
+		["nbal"] = "Doomguard",
+		["Nplh"] = "Pit Lord",
+		["Uwar"] = "Archimonde",
 	},
 	
 	W3Icon = {
 		[""] = "Default icon",
-		["MAP"] = "MAP",
-		["TYPE"] = "TYPE",
-		["DESC"] = "DESC",
-		["LADR"] = "LADR",
+		["W3H1"] = "",
+		
+		["W3O1"] = "",
+		
+		["W3N1"] = "",
+		
+		["W3U1"] = "",
+		
+		["W3R1"] = "",
+		
+		["W3D1"] = "",
+		
 	},
 
+	W3Races = {
+		[0x00] = "Random",
+		[0x01] = "Humans",
+		[0x02] = "Orcs",
+		[0x03] = "Undead",
+		[0x04] = "Night Elves",
+		[0x05] = "Tournament",
+	},
+	
 	-- Friend online status
 	OnlineStatus = {
 		[0x00] = "Offline",
@@ -2221,7 +2325,7 @@ SPacketDescription = {
 	-- Subcommand ID 4: User stats request
 	oldwhen{condition=Cond.equals("subcommand", 4), block = {
 		uint32("Cookie"),
-		stringz{"Icon ID", length=4},
+		strdw("Icon ID", Descs.W3IconNames),
 		uint8{"Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
 			strdw("Ladder type"),
@@ -2304,8 +2408,8 @@ SPacketDescription = {
 		uint8{"Number of Icons", key="icons"},
 		iterator{label="Icon", refkey="icons", repeated={
 			strdw("Icon", Descs.W3Icon),
-			uint32("Name", base.HEX),
-			uint8("Race", base.HEX),
+			strdw("Name", Descs.W3IconNames),
+			uint8("Race", nil, Descs.W3Races),
 			uint16("Wins required"),
 			uint8("Unknown", base.HEX),
 		}},

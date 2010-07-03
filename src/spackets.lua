@@ -3764,7 +3764,7 @@ WID_SETICON 0x0A SEND
 	-- Subcommand ID 4: User stats request
 	oldwhen{condition=Cond.equals("subcommand", 4), block = {
 		uint32("Cookie"),
-		stringz{"Icon ID", length=4},
+		strdw("Icon ID", Descs.W3IconNames),
 		uint8{"Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
 			strdw("Ladder type"),
@@ -3859,6 +3859,18 @@ WID_SETICON 0x0A SEND
 		}},
 	}},
 	
+	--[[doc
+	WID_ICONLIST 0x09 RECV
+		(DWORD) Cookie
+		(DWORD) Unknown
+		(BYTE) Tiers
+		(BYTE) Icons
+		(DWORD) Icon
+		(DWORD) Name
+		(BYTE) Race
+		(WORD) Required Wins
+		(BYTE) Unknown
+	--]]
 	-- Subcommand ID 9: Icon list request
 	oldwhen{condition=Cond.equals("subcommand", 0x9), block={
 		uint32("Cookie"),
@@ -3867,8 +3879,8 @@ WID_SETICON 0x0A SEND
 		uint8{"Number of Icons", key="icons"},
 		iterator{label="Icon", refkey="icons", repeated={
 			strdw("Icon", Descs.W3Icon),
-			uint32("Name", base.HEX),
-			uint8("Race", base.HEX),
+			strdw("Name", Descs.W3IconNames),
+			uint8("Race", nil, Descs.W3Races),
 			uint16("Wins required"),
 			uint8("Unknown", base.HEX),
 		}},
