@@ -259,27 +259,159 @@ local Descs = {
 		["LADR"] = "LADR",
 	},
 	
-	W3Race = {
-		[0x01] = "",
-		[0x02] = "Request ladder map listing",
-		[0x03] = "Cancel ladder game search",
-		[0x04] = "User stats request",
-		[0x05] = "",
-		[0x06] = "",
-		[0x07] = "WID_TOURNAMENT",
-		[0x08] = "Clan stats request",
-		[0x09] = "Icon list request",
-		[0x0A] = "Change icon",
+	--[[doc
+	source: pvpgn \bnetd\account_wrap.c
+
+	// Ramdom - Nothing, Grean Dragon Whelp, Azure Dragon (Blue Dragon), Red Dragon, Deathwing, Nothing
+	// Humans - Peasant, Footman, Knight, Archmage, Medivh, Nothing
+	// Orcs - Peon, Grunt, Tauren, Far Seer, Thrall, Nothing
+	// Undead - Acolyle, Ghoul, Abomination, Lich, Tichondrius, Nothing
+	// Night Elves - Wisp, Archer, Druid of the Claw, Priestess of the Moon, Furion Stormrage, Nothing
+	// Demons - Nothing, ???(wich unit is nfgn), Infernal, Doom Guard, Pit Lord/Manaroth, Archimonde
+	// ADDED TFT ICON BY DJP 07/16/2003 
+	static char * profile_code[12][6] = {
+	    {NULL  , "ngrd", "nadr", "nrdr", "nbwm", NULL  },
+	    {"hpea", "hfoo", "hkni", "Hamg", "nmed", NULL  },
+	    {"opeo", "ogru", "otau", "Ofar", "Othr", NULL  },
+	    {"uaco", "ugho", "uabo", "Ulic", "Utic", NULL  },
+	    {"ewsp", "earc", "edoc", "Emoo", "Efur", NULL  },
+	    {NULL  , "nfng", "ninf", "nbal", "Nplh", "Uwar"}, /* not used by RoC */
+	    {NULL  , "nmyr", "nnsw", "nhyc", "Hvsh", "Eevm"},
+	    {"hpea", "hrif", "hsor", "hspt", "Hblm", "Hjai"},
+	    {"opeo", "ohun", "oshm", "ospw", "Oshd", "Orex"},
+	    {"uaco", "ucry", "uban", "uobs", "Ucrl", "Usyl"},
+	    {"ewsp", "esen", "edot", "edry", "Ekee", "Ewrd"},
+	    {NULL  , "nfgu", "ninf", "nbal", "Nplh", "Uwar"}
+	};
+		
+	http://harpywar.com/?a=articles&b=2&c=1&d=28&lang=ru
+	http://www.edgeofnowhere.cc/viewtopic.php?p=3818312
+	--]]
+
+	W3IconNames = {
+		-- Random
+		--NULL
+		["ngrd"] = "Green Dragon Whelp",
+		["nadr"] = "Azure Dragon (Blue Dragon)",
+		["nrdr"] = "Red Dragon",
+		["nbwm"] = "Deathwing",
+		--NULL
+
+		-- Humans
+		["hpea"] = "Peasant",
+		["hfoo"] = "Footman",
+		["hkni"] = "Knight",
+		["Hamg"] = "Archmage",
+		["nmed"] = "Medivh",
+		--NULL
+
+		-- Orcs
+		["opeo"] = "Peon",
+		["ogru"] = "Grunt",
+		["otau"] = "Tauren",
+		["Ofar"] = "Far Seer",
+		["Othr"] = "Thrall",
+		--NULL
+
+		-- Undead
+		["uaco"] = "Acolyle",
+		["ugho"] = "Ghoul",
+		["uabo"] = "Abomination",
+		["Ulic"] = "Lich",
+		["Utic"] = "Tichondrius",
+		--NULL
+
+		-- Night Elves
+		["ewsp"] = "Wisp",
+		["earc"] = "Archer",
+		["edoc"] = "Druid of the Claw",
+		["Emoo"] = "Priestess of the Moon",
+		["Efur"] = "Furion Stormrage",
+		--NULL
+
+		-- Demons
+		--NULL
+		["nfng"] = "dunno",
+		["ninf"] = "Infernal",
+		["nbal"] = "Doom Guard",
+		["Nplh"] = "Pit Lord/Manaroth",
+		["Uwar"] = "Archimonde",
+		--/* not used by RoC */
+
+		-- Random
+		--NULL
+		["nmyr"] = "Naga Myrmidon",
+		["nnsw"] = "Naga Siren",
+		["nhyc"] = "Dragon Turtle",
+		["Hvsh"] = "Lady Vashj",
+		["Eevm"] = "Illidan (Morphed 2)",
+		
+		-- Humans
+		["hpea"] = "Peasant",
+		["hrif"] = "Rifleman",
+		["hsor"] = "Sorceress",
+		["hspt"] = "Spellbreaker",
+		["Hblm"] = "Blood Mage",
+		["Hjai"] = "Jaina",
+
+		-- Orcs
+		["opeo"] = "Peon",
+		["ohun"] = "Troll Headhunter",
+		["oshm"] = "Shaman",
+		["ospw"] = "Spirit Walker",
+		["Oshd"] = "Shadow Hunter",
+		["Orex"] = "Rexxar",
+
+		-- Undead
+		["uaco"] = "Acolyle",
+		["ucry"] = "Crypt Fiend",
+		["uban"] = "Banshee",
+		["uobs"] = "Destroyer",
+		["Ucrl"] = "Crypt Lord",
+		["Usyl"] = "Sylvanas",
+
+		-- Night Elves
+		["ewsp"] = "Wisp",
+		["esen"] = "Huntress",
+		["edot"] = "Druid of the Talon",
+		["edry"] = "Dryad",
+		["Ekee"] = "Keeper of the Grove",
+		["Ewrd"] = "Maiev",
+
+		-- Tournament
+		--NULL
+		["nfgu"] = "Felguard",
+		["ninf"] = "Infernal",
+		["nbal"] = "Doomguard",
+		["Nplh"] = "Pit Lord",
+		["Uwar"] = "Archimonde",
 	},
 	
 	W3Icon = {
 		[""] = "Default icon",
-		["MAP"] = "MAP",
-		["TYPE"] = "TYPE",
-		["DESC"] = "DESC",
-		["LADR"] = "LADR",
+		["W3H1"] = "",
+		
+		["W3O1"] = "",
+		
+		["W3N1"] = "",
+		
+		["W3U1"] = "",
+		
+		["W3R1"] = "",
+		
+		["W3D1"] = "",
+		
 	},
 
+	W3Races = {
+		[0x00] = "Random",
+		[0x01] = "Humans",
+		[0x02] = "Orcs",
+		[0x03] = "Undead",
+		[0x04] = "Night Elves",
+		[0x05] = "Tournament",
+	},
+	
 	-- Friend online status
 	OnlineStatus = {
 		[0x00] = "Offline",
