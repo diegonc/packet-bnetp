@@ -35,6 +35,9 @@ local Descs = {
 		[0x04] = "Game already started",
 		[0x06] = "Too many server requests",
 	},
+	
+	-- Locale ID (LCID)
+	-- http://support.microsoft.com/kb/221435
 	LocaleID = {
 		[11276] = "French (Cameroon)",
 		[1025] = "Arabic (Saudi Arabia)",
@@ -226,6 +229,67 @@ local Descs = {
 		[19466] = "Spanish (Nicaragua)",
 		[20490] = "Spanish (Puerto Rico)",
 	},
+	
+	ClanRank = {
+		[0x00] = "Initiate that has been in the clan for less than one week (Peon)",
+		[0x01] = "Initiate that has been in the clan for over one week (Peon)",
+		[0x02] = "Member (Grunt)",
+		[0x03] = "Officer (Shaman)",
+		[0x04] = "Leader (Chieftain)",
+	},
+	
+	WarcraftGeneralSubcommandId = {
+		[0x01] = "",
+		[0x02] = "Request ladder map listing",
+		[0x03] = "Cancel ladder game search",
+		[0x04] = "User stats request",
+		[0x05] = "",
+		[0x06] = "",
+		[0x07] = "WID_TOURNAMENT",
+		[0x08] = "Clan stats request",
+		[0x09] = "Icon list request",
+		[0x0A] = "Change icon",
+	},
+	
+	WarcraftGeneralRequestType = {
+		["URL"] = "URL",
+		["MAP"] = "MAP",
+		["TYPE"] = "TYPE",
+		["DESC"] = "DESC",
+		["LADR"] = "LADR",
+	},
+	
+	W3Race = {
+		[0x01] = "",
+		[0x02] = "Request ladder map listing",
+		[0x03] = "Cancel ladder game search",
+		[0x04] = "User stats request",
+		[0x05] = "",
+		[0x06] = "",
+		[0x07] = "WID_TOURNAMENT",
+		[0x08] = "Clan stats request",
+		[0x09] = "Icon list request",
+		[0x0A] = "Change icon",
+	},
+	
+	W3Icon = {
+		[""] = "Default icon",
+		["MAP"] = "MAP",
+		["TYPE"] = "TYPE",
+		["DESC"] = "DESC",
+		["LADR"] = "LADR",
+	},
+
+	-- Friend online status
+	OnlineStatus = {
+		[0x00] = "Offline",
+		[0x01] = "Not in chat",
+		[0x02] = "In chat",
+		[0x03] = "In a public game",
+		[0x04] = "In a private game, and you are not that person's friend",
+		[0x05] = "In a private game, and you are that person's friend",
+	},
+	
 }
 
 -- Common condition functions
@@ -238,19 +302,27 @@ Cond = {
 		end
 		return true
 	end,
-	always = function() return function() return true end end,
+	
+	always = function() 
+		return function() 
+			return true 
+		end 
+	end,
+	
 	equals = function(key, value)
 		return function(self, state)
 			Cond.assert_key(state, key)
 			return state.packet[key] == value
 		end
 	end,
+	
 	nequals = function(key, value)
 		return function(self, state)
 			Cond.assert_key(state, key)
 			return state.packet[key] ~= value
 		end
 	end,
+	
 	neg = function(fun, ...)
 		local func = fun
 		if type(fun) == "string" then
@@ -260,6 +332,7 @@ Cond = {
 			return not func(self, state)
 		end
 	end,
+	
 	inlist = function(key, arr)
 		return function(self, state)
 			Cond.assert_key(state, key)

@@ -3382,7 +3382,7 @@ CPacketDescription = {
 
 ]]
 [SID_STARTVERSIONING] = { -- 0x06
-	strdw("Platform ID"),
+	strdw("Platform ID", Descs.PlatformID),
 	strdw("Product ID", Descs.ClientTag),
 	uint32("Version Byte"),
 	uint32("Unknown"),
@@ -3410,7 +3410,7 @@ CPacketDescription = {
 
 ]]
 [SID_REPORTVERSION] = { -- 0x07
-	strdw("Platform ID"),
+	strdw("Platform ID", Descs.PlatformID),
 	strdw("Product ID", Descs.ClientTag),
 	uint32("Version Byte"),
 	uint32("EXE Version"),
@@ -3861,7 +3861,7 @@ CPacketDescription = {
 
 ]]
 [SID_CHECKAD] = { -- 0x15
-	strdw("Platform ID"),
+	strdw("Platform ID", Descs.PlatformID),
 	strdw("Product ID", Descs.ClientTag),
 	uint32("ID of last displayed banner"),
 	posixtime("Current time"),
@@ -4155,7 +4155,7 @@ CPacketDescription = {
 
 ]]
 [SID_DISPLAYAD] = { -- 0x21
-	strdw("Platform ID"),
+	strdw("Platform ID", Descs.PlatformID),
 	strdw("Product ID", Descs.ClientTag),
 	uint32("Ad ID"),
 	stringz("Filename"),
@@ -5043,47 +5043,196 @@ CPacketDescription = {
 
     Related:         [0x44] SID_WARCRAFTGENERAL (S->C)
 
+		SID_WARCRAFTGENERAL
+
+WID_GAMESEARCH 0x00 SEND
+	(DWORD)	Cookie
+	(DWORD)	Unknown
+	(BYTE) 	Unknown
+	(BYTE)	Type
+		0x00: 1vs1
+		0x01: 2vs2
+		0x02: 3vs3
+		0x03: 4vs4
+		0x04: Free for All
+	(WORD) Enabled Maps (every bit is one map, from 0x0000 to 0x0FFF)
+	(WORD) Unknown
+	(BYTE) Unknown
+	(DWORD) TickCount
+	(DWORD) Race
+		0x00000001: Human
+		0x00000002: Orc
+		0x00000004: Night Elf
+		0x00000008: Undead
+		0x00000020: Random
+
+WID_GAMESEARCH 0x00 RECV
+	(DWORD) Cookie
+	(BYTE) Status
+		0x00: Search Started
+		0x04: Banned CD Key
+
+WID_MAPLIST 0x02 SEND
+	(DWORD) Cookie
+	(BYTE) Requests
+	(DWORD) ID
+	(DWORD) Checksum
+
+WID_MAPLIST 0x02 RECV
+	(DWORD) Cookie
+	(Byte) Responses
+	(DWORD) ID
+	(DWORD) Checksum
+	(WORD) Decompressed Len
+	(WORD) Compressed Len
+	(VOID) Compressed Data
+	(BYTE) Remaining Packets
+
+WID_CANCELSEARCH 0x03 SEND
+	-Empty
+
+WID_CANCELSEARCH 0x03 RECV
+	(DWORD) Cookie from WID_GAMESEARCH
+
+WID_USERRECORD 0x04 SEND
+	(DWORD) Cookie
+	(STRING) Account
+	(DWORD) Product
+
+WID_USERRECORD 0x04 RECV
+	(DWORD) Cookie
+	(DWORD) Icon ID
+	(BYTE) Ladder Records
+	(DWORD) Ladder Type
+	(WORD) Wins
+	(WORD) Losses
+	(BYTE) Level
+	(BYTE) Unknown
+	(WORD) Experience
+	(DWORD) Rank
+	(BYTE) Race Records
+	(WORD) Wins
+	(WORD) Losses
+	(BYTE) Team Records
+	(DWORD) Ladder Type
+	(WORD) Wins
+	(WORD) Losses
+	(BYTE) Level
+	(BYTE) Unknown
+	(WORD) Experience
+	(DWORD) Rank
+	(FILETIME) Last Game
+	(BYTE) Partners
+	(STRING) Partner Account
+
+WID_TOURNAMENT 0x07 SEND
+	(DWORD) Cookie
+
+WID_TOURNAMENT 0x07 RECV
+	(DWORD) Cookie
+	(BYTE) Status
+		0x00 No Tournament
+		0x01 Starting Soon
+		0x02 Ending Soon
+		0x03 Started
+		0x04 Last Call
+	(FILETIME) Time of Status
+	(WORD) Unknown
+	(WORD) Unknown
+	(BYTE) Wins
+	(BYTE) Losses
+	(BYTE) Draws
+	(BYTE) Unknown
+	(BYTE) Unknown
+	(BYTE) Unknown
+	(BYTE) Unknown
+
+WID_CLANRECORD 0x08 SEND
+	(DWORD) Cookie
+	(DWORD) Clan Tag
+	(DWORD) Product
+
+WID_CLANRECORD 0x08 RECV
+	(DWORD) Cookie
+	(BYTE) Ladder Records
+	(DWORD) Ladder Type
+	(WORD) Wins
+	(WORD) Losses
+	(BYTE) Level
+	(BYTE) Unknown
+	(WORD) Experience
+	(DWORD) Rank
+	(BYTE) Race Records
+	(WORD) Wins
+	(WORD) Losses
+
+WID_ICONLIST 0x09 SEND
+	(DWORD) Cookie
+
+WID_ICONLIST 0x09 RECV
+	(DWORD) Cookie
+	(DWORD) Unknown
+	(BYTE) Tiers
+	(BYTE) Icons
+	(DWORD) Icon
+	(DWORD) Name
+	(BYTE) Race
+	(WORD) Required Wins
+	(BYTE) Unknown
+
+WID_SETICON 0x0A SEND
+	(DWORD) Icon 
+
 ]]
 [SID_WARCRAFTGENERAL] = { -- 0x44
-	uint8{label="Subcommand ID", key="subcommand", desc={
-		[0x02] = "Request ladder map listing",
-		[0x03] = "Cancel ladder game search",
-		[0x04] = "User stats request",
-		[0x08] = "Clan stats request",
-		[0x09] = "Icon list request",
-		[0x0A] = "Change icon",
-	}},
+	uint8{"Subcommand ID", key="subcommand", nil, Descs.WarcraftGeneralSubcommandId},
+	-- Subcommand ID 2: Request ladder map listing
 	oldwhen{ condition=Cond.equals("subcommand",0x02),
 		block = {  
 			uint32("Cookie"),
 			uint8{label="Number of types requested",key="num"},
 			iterator{label="Game Information", refkey="num", repeated={
-				strdw("Request data"),
+				strdw("Request data", Descs.WarcraftGeneralRequestType),
 				-- seems to be dword(0)
 				-- seems this is another war3 datatype, double strdw :)
 				uint32("Dword(0)"),
 			}},
 		},
 	},
+	
+	
 	oldwhen{ condition=Cond.equals("subcommand",0x03),
 		block = {  },
 	},
+	
+	-- Subcommand ID 4: User stats request
 	oldwhen{ condition=Cond.equals("subcommand",0x04),	block = {  
 		uint32("Cookie"),
-		strdw("Clan Tag"),
+		stringz("Username"),
 		strdw("Product ID", Descs.ClientTag),
 	}},
-	oldwhen{ condition=Cond.equals("subcommand",0x08),	block = { 			
+	
+	-- Subcommand ID 7: WID_TOURNAMENT
+	oldwhen{ condition=Cond.equals("subcommand", 7), block = {  
+		uint32("Cookie"),
+	}},
+	
+	-- Subcommand ID 8: Clan stats request
+	oldwhen{ condition=Cond.equals("subcommand",0x08),	block = { 
 		uint32("Cookie"),
 		stringz("Account name"),
 		-- TODO: "' in strings?
 		strdw("Product ID (WAR3 or W3XP)", Descs.ClientTag), 
 	}}, 
+	
+	-- Subcommand ID 9: Icon list request
 	oldwhen{ condition=Cond.equals("subcommand",0x09),	block = { 			
 		uint32("Cookie"),
 	}},
+	
+	-- Subcommand ID 10: Change icon
 	oldwhen{ condition=Cond.equals("subcommand",0x0A),	block = { 			
-		strdw("Icon"),
+		strdw("Icon", Descs.W3Icon),
 	}},
 },
 --[[doc
@@ -5265,8 +5414,8 @@ CPacketDescription = {
 
 ]]
 [SID_AUTH_INFO] = { -- 0x50
-	uint32("Protocol ID"),
-	strdw("Platform ID"),
+	uint32("Protocol ID (0)"),
+	strdw("Platform ID", Descs.PlatformID),
 	strdw("Product ID", Descs.ClientTag),
 	uint32("Version Byte", base.HEX),
 	strdw("Product language"),
@@ -5344,7 +5493,7 @@ CPacketDescription = {
 				[0x12] = "W3XP",
 		}),
 		uint32("CD-key's public value", base.HEX),
-		uint32("Unknown", base.HEX),
+		uint32("Unknown (0)"),
 		array("Hashed Key Data", uint32, 5),
 	}},
 	stringz("Exe Information"),
@@ -5862,7 +6011,7 @@ CPacketDescription = {
 [SID_CLANINVITEMULTIPLE] = { -- 0x71
 	uint32("Cookie"),
 	stringz("Clan name"),
-	uint32("Clan tag"),
+	strdw("Clan tag"),
 	uint8{"Number of users to invite", key="numusers"},
 	iterator{label="Usernames to invite", refkey="numusers", repeated={
 		stringz("Account"),
@@ -5890,7 +6039,7 @@ CPacketDescription = {
 ]]
 [SID_CLANCREATIONINVITATION] = { -- 0x72
 	uint32("Cookie"),
-	uint32("Clan tag"),
+	strdw("Clan tag"),
 	stringz("Inviter name"),
 	uint8("Status"),
 },
