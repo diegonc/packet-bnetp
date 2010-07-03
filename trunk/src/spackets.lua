@@ -1,3 +1,4 @@
+-- Begin spackets.lua
 -- Packets from server to client
 SPacketDescription = {
 --[[doc
@@ -21,7 +22,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_CDKEY] = { -- 0x01
-	uint32{label="Result", desc=Descs.YesNo},
+	uint32("Result", nil, Descs.YesNo),
 	uint32("Client Token", base.HEX),
 	array("CD key data for SID_AUTH_CHECK", uint32, 9),
 },
@@ -151,7 +152,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_UPGRADECHALLENGE] = { -- 0x07
-	uint32{label="Success code", desc=Descs.YesNo},
+	uint32("Success code", nil, Descs.YesNo),
 },
 --[[doc
     Message ID:      0x08
@@ -184,8 +185,11 @@ SPacketDescription = {
 
     Used By:         Diablo II, Diablo
 
-    Format:          (BOOLEAN) Success If Success is TRUE:(DWORD) Version.(DWORD) Checksum.(STRING)
-                     Version check stat string.
+    Format:          (BOOLEAN) Success 
+					 If Success is TRUE:
+					 (DWORD) Version.
+					 (DWORD) Checksum.
+					 (STRING) Version check stat string.
 
     Remarks:         This message contains the information required for the specified
                      product.
@@ -196,7 +200,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_VERSIONCHECK] = { -- 0x09
-	uint32{label="Success If Success is TRUE:", desc=Descs.YesNo},
+	uint32("Success", nil, Descs.YesNo),
 	uint32("Version"),
 	uint32("Checksum"),
 	stringz("Version check stat string"),
@@ -220,7 +224,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_CONFIRMLOGON] = { -- 0x0A
-	uint32{label="Success", desc=Descs.YesNo},
+	uint32("Success", nil, Descs.YesNo),
 },
 --[[doc
     Message ID:      0x0B
@@ -303,7 +307,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_CHOOSENLSREVISION] = { -- 0x0D
-	uint32{label="Success code", desc=Descs.YesNo},
+	uint32("Success code", nil, Descs.YesNo),
 },
 --[[doc
     Message ID:      0x0E
@@ -391,8 +395,11 @@ SPacketDescription = {
 [BNLS_REQUESTVERSIONBYTE] = { -- 0x10
 	uint32{label="Product", key="prod"},
 	oldwhen{
-		condition=function(...) return arg[2].packet.prod ~= 0 end,
-		block = {uint32("Version byte", base.HEX)},
+		-- condition=function(...) return arg[2].packet.prod ~= 0 end,
+		condition = Cond.nequals("prod", 0),
+		block = {
+			uint32("Version byte", base.HEX)
+		},
 	}
 },
 --[[doc
@@ -413,7 +420,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_VERIFYSERVER] = { -- 0x11
-	uint32{label="Success", desc=Descs.YesNo},
+	uint32("Success", nil, Descs.YesNo),
 },
 --[[doc
     Message ID:      0x12
@@ -500,7 +507,7 @@ SPacketDescription = {
 ]]
 [BNLS_SERVERLOGONPROOF] = { -- 0x14
 	uint32("Slot index"),
-	uint32{label="Success", desc=Descs.YesNo},
+	uint32("Success", nil, Descs.YesNo),
 	array("Data server's SID_AUTH_ACCOUNTLOGONPROOF (0x54) response", uint32, 5),
 },
 --[[doc
@@ -524,7 +531,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_VERSIONCHECKEX] = { -- 0x18
-	uint32{label="Success", desc=Descs.YesNo},
+	uint32("Success", nil, Descs.YesNo),
 	uint32("Version"),
 	uint32("Checksum"),
 	stringz("Version check"),
@@ -555,7 +562,7 @@ SPacketDescription = {
 
 ]]
 [BNLS_VERSIONCHECKEX2] = { -- 0x1A
-	uint32{label="Success", desc=Descs.YesNo},
+	uint32("Success", nil, Descs.YesNo),
 	version("Version"),
 	uint32("Checksum", base.HEX),
 	stringz("Version check stat string"),
@@ -1984,7 +1991,7 @@ SPacketDescription = {
 
 ]]
 [SID_REPORTVERSION] = { -- 0x07
-	uint32("Result", base.DEC, {
+	uint32("Result", nil, {
 		[0x00] = "Failed version check",
 		[0x01] = "Old game version",
 		[0x02] = "Success",
@@ -2013,7 +2020,7 @@ SPacketDescription = {
 
 ]]
 [SID_STARTADVEX] = { -- 0x08
-	uint32("Status", base.DEC, {
+	uint32("Status", nil, {
 		[0x00] = "Failed",
 		[0x01] = "Success",
 	}),
@@ -2090,7 +2097,7 @@ SPacketDescription = {
 	uint32{label="Number of games", key="games"},
 	oldwhen{condition=Cond.equals("games", 0),
 		block = {
-			uint32("Status", base.DEC, Descs.GameStatus)
+			uint32("Status", nil, Descs.GameStatus)
 		},
 		otherwise = {
 			-- error in description?
@@ -2247,7 +2254,7 @@ SPacketDescription = {
 				uint32("Language ID", base.HEX, Descs.LocaleID), -- only on bnet - comment out for pvpgn
 				--sockaddr("Game Host"),
 				sockaddr(),
-				uint32("Status", base.DEC, Descs.GameStatus),
+				uint32("Status", nil, Descs.GameStatus),
 				uint32("Elapsed time"),
 				stringz("Game name"),
 				stringz("Game password"),
@@ -2554,7 +2561,7 @@ SPacketDescription = {
 ]]
 [SID_CHECKAD] = { -- 0x15
 	uint32("Ad ID", base.HEX),
-	stringz{label="File extension", length=4},
+	stringz{"File extension", length=4},
 	wintime("Local file time"),
 	stringz("Filename"),
 	stringz("Link URL"),
@@ -2656,7 +2663,7 @@ SPacketDescription = {
 
 ]]
 [SID_STARTADVEX3] = { -- 0x1C
-	uint32("Status", base.DEC, {
+	uint32("Status", nil, {
 		[0x00] ="Ok", 
 		[0x01] = "Failed",
 	}),
@@ -2736,13 +2743,10 @@ SPacketDescription = {
 	uint32{label="Number of accounts", key="numaccts"},
 	uint32{label="Number of keys", key="numkeys"},
 	uint32("Request ID"),
-	-- TODO: DONE
 	iterator{label="Requested Account", refkey="numaccts", repeated={
-		iterator{
-			refkey="numkeys",
-			repeated={stringz("Requested Key Value")},
-			label="Key Values",
-		},
+		iterator{label="Key Values", refkey="numkeys", repeated={
+			stringz("Requested Key Value"),
+		}},
 	}},
 },
 --[[doc
@@ -2786,7 +2790,7 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONRESPONSE] = { -- 0x29
-	uint32("Result", base.DEC, {
+	uint32("Result", nil, {
 		[0x00] = "Invalid password",
 		[0x01] = "Success",
 	}),
@@ -2815,7 +2819,7 @@ SPacketDescription = {
 
 ]]
 [SID_CREATEACCOUNT] = { -- 0x2A
-	uint32("Result", base.DEC, {
+	uint32("Result", nil, {
 		[0x00] = "Failed",
 		[0x01] = "Success",
 	}),
@@ -2910,7 +2914,7 @@ SPacketDescription = {
 [SID_GETLADDERDATA] = { -- 0x2E
 	uint32("Ladder type", base.HEX),
 	uint32("League", base.HEX),
-	uint32("Sort method", base.DEC, {
+	uint32("Sort method", nil, {
 		[0x00] = "Highest rating",
 		[0x01] = "Fastest climbers",
 		[0x02] = "Most wins on record",
@@ -2993,7 +2997,7 @@ SPacketDescription = {
 
 ]]
 [SID_CDKEY] = { -- 0x30
-	uint32("Result", base.DEC, {
+	uint32("Result", nil, {
 		[0x01] = "Ok",
 		[0x02] = "Invalid key",
 		[0x03] = "Bad product",
@@ -3020,7 +3024,7 @@ SPacketDescription = {
 
 ]]
 [SID_CHANGEPASSWORD] = { -- 0x31
-	uint32{label="Password change succeeded", desc=Descs.YesNo},
+	uint32("Password change succeeded", nil, Descs.YesNo),
 },
 --[[doc
     Message ID:      0x32
@@ -3050,7 +3054,7 @@ SPacketDescription = {
 
 ]]
 [SID_CHECKDATAFILE] = { -- 0x32
-	uint32("Status", base.DEC, {
+	uint32("Status", nil, {
 		[0x00] = "Rejected",
 		[0x01] = "Approved",
 		[0x02] = "Ladder approved",
@@ -3192,7 +3196,7 @@ SPacketDescription = {
 
 ]]
 [SID_CDKEY2] = { -- 0x36
-	uint32("Result", base.DEC, {
+	uint32("Result", nil, {
 		[0x01] = "Ok",
 		[0x02] = "Invalid key",
 		[0x03] = "Bad product",
@@ -3228,7 +3232,7 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONRESPONSE2] = { -- 0x3A
-	uint32{label="Result", display=base.DEC, desc={
+	uint32{"Result", nil, {
 		[0x00] = "Success",
 		[0x01] = "Account Does Not Exist",
 		[0x02] = "Invalid Password",
@@ -3263,7 +3267,7 @@ SPacketDescription = {
 
 ]]
 [SID_CHECKDATAFILE2] = { -- 0x3C
-	uint32("Result", base.DEC, {
+	uint32("Result", nil, {
 		[0x00] = "Not approved",
 		[0x01] = "Blizzard approved",
 		[0x02] = "Approved for ladder",
@@ -3299,7 +3303,7 @@ SPacketDescription = {
 
 ]]
 [SID_CREATEACCOUNT2] = { -- 0x3D
-	uint32("Status", base.DEC, {
+	uint32("Status", nil, {
 		[0x00] = "Account created",
 		[0x02] = "Name contained invalid characters",
 		[0x03] = "Name contained a banned word",
@@ -3579,7 +3583,7 @@ SPacketDescription = {
 	uint8{label="Subcommand ID", display=base.HEX, key="subcommand"},
 	oldwhen{condition=Cond.equals("subcommand", 0x4), block = {
 		uint32("Cookie", base.HEX),
-		stringz{label="Icon ID", length=4},
+		stringz{"Icon ID", length=4},
 		uint8{label="Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
 			strdw("Ladder type"),
@@ -3683,7 +3687,8 @@ SPacketDescription = {
 	iterator{label="News", refkey="news", repeated={
 		posixtime{label="Timestamp", key="stamp"},
 		oldwhen{
-			condition=function(self, state) return state.packet.stamp == 0 end,
+			-- condition=function(self, state) return state.packet.stamp == 0 end,
+			condition=Cond.equals("stamp", 0),
 			block = { stringz("MOTD") },
 			otherwise = {stringz("News")},
 		},},
@@ -3940,13 +3945,14 @@ SPacketDescription = {
 	}},
 	stringz("Additional Information"),
 	--[[
-	oldwhen{ -- TODO: Cond.in
+	when{ -- TODO: Cond.in
+		  -- TODO: elswhen
 		condition=function(self, state)
 			return (state.packet.res == 0x100) or (state.packet.res == 0x102)
 		end,
 		block = { stringz("MPQ Filename") },
 	},
-	oldwhen{
+	when{
 		condition=function(self, state)
 			return bit.band(state.packet.res, 0x201) == 0x201
 		end,
@@ -3992,7 +3998,7 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCREATE] = { -- 0x52
-	uint32("Status", base.DEC, {
+	uint32("Status", nil, {
 		[0x00] = "Successfully created account name",
 		[0x04] = "Name already exists",
 		[0x07] = "Name is too short/blank",
@@ -4112,7 +4118,7 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCHANGE] = { -- 0x55
-	uint32("Status", base.DEC, {
+	uint32("Status", nil, {
 		[0x00] = "Change accepted, requires proof",
 		[0x01] = "Account doesn't exist",
 		[0x05] = "Account requires upgrade",
@@ -4145,7 +4151,7 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTCHANGEPROOF] = { -- 0x56
-	uint32("Status code", base.DEC, {
+	uint32("Status code", nil, {
 		[0x00] = "Password changed",
 		[0x02] = "Incorrect old password",
 	}),
@@ -4177,7 +4183,7 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTUPGRADE] = { -- 0x57
-	uint32("Status", base.DEC, {
+	uint32("Status", nil, {
 		[0x00] = "Upgrade Request Accepted",
 		[0x01] = "Upgrade Request Denied",
 	}),
@@ -4209,7 +4215,7 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTUPGRADEPROOF] = { -- 0x58
-	uint32("Status", base.DEC, {
+	uint32("Status", nil, {
 		[0x00] = "Password changed",
 		[0x02] = "Incorrect old password",
 	}),
@@ -4452,7 +4458,7 @@ SPacketDescription = {
 			{sname="DND", mask=0x02, desc=Descs.YesNo},
 			{sname="Away", mask=0x04, desc=Descs.YesNo} 
 		}},
-		uint8("Location", base.DEC, {
+		uint8("Location", nil, {
 			[0x00] = "Offline",
 			[0x01] = "Not in chat",
 			[0x02] = "In chat",
@@ -4460,7 +4466,7 @@ SPacketDescription = {
 			[0x04] = "In a private game, and you are not that person's friend",
 			[0x05] = "In a private game, and you are that person's friend",
 		}),
-		strdw("ProductID", nil, Descs.ClientTag),
+		strdw("ProductID", Descs.ClientTag),
 		stringz("Location name"),
 	}},
 },
@@ -4505,7 +4511,7 @@ SPacketDescription = {
 		{sname="DND", mask=0x02, desc=Descs.YesNo},
 		{sname="Away", mask=0x04, desc=Descs.YesNo} 
 	}},
-	uint8("Location", base.DEC, {
+	uint8("Location", nil, {
 		[0x00] = "Offline",
 		[0x01] = "Not in chat",
 		[0x02] = "In chat",
@@ -4513,7 +4519,7 @@ SPacketDescription = {
 		[0x04] = "In a private game, and you are not that person's friend",
 		[0x05] = "In a private game, and you are that person's friend",
 	}),
-	strdw("ProductID", nil, Descs.ClientTag),
+	strdw("ProductID", Descs.ClientTag),
 	stringz("Location name"),
 },
 --[[doc
@@ -4558,7 +4564,7 @@ SPacketDescription = {
 ]]
 [SID_FRIENDSADD] = { -- 0x67
 	stringz("Account"),
-	uint8("Friend Type", base.DEC, {
+	uint8("Friend Type", nil, {
 		[0x00] = "Non-mutual",
 		[0x01] = "Mutual",
 		[0x02] = "Nonmutual, DND",
@@ -4566,13 +4572,13 @@ SPacketDescription = {
 		[0x04] = "Nonmutual, Away",
 		[0x05] = "Mutual, Away",
 	}),
-	uint8("Friend Status", base.DEC, {
+	uint8("Friend Status", nil, {
 		[0x00] = "Offline",
 		[0x02] = "In chat",
 		[0x03] = "In public game",
 		[0x05] = "In private game",
 	}),
-	strdw("ProductID", nil, Descs.ClientTag),
+	strdw("ProductID", Descs.ClientTag),
 	stringz("Location"),
 },
 --[[doc
@@ -4650,7 +4656,7 @@ SPacketDescription = {
 ]]
 [SID_CLANFINDCANDIDATES] = { -- 0x70
 	uint32("Cookie", base.HEX),
-	uint8("Status", base.DEC, {
+	uint8("Status", nil, {
 		[0x00] = "Successfully found candidate(s)",
 		[0x01] = "Clan tag already taken",
 		[0x08] = "Already in clan",
@@ -4691,14 +4697,15 @@ SPacketDescription = {
 ]]
 [SID_CLANINVITEMULTIPLE] = { -- 0x71
 	uint32("Cookie", base.HEX),
-	uint8("Result", base.DEC, {
+	uint8("Result", nil, {
 		[0x00] = "Everyone accepted",
 		[0x04] = "Declined",
 		[0x05] = "Not available",
 	}),
 	iterator{
 		alias="none",
-		condition = function(self, state) return state.packet.acc ~="" end,
+		-- condition = function(self, state) return state.packet.acc ~="" end,
+		condition = Cond.nequals("acc", ""),
 		repeated = {
 			stringz{label="Failed Account", key="acc"},
 		}
@@ -4775,15 +4782,26 @@ SPacketDescription = {
     Remarks:       Notifies the sending client of the success/failure of its request.
                    Status:
 
-                   0x00: Success 0x02: Can't change until clan is a week old 0x04:
-                   Declined 0x05: Failed 0x07: Not Authorized 0x08: Not Allowed
+                   0x00: Success 
+				   0x02: Can't change until clan is a week old 
+				   0x04: Declined 
+				   0x05: Failed 
+				   0x07: Not Authorized 
+				   0x08: Not Allowed
 
     Related:       [0x74] SID_CLANMAKECHIEFTAIN (C->S), Clan Message Codes
 
 ]]
 [SID_CLANMAKECHIEFTAIN] = { -- 0x74
 	uint32("Cookie"),
-	uint8("Status"),
+	uint8("Status", nil, {
+		[0x00] = "Success",
+		[0x02] = "Can't change until clan is a week old",
+		[0x04] = "Declined",
+		[0x05] = "Failed",
+		[0x07] = "Not Authorized",
+		[0x08] = "Not Allowed",
+	}),
 },
 --[[doc
     Message ID:    0x75
@@ -4804,8 +4822,10 @@ SPacketDescription = {
                    Possible values for Rank:
 
                    0x00: Initiate that has been in the clan for less than one week
-                   0x01: Initiate that has been in the clan for over one week 0x02:
-                   Member 0x03: Officer 0x04: Leader
+                   0x01: Initiate that has been in the clan for over one week 
+				   0x02: Member 
+				   0x03: Officer 
+				   0x04: Leader
 
     Related:       Clan Message Codes
 
@@ -4813,7 +4833,13 @@ SPacketDescription = {
 [SID_CLANINFO] = { -- 0x75
 	uint8("Unknown"),
 	uint32("Clan tag"),
-	uint8("Rank"),
+	uint8("Rank", nil, {
+		[0x00] = "Initiate that has been in the clan for less than one week",
+		[0x01] = "Initiate that has been in the clan for over one week",
+		[0x02] = "Member",
+		[0x03] = "Officer",
+		[0x04] = "Leader",
+	}),
 },
 --[[doc
     Message ID:    0x76
@@ -4852,15 +4878,22 @@ SPacketDescription = {
 
                    Result:
 
-                   0x00: Invitation accepted 0x04: Invitation declined 0x05: Failed
-                   to invite user 0x09: Clan is full
+                   0x00: Invitation accepted 
+				   0x04: Invitation declined 
+				   0x05: Failed to invite user 
+				   0x09: Clan is full
 
     Related:       [0x77] SID_CLANINVITATION (C->S)
 
 ]]
 [SID_CLANINVITATION] = { -- 0x77
 	uint32("Cookie"),
-	uint8("Result"),
+	uint8("Result", nil, {
+		[0x00] = "Invitation accepted",
+		[0x04] = "Invitation declined",
+		[0x05] = "Failed to invite user",
+		[0x09] = "Clan is full",
+	}),
 },
 --[[doc
     Message ID:    0x78
@@ -4878,15 +4911,24 @@ SPacketDescription = {
 
                    Status constants:
 
-                   0x00: Removed 0x01: Removal failed 0x02: Can not be removed yet
-                   0x07: Not authorized to remove 0x08: Not allowed to remove
+                   0x00: Removed 
+				   0x01: Removal failed 
+				   0x02: Can not be removed yet
+                   0x07: Not authorized to remove 
+				   0x08: Not allowed to remove
 
     Related:       [0x78] SID_CLANREMOVEMEMBER (C->S), Clan Message Codes
 
 ]]
 [SID_CLANREMOVEMEMBER] = { -- 0x78
 	uint32("Cookie"),
-	uint8("Status"),
+	uint8("Status", nil, {
+		[0x00] = "Removed",
+		[0x01] = "Removal failed",
+		[0x02] = "Can not be removed yet",
+		[0x07] = "Not authorized to remove",
+		[0x08] = "Not allowed to remove",
+	}),
 },
 --[[doc
     Message ID:    0x79
@@ -4929,9 +4971,11 @@ SPacketDescription = {
 
                    Result:
 
-                   0x00: Successfully changed rank 0x01: Failed to change rank
-                   0x02: Cannot change user's rank yet 0x07: Not authorized to
-                   change user rank * 0x08: Not allowed to change user rank **
+                   0x00: Successfully changed rank 
+				   0x01: Failed to change rank
+                   0x02: Cannot change user's rank yet 
+				   0x07: Not authorized to change user rank * 
+				   0x08: Not allowed to change user rank **
 
                    * This will be received when you are not a shaman/chieftain and you're
                    trying to change the rank of another user.
@@ -4944,7 +4988,13 @@ SPacketDescription = {
 ]]
 [SID_CLANRANKCHANGE] = { -- 0x7A
 	uint32("Cookie"),
-	uint8("Status"),
+	uint8("Status", nil, {
+		[0x00] = "Successfully changed rank",
+		[0x01] = "Failed to change rank",
+		[0x02] = "Cannot change user's rank yet",
+		[0x07] = "Not authorized to change user rank",
+		[0x08] = "Not allowed to change user rank",
+	}),
 },
 --[[doc
     Message ID:    0x7C
@@ -4989,13 +5039,16 @@ SPacketDescription = {
 
                    Online Status:
 
-                   0x00: Offline 0x01: Online
+                   0x00: Offline 
+				   0x01: Online
 
                    Rank:
 
                    0x00: Initiate that has been in the clan for less than one week
-                   0x01: Initiate that has been in the clan for over one week 0x02:
-                   Member 0x03: Officer 0x04: Leader
+                   0x01: Initiate that has been in the clan for over one week 
+				   0x02: Member 
+				   0x03: Officer 
+				   0x04: Leader
 
                    Location:
 
@@ -5009,8 +5062,17 @@ SPacketDescription = {
 	uint32("Cookie"),
 	uint8("Number of Members"),
 	stringz("Username"),
-	uint8("Rank"),
-	uint8("Online Status"),
+	uint8("Rank", nil, {
+		[0x00] = "Initiate that has been in the clan for less than one week",
+		[0x01] = "Initiate that has been in the clan for over one week",
+		[0x02] = "Member",
+		[0x03] = "Officer",
+		[0x04] = "Leader",
+	}),
+	uint8("Online Status", nil, {
+		[0x00] = "Offline",
+		[0x01] = "Online",
+	}),
 	stringz("Location"),
 },
 --[[doc
@@ -5055,8 +5117,10 @@ SPacketDescription = {
                    Rank:
 
                    0x00: Initiate that has been in the clan for less than one week
-                   0x01: Initiate that has been in the clan for over one week 0x02:
-                   Member 0x03: Officer 0x04: Leader
+                   0x01: Initiate that has been in the clan for over one week 
+				   0x02: Member 
+				   0x03: Officer 
+				   0x04: Leader
 
                    Status:
 
@@ -5072,14 +5136,14 @@ SPacketDescription = {
 ]]
 [SID_CLANMEMBERSTATUSCHANGE] = { -- 0x7F
 	stringz("Username"),
-	uint8("Rank", base.DEC, {
+	uint8("Rank", nil, {
 		[0x00] = "Initiate that has been in the clan for less than one week",
 		[0x01] = "Initiate that has been in the clan for over one week",
 		[0x02] = "Member",
 		[0x03] = "Officer",
 		[0x04] = "Leader",
 	}),
-	uint8("Status", base.DEC, {
+	uint8("Status", nil, {
 		[0x00] = "Offline",
 		[0x01] = "Online (not in either channel or game)",
 		[0x02] = "In a channel",
@@ -5110,8 +5174,20 @@ SPacketDescription = {
 
 ]]
 [SID_CLANMEMBERRANKCHANGE] = { -- 0x81
-	uint8("Old rank"),
-	uint8("New rank"),
+	uint8("Old rank", nil, {
+		[0x00] = "Initiate that has been in the clan for less than one week",
+		[0x01] = "Initiate that has been in the clan for over one week",
+		[0x02] = "Member",
+		[0x03] = "Officer",
+		[0x04] = "Leader",
+	}),
+	uint8("New rank", nil, {
+		[0x00] = "Initiate that has been in the clan for less than one week",
+		[0x01] = "Initiate that has been in the clan for over one week",
+		[0x02] = "Member",
+		[0x03] = "Officer",
+		[0x04] = "Leader",
+	}),
 	stringz("Clan member who changed your rank"),
 },
 --[[doc
@@ -5148,3 +5224,4 @@ SPacketDescription = {
 	wintime("Date joined"),
 },
 }
+-- End spackets.lua

@@ -1,3 +1,4 @@
+-- Begin valuemaps.lua
 -- Common value descriptions
 local Descs = {
 	-- Boolean values
@@ -21,7 +22,9 @@ local Descs = {
 	},
 	
 	PlatformID = {
-		["IX86"] = "Intel x86",
+		["IX86"] = "Windows (Intel x86)",
+		["PMAC"] = "Macintosh",
+		["XMAC"] = "Macintosh OS X",
 	},
 
 	GameStatus = {
@@ -270,3 +273,4 @@ Cond = {
 		end
 	end,
 }
+-- End valuemaps.lua
