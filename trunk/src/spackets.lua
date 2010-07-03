@@ -2123,75 +2123,63 @@ SPacketDescription = {
 				-- uint16("Parameter", base.HEX),
 				-- [[ source:unverified
 				when{ 
-				{Cond.inlist("gametype", {2, 3, 4, 5, 8}), -- melee / ffa / 1 on 1 / CTF / suddenDeath
-					{
-						uint16("Penalty", nil, {
-							[1] = "Melee Disc",
-							[2] = "Loss",
-						})
-					}
-				},
-				{Cond.equals("gametype", 6), -- Greed
-					{
-						uint16("Resources", nil, {
-							[1] = 2500,
-							[2] = 5000,
-							[3] = 7500,
-							[4] = 10000,
-						})
-					}
-				},
-				{Cond.equals("gametype", 7), -- Slaughter
-					{
-						uint16("Minutes", nil, {
-							[1] = 15,
-							[2] = 30,
-							[3] = 45,
-							[4] = 60,
-							-- ["default"] = "Unlimited",
-						})
-					},
-				},
-				{Cond.equals("gametype", 9), -- Ladder
-					{
-						uint16("Penalty", nil, {
-							[1] = "Ladder Disc",
-							[2] = "Ladder Loss + Disc",
-						})
-					},
-				},
-				{Cond.equals("gametype", 0xA), -- UMS
-					{
-						uint16("Penalty", nil, {
-							[1] = "Draw",
-							[2] = "Draw",
-						})
-					},
-				},
-				{Cond.inlist("gametype", {0xB,0xC,0xD}), -- Team melee / team FFA / team CTF
-					{
-						uint16("Teams", nil, {
-							[1] = 2,
-							[2] = 3,
-							[3] = 4,
-						})
-					},
-				},
-				{Cond.equals("gametype", 0xF), -- Top vs Bottom
-					{
-						uint16("Teams", nil, { -- TODO: x vs the rest?
-							[1] = "1 vs 7",
-							[2] = "2 vs 6",
-							[3] = "3 vs 5",
-							[4] = "4 vs 4",
-							[5] = "5 vs 3",
-							[6] = "6 vs 2",
-							[7] = "7 vs 1",
-						})
-					},
-				},
+				{Cond.inlist("gametype", {2, 3, 4, 5, 8}), { -- melee / ffa / 1 on 1 / CTF / suddenDeath
+					uint16("Penalty", nil, {
+						[1] = "Melee Disc",
+						[2] = "Loss",
+					})
+				}},
+				{Cond.equals("gametype", 6), { -- Greed
+					uint16("Resources", nil, {
+						[1] = 2500,
+						[2] = 5000,
+						[3] = 7500,
+						[4] = 10000,
+					})
+				}},
+				{Cond.equals("gametype", 7), { -- Slaughter
+					uint16("Minutes", nil, {
+						[1] = 15,
+						[2] = 30,
+						[3] = 45,
+						[4] = 60,
+						-- ["default"] = "Unlimited",
+					})
+				}},
+				{Cond.equals("gametype", 9), { -- Ladder
+					uint16("Penalty", nil, {
+						[1] = "Ladder Disc",
+						[2] = "Ladder Loss + Disc",
+					})
+				}},
+				{Cond.equals("gametype", 0xA), { -- UMS
+					uint16("Penalty", nil, {
+						[1] = "Draw",
+						[2] = "Draw",
+					})
+				}},
+				{Cond.inlist("gametype", {0xB,0xC,0xD}), { -- Team melee / team FFA / team CTF
+					uint16("Teams", nil, {
+						[1] = 2,
+						[2] = 3,
+						[3] = 4,
+					})
+				}},
+				{Cond.equals("gametype", 0xF), { -- Top vs Bottom
+					uint16("Teams", nil, { -- TODO: x vs the rest?
+						[1] = "1 vs 7",
+						[2] = "2 vs 6",
+						[3] = "3 vs 5",
+						[4] = "4 vs 4",
+						[5] = "5 vs 3",
+						[6] = "6 vs 2",
+						[7] = "7 vs 1",
+					})
+				}},
 				-- default block
-				{Cond.always(), { uint16("Parameter", base.HEX) }}
+				{Cond.always(), { 
+					uint16("Parameter", base.HEX) 
+				}}
 				},
 			--]]
 				--[[doc
@@ -2317,9 +2305,10 @@ SPacketDescription = {
 [SID_GETCHANNELLIST] = { -- 0x0B
 	iterator{
 		alias="none",
-		condition = function(self, state) return state.packet.chan ~="" end,
+		--condition = function(self, state) return state.packet.chan ~="" end,
+		condition = Cond.nequals("chan", ""),
 		repeated = {
-			stringz{label="Channel name", key="chan"},
+			stringz{"Channel name", key="chan"},
 		}
 	}
 },
@@ -2484,7 +2473,7 @@ SPacketDescription = {
 
 ]]
 [SID_CHATEVENT] = { -- 0x0F
-	uint32{label="Event ID", key="eid", base.DEX, desc={ -- TODO: hash name for base?
+	uint32{"Event ID", key="eid", nil, { -- TODO: hash name for base?
 		[0x01] = "EID_SHOWUSER: User in channel",
 		[0x02] = "EID_JOIN: User joined channel",
 		[0x03] = "EID_LEAVE: User left channel",
@@ -2740,8 +2729,8 @@ SPacketDescription = {
 
 ]]
 [SID_READUSERDATA] = { -- 0x26
-	uint32{label="Number of accounts", key="numaccts"},
-	uint32{label="Number of keys", key="numkeys"},
+	uint32{"Number of accounts", key="numaccts"},
+	uint32{"Number of keys", key="numkeys"},
 	uint32("Request ID"),
 	iterator{label="Requested Account", refkey="numaccts", repeated={
 		iterator{label="Key Values", refkey="numkeys", repeated={
@@ -2921,7 +2910,7 @@ SPacketDescription = {
 		[0x03] = "Most games played",
 	}),
 	uint32("Starting rank", base.HEX),
-	uint32{label="Number of ranks listed", key="ranks"},
+	uint32{"Number of ranks listed", key="ranks"},
 	iterator{label="Rank", refkey="ranks", repeated={
 		uint32("Wins"),
 		uint32("Losses"),
@@ -3121,7 +3110,7 @@ SPacketDescription = {
 ]]
 [SID_QUERYREALMS] = { -- 0x34
 	uint32("Unknown", base.HEX),
-	uint32{label="Count", key="realms"},
+	uint32{"Count", key="realms"},
 	iterator{label="Realm", refkey="realms", repeated={
 		uint32("Unknown", base.HEX),
 		stringz("Realm title"),
@@ -3155,7 +3144,7 @@ SPacketDescription = {
 ]]
 [SID_PROFILE] = { -- 0x35
 	uint32("Cookie", base.HEX),
-	uint8{label="Success", key="status"},
+	uint8{"Success", key="status"},
 	oldwhen{condition=Cond.equals("status", 0), block={
 		stringz("Profile\\Description value"),
 		stringz("Profile\\Location value"),
@@ -3353,12 +3342,12 @@ SPacketDescription = {
 ]]
 [SID_LOGONREALMEX] = { -- 0x3E
 	uint32("MCP Cookie", base.HEX),
-	uint32{label="MCP Status", key="status"},
+	uint32{"MCP Status", key="status"},
 	oldwhen{condition=Cond.equals("status", 0), block={
 		array("MCP Chunk 1", uint32, 2),
 		ipv4("IP"),
-		uint16{label="Port", big_endian=true},
-		bytes{label="Padding", length=2},
+		uint16{"Port", big_endian=true},
+		array("Padding", uint8, 2),
 		array("MCP Chunk 2", uint32, 12),
 		stringz("Battle.net unique name"),
 	}},
@@ -3420,7 +3409,7 @@ SPacketDescription = {
 ]]
 [SID_QUERYREALMS2] = { -- 0x40
 	uint32("Unknown", base.HEX),
-	uint32{label="Count", key="realms"},
+	uint32{"Count", key="realms"},
 	iterator{label="Realm", refkey="realms", repeated={
 		uint32("Unknown", base.HEX),
 		stringz("Realm title"),
@@ -3578,13 +3567,205 @@ SPacketDescription = {
 
     Related:         [0x44] SID_WARCRAFTGENERAL (C->S)
 
+	
+	SID_WARCRAFTGENERAL
+
+WID_GAMESEARCH 0x00 SEND
+	(DWORD)	Cookie
+	(DWORD)	Unknown
+	(BYTE) 	Unknown
+	(BYTE)	Type
+		0x00: 1vs1
+		0x01: 2vs2
+		0x02: 3vs3
+		0x03: 4vs4
+		0x04: Free for All
+	(WORD) Enabled Maps (every bit is one map, from 0x0000 to 0x0FFF)
+	(WORD) Unknown
+	(BYTE) Unknown
+	(DWORD) TickCount
+	(DWORD) Race
+		0x00000001: Human
+		0x00000002: Orc
+		0x00000004: Night Elf
+		0x00000008: Undead
+		0x00000020: Random
+
+WID_GAMESEARCH 0x00 RECV
+	(DWORD) Cookie
+	(BYTE) Status
+		0x00: Search Started
+		0x04: Banned CD Key
+
+WID_MAPLIST 0x02 SEND
+	(DWORD) Cookie
+	(BYTE) Requests
+	(DWORD) ID
+	(DWORD) Checksum
+
+WID_MAPLIST 0x02 RECV
+	(DWORD) Cookie
+	(Byte) Responses
+	(DWORD) ID
+	(DWORD) Checksum
+	(WORD) Decompressed Len
+	(WORD) Compressed Len
+	(VOID) Compressed Data
+	(BYTE) Remaining Packets
+
+WID_CANCELSEARCH 0x03 SEND
+	-Empty
+
+WID_CANCELSEARCH 0x03 RECV
+	(DWORD) Cookie from WID_GAMESEARCH
+
+WID_USERRECORD 0x04 SEND
+	(DWORD) Cookie
+	(STRING) Account
+	(DWORD) Product
+
+WID_USERRECORD 0x04 RECV
+	(DWORD) Cookie
+	(DWORD) Icon ID
+	(BYTE) Ladder Records
+	(DWORD) Ladder Type
+	(WORD) Wins
+	(WORD) Losses
+	(BYTE) Level
+	(BYTE) Unknown
+	(WORD) Experience
+	(DWORD) Rank
+	(BYTE) Race Records
+	(WORD) Wins
+	(WORD) Losses
+	(BYTE) Team Records
+	(DWORD) Ladder Type
+	(WORD) Wins
+	(WORD) Losses
+	(BYTE) Level
+	(BYTE) Unknown
+	(WORD) Experience
+	(DWORD) Rank
+	(FILETIME) Last Game
+	(BYTE) Partners
+	 (STRING) Partner Account
+
+WID_TOURNAMENT 0x07 SEND
+	(DWORD) Cookie
+
+WID_TOURNAMENT 0x07 RECV
+	(DWORD) Cookie
+	(BYTE) Status
+		0x00 No Tournament
+		0x01 Starting Soon
+		0x02 Ending Soon
+		0x03 Started
+		0x04 Last Call
+	(FILETIME) Time of Status
+	(WORD) Unknown
+	(WORD) Unknown
+	(BYTE) Wins
+	(BYTE) Losses
+	(BYTE) Draws
+	(BYTE) Unknown
+	(BYTE) Unknown
+	(BYTE) Unknown
+	(BYTE) Unknown
+
+WID_CLANRECORD 0x08 SEND
+	(DWORD) Cookie
+	(DWORD) Clan Tag
+	(DWORD) Product
+
+WID_CLANRECORD 0x08 RECV
+	(DWORD) Cookie
+	(BYTE) Ladder Records
+	(DWORD) Ladder Type
+	(WORD) Wins
+	(WORD) Losses
+	(BYTE) Level
+	(BYTE) Unknown
+	(WORD) Experience
+	(DWORD) Rank
+	(BYTE) Race Records
+	(WORD) Wins
+	(WORD) Losses
+
+WID_ICONLIST 0x09 SEND
+	(DWORD) Cookie
+
+WID_ICONLIST 0x09 RECV
+	(DWORD) Cookie
+	(DWORD) Unknown
+	(BYTE) Tiers
+	(BYTE) Icons
+	(DWORD) Icon
+	(DWORD) Name
+	(BYTE) Race
+	(WORD) Required Wins
+	(BYTE) Unknown
+
+WID_SETICON 0x0A SEND
+	(DWORD) Icon 
 ]]
 [SID_WARCRAFTGENERAL] = { -- 0x44
-	uint8{label="Subcommand ID", display=base.HEX, key="subcommand"},
-	oldwhen{condition=Cond.equals("subcommand", 0x4), block = {
-		uint32("Cookie", base.HEX),
+	uint8{"Subcommand ID", key="subcommand", nil, Descs.WarcraftGeneralSubcommandId},
+	--[[doc
+		WID_MAPLIST 0x02 RECV
+			(DWORD) Cookie
+			(Byte) Responses
+			(DWORD) ID
+			(DWORD) Checksum
+			(WORD) Decompressed Len
+			(WORD) Compressed Len
+			(VOID) Compressed Data
+			(BYTE) Remaining Packets
+	]]
+	-- Subcommand ID 2: Request ladder map listing
+	oldwhen{condition=Cond.equals("subcommand", 2), block = {
+		uint32("Cookie"),
+		uint8("Responses"),
+		strdw("ID", Descs.WarcraftGeneralRequestType),
+		uint32("Checksum", base.HEX),
+		uint16("Decompressed Len"),
+		uint16("Compressed Len"),
+		-- TODO: length as refkey
+		-- array("Compressed Data", uint8,
+		uint8("Remaining Packets"),
+	}},
+	
+	--[[doc
+	WID_USERRECORD 0x04 RECV
+		(DWORD) Cookie
+		(DWORD) Icon ID
+		(BYTE) Ladder Records
+		(DWORD) Ladder Type
+		(WORD) Wins
+		(WORD) Losses
+		(BYTE) Level
+		(BYTE) Unknown
+		(WORD) Experience
+		(DWORD) Rank
+		(BYTE) Race Records
+		(WORD) Wins
+		(WORD) Losses
+		(BYTE) Team Records
+		(DWORD) Ladder Type
+		(WORD) Wins
+		(WORD) Losses
+		(BYTE) Level
+		(BYTE) Unknown
+		(WORD) Experience
+		(DWORD) Rank
+		(FILETIME) Last Game
+		(BYTE) Partners
+		(STRING) Partner Account
+	]]
+	-- Subcommand ID 4: User stats request
+	oldwhen{condition=Cond.equals("subcommand", 4), block = {
+		uint32("Cookie"),
 		stringz{"Icon ID", length=4},
-		uint8{label="Number of ladder records", key="ladders"},
+		uint8{"Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
 			strdw("Ladder type"),
 			uint16("Number of wins"),
@@ -3594,12 +3775,12 @@ SPacketDescription = {
 			uint16("Experience"),
 			uint32("Rank"),
 		}},
-		uint8{label="Number of race records", key="races"},
+		uint8{"Number of race records", key="races"},
 		iterator{label="Race Record", refkey="races", repeated={
 			uint16("Wins"),
 			uint16("Losses"),
 		}},
-		uint8{label="Number of team records", key="teams"},
+		uint8{"Number of team records", key="teams"},
 		iterator{label="Team Record", refkey="teams", repeated={
 			strdw("Type of team"),
 			uint16("Number of wins"),
@@ -3609,15 +3790,59 @@ SPacketDescription = {
 			uint16("Experience"),
 			uint32("Rank"),
 			wintime("Time of last game played"),
-			uint8{label="Number of partners", key="partners"},
+			uint8{"Number of partners", key="partners"},
 			iterator{label="Partners", refkey="partners", repeated={
 				stringz("Names of partners"),
 			}},
 		}},
 	}},
-	oldwhen{condition=Cond.equals("subcommand", 0x8), block={
-		uint32("Cookie", base.HEX),
-		uint8{label="Number of ladder records", key="ladders"},
+	
+	--[[doc
+	WID_TOURNAMENT 0x07 RECV
+		(DWORD) Cookie
+		(BYTE) Status
+			0x00 No Tournament
+			0x01 Starting Soon
+			0x02 Ending Soon
+			0x03 Started
+			0x04 Last Call
+		(FILETIME) Time of Status
+		(WORD) Unknown
+		(WORD) Unknown
+		(BYTE) Wins
+		(BYTE) Losses
+		(BYTE) Draws
+		(BYTE) Unknown
+		(BYTE) Unknown
+		(BYTE) Unknown
+		(BYTE) Unknown
+	]]
+	-- Subcommand ID 7: WID_TOURNAMENT
+	oldwhen{ condition=Cond.equals("subcommand", 7), block = {  
+		uint32("Cookie"),
+		uint8("Status", nil, {
+			[0x00] = "No Tournament",
+			[0x01] = "Starting Soon",
+			[0x02] = "Ending Soon",
+			[0x03] = "Started",
+			[0x04] = "Last Call",
+		}),
+		wintime("Time of Status"),
+		uint16("Unknown"),
+		uint16("Unknown"),
+		uint8("Wins"),
+		uint8("Losses"),
+		uint8("Draws"),
+		uint8("Unknown"),
+		uint8("Unknown"),
+		uint8("Unknown"),
+		uint8("Unknown"),
+	}},
+	
+	-- Subcommand ID 8: Clan stats request
+	oldwhen{condition=Cond.equals("subcommand", 8), block={
+		uint32("Cookie"),
+		uint8{"Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
 			strdw("Ladder type"),
 			uint16("Number of wins"),
@@ -3627,19 +3852,21 @@ SPacketDescription = {
 			uint16("Experience"),
 			uint32("Rank"),
 		}},
-		uint8{label="Number of race records", key="races"},
+		uint8{"Number of race records", key="races"},
 		iterator{label="Race Record", refkey="races", repeated={
 			uint16("Wins"),
 			uint16("Losses"),
 		}},
 	}},
+	
+	-- Subcommand ID 9: Icon list request
 	oldwhen{condition=Cond.equals("subcommand", 0x9), block={
-		uint32("Cookie", base.HEX),
+		uint32("Cookie"),
 		uint32("Unknown", base.HEX),
 		uint8("Tiers"),
-		uint8{label="Count (Number of Icons?)", key="icons"},
+		uint8{"Number of Icons", key="icons"},
 		iterator{label="Icon", refkey="icons", repeated={
-			uint32("Icon", base.HEX),
+			strdw("Icon", Descs.W3Icon),
 			uint32("Name", base.HEX),
 			uint8("Race", base.HEX),
 			uint16("Wins required"),
@@ -3680,12 +3907,12 @@ SPacketDescription = {
 
 ]]
 [SID_NEWS_INFO] = { -- 0x46
-	uint8{label="Number of entries", key="news" },
+	uint8{"Number of entries", key="news" },
 	posixtime("Last logon timestamp"),
 	posixtime("Oldest news timestamp"),
 	posixtime("Newest news timestamp"),
 	iterator{label="News", refkey="news", repeated={
-		posixtime{label="Timestamp", key="stamp"},
+		posixtime{"Timestamp", key="stamp"},
 		oldwhen{
 			-- condition=function(self, state) return state.packet.stamp == 0 end,
 			condition=Cond.equals("stamp", 0),
@@ -3859,7 +4086,7 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_INFO] = { -- 0x50
-	uint32{label="Logon Type", key="logontype", desc={
+	uint32{"Logon Type", key="logontype", nil, {
 		[0x00] = "Broken SHA-1 (STAR/SEXP/D2DV/D2XP)",
 		[0x01] = "NLS Version 1",
 		[0x02] = "NLS Version 2 (WAR3/W3XP)",
@@ -3869,9 +4096,9 @@ SPacketDescription = {
 	wintime("MPQ filetime"),
 	stringz("IX86ver filename"),
 	stringz("ValueString"),
-	oldwhen{ condition = Cond.equals("logontype", 2),
-		block = { bytes{label="Server signature", length=128}},
-	},
+	oldwhen{ condition = Cond.equals("logontype", 2), block = {
+		 array("Server signature", uint8, 128),
+	}},
 },
 --[[doc
     Message ID:    0x51
@@ -3924,8 +4151,8 @@ SPacketDescription = {
     Related:       [0x51] SID_AUTH_CHECK (C->S)
 
 ]]
-[SID_AUTH_CHECK] = { -- 0x51
-	uint32{label="Result", key="res", display = base.HEX, desc={
+[SID_AUTH_CHECK] = { -- 0xff51
+	uint32{"Result", key="res", base.HEX, {
 		[0x000] = "Passed challenge",
 		[0x100] = "Old game version",
 		[0x101] = "Invalid version",
@@ -3943,22 +4170,18 @@ SPacketDescription = {
 		[0x212] = "Banned second key",
 		[0x213] = "Wrong product for second CD key",
 	}},
-	stringz("Additional Information"),
-	--[[
-	when{ -- TODO: Cond.in
-		  -- TODO: elswhen
-		condition=function(self, state)
-			return (state.packet.res == 0x100) or (state.packet.res == 0x102)
-		end,
-		block = { stringz("MPQ Filename") },
+	
+	when{ 
+		{Cond.inlist("res", {0x100, 0x102}), {
+			stringz("MPQ Filename"),
+		}},
+		{Cond.inlist("res", {0x201, 0x211}), {
+			stringz("Username"),
+		}},
+		{Cond.always(), {
+			stringz("Additional Information"),
+		}},
 	},
-	when{
-		condition=function(self, state)
-			return bit.band(state.packet.res, 0x201) == 0x201
-		end,
-		block = { stringz("Username") },
-	},
-	]]
 },
 --[[doc
     Message ID:    0x52
@@ -4039,7 +4262,7 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTLOGON] = { -- 0x53
-	uint32("Status", base.HEX, {
+	uint32("Status", nil, {
 		[0x00] = "Logon accepted, requires proof",
 		[0x01] = "Account doesn't exist",
 		[0x05] = "Account requires upgrade",
@@ -4062,12 +4285,12 @@ SPacketDescription = {
 
     Remarks:       Status
 
-                   0x00: Logon successful.0x02: Incorrect password.
-
+                   0x00: Logon successful.
+				   0x02: Incorrect password.
                    0x0E: An email address should be registered for this account.
-
                    0x0F: Custom error. A string at the end of this message contains
                    the error.
+				   
                    This message confirms the validity of the client password proof and
                    supplies the server password proof. See [NLS/SRP Protocol] for more
                    information.
@@ -4076,16 +4299,14 @@ SPacketDescription = {
 
 ]]
 [SID_AUTH_ACCOUNTLOGONPROOF] = { -- 0x54
-	uint32{label="Status", display=base.DEC, desc={
+	uint32{"Status", key="status", nil, {
 		[0x00] = "Logon successful",
 		[0x02] = "Incorrect password",
 		[0x0E] = "An email address should be registered for this account",
 		[0x0F] = "Custom error. A string at the end of this message contains the error",
-	}, key="status"},
-	array("Server Password Proof", uint8, 20),
-	oldwhen{condition=Cond.equals("status", 0x0F), block={
-		stringz("Additional information")
 	}},
+	array("Server Password Proof", uint8, 20),
+	stringz("Additional information"),
 },
 --[[doc
     Message ID:    0x55
@@ -4386,7 +4607,7 @@ SPacketDescription = {
 
 ]]
 [SID_GAMEPLAYERSEARCH] = { -- 0x60
-	uint8{label="Number of players", key="players"},
+	uint8{"Number of players", key="players"},
 	iterator{alias="none", refkey="players", repeated={
 		stringz("Player name"),
 	}},
@@ -4450,7 +4671,7 @@ SPacketDescription = {
 
 ]]
 [SID_FRIENDSLIST] = { -- 0x65
-	uint8{label="Number of Entries", key="friends"},
+	uint8{"Number of Entries", key="friends"},
 	iterator{label="Friend", refkey="friends", repeated={
 		stringz("Account"),
 		flags{of=uint8, label="Status", fields={
@@ -4458,14 +4679,7 @@ SPacketDescription = {
 			{sname="DND", mask=0x02, desc=Descs.YesNo},
 			{sname="Away", mask=0x04, desc=Descs.YesNo} 
 		}},
-		uint8("Location", nil, {
-			[0x00] = "Offline",
-			[0x01] = "Not in chat",
-			[0x02] = "In chat",
-			[0x03] = "In a public game",
-			[0x04] = "In a private game, and you are not that person's friend",
-			[0x05] = "In a private game, and you are that person's friend",
-		}),
+		uint8("Location", nil, Descs.OnlineStatus),
 		strdw("ProductID", Descs.ClientTag),
 		stringz("Location name"),
 	}},
@@ -4511,14 +4725,7 @@ SPacketDescription = {
 		{sname="DND", mask=0x02, desc=Descs.YesNo},
 		{sname="Away", mask=0x04, desc=Descs.YesNo} 
 	}},
-	uint8("Location", nil, {
-		[0x00] = "Offline",
-		[0x01] = "Not in chat",
-		[0x02] = "In chat",
-		[0x03] = "In a public game",
-		[0x04] = "In a private game, and you are not that person's friend",
-		[0x05] = "In a private game, and you are that person's friend",
-	}),
+	uint8("Location", nil, Descs.OnlineStatus),
 	strdw("ProductID", Descs.ClientTag),
 	stringz("Location name"),
 },
@@ -4655,14 +4862,14 @@ SPacketDescription = {
 
 ]]
 [SID_CLANFINDCANDIDATES] = { -- 0x70
-	uint32("Cookie", base.HEX),
+	uint32("Cookie"),
 	uint8("Status", nil, {
 		[0x00] = "Successfully found candidate(s)",
 		[0x01] = "Clan tag already taken",
 		[0x08] = "Already in clan",
 		[0x0a] = "Invalid clan tag specified",
 	}),
-	uint8{label="Number of potential candidates", key="names"},
+	uint8{"Number of potential candidates", key="names"},
 	iterator{alias="none", refkey="names", repeted={
 		stringz("Username"),
 	}},
@@ -4696,20 +4903,16 @@ SPacketDescription = {
 
 ]]
 [SID_CLANINVITEMULTIPLE] = { -- 0x71
-	uint32("Cookie", base.HEX),
+	uint32("Cookie"),
 	uint8("Result", nil, {
 		[0x00] = "Everyone accepted",
 		[0x04] = "Declined",
 		[0x05] = "Not available",
 	}),
-	iterator{
-		alias="none",
-		-- condition = function(self, state) return state.packet.acc ~="" end,
-		condition = Cond.nequals("acc", ""),
-		repeated = {
-			stringz{label="Failed Account", key="acc"},
-		}
-	}
+	-- condition = function(self, state) return state.packet.acc ~="" end,
+	iterator{alias="none", condition = Cond.nequals("acc", ""), repeated = {
+		stringz{"Failed Account", key="acc"},
+	}}
 },
 --[[doc
     Message ID:    0x72
@@ -4734,11 +4937,11 @@ SPacketDescription = {
 
 ]]
 [SID_CLANCREATIONINVITATION] = { -- 0x72
-	uint32("Cookie", base.HEX),
+	uint32("Cookie"),
 	uint32("Clan Tag"),
 	stringz("Clan Name"),
 	stringz("Inviter's username"),
-	uint8{label="Number of users being invited", key="users"},
+	uint8{"Number of users being invited", key="users"},
 	iterator{refkey="users", label="Invited users", repeated={
 		stringz("Name"),
 	}},
@@ -4833,13 +5036,7 @@ SPacketDescription = {
 [SID_CLANINFO] = { -- 0x75
 	uint8("Unknown"),
 	uint32("Clan tag"),
-	uint8("Rank", nil, {
-		[0x00] = "Initiate that has been in the clan for less than one week",
-		[0x01] = "Initiate that has been in the clan for over one week",
-		[0x02] = "Member",
-		[0x03] = "Officer",
-		[0x04] = "Leader",
-	}),
+	uint8("Rank", nil, Descs.ClanRank),
 },
 --[[doc
     Message ID:    0x76
@@ -5062,13 +5259,7 @@ SPacketDescription = {
 	uint32("Cookie"),
 	uint8("Number of Members"),
 	stringz("Username"),
-	uint8("Rank", nil, {
-		[0x00] = "Initiate that has been in the clan for less than one week",
-		[0x01] = "Initiate that has been in the clan for over one week",
-		[0x02] = "Member",
-		[0x03] = "Officer",
-		[0x04] = "Leader",
-	}),
+	uint8("Rank", nil, Descs.ClanRank),
 	uint8("Online Status", nil, {
 		[0x00] = "Offline",
 		[0x01] = "Online",
@@ -5136,19 +5327,13 @@ SPacketDescription = {
 ]]
 [SID_CLANMEMBERSTATUSCHANGE] = { -- 0x7F
 	stringz("Username"),
-	uint8("Rank", nil, {
-		[0x00] = "Initiate that has been in the clan for less than one week",
-		[0x01] = "Initiate that has been in the clan for over one week",
-		[0x02] = "Member",
-		[0x03] = "Officer",
-		[0x04] = "Leader",
-	}),
+	uint8("Rank", nil, Descs.ClanRank),
 	uint8("Status", nil, {
 		[0x00] = "Offline",
 		[0x01] = "Online (not in either channel or game)",
 		[0x02] = "In a channel",
 		[0x03] = "In a public game",
-		[0x05] = "In a private game)",
+		[0x05] = "In a private game",
 	}),
 	stringz("Location"),
 },
@@ -5174,20 +5359,8 @@ SPacketDescription = {
 
 ]]
 [SID_CLANMEMBERRANKCHANGE] = { -- 0x81
-	uint8("Old rank", nil, {
-		[0x00] = "Initiate that has been in the clan for less than one week",
-		[0x01] = "Initiate that has been in the clan for over one week",
-		[0x02] = "Member",
-		[0x03] = "Officer",
-		[0x04] = "Leader",
-	}),
-	uint8("New rank", nil, {
-		[0x00] = "Initiate that has been in the clan for less than one week",
-		[0x01] = "Initiate that has been in the clan for over one week",
-		[0x02] = "Member",
-		[0x03] = "Officer",
-		[0x04] = "Leader",
-	}),
+	uint8("Old rank", nil, Descs.ClanRank),
+	uint8("New rank", nil, Descs.ClanRank),
 	stringz("Clan member who changed your rank"),
 },
 --[[doc
