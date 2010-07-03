@@ -1,3 +1,4 @@
+-- Begin cpackets.lua
 -- Packets from client to server
 CPacketDescription = {
 --[[doc
@@ -1346,10 +1347,10 @@ CPacketDescription = {
 
 ]]
 [D2GS_OVERHEADMESSAGE] = { -- 0x14
-	uint16("Unknown - 0x00, 0x00"),
+	uint16("Unknown (0)"),
 	stringz("Message"),
-	uint8("Unused - 0x00"),
-	uint16("Unknown - 0x00, 0x00"),
+	uint8("Unused (0)"),
+	uint16("Unknown (0)"),
 },
 --[[doc
     Message ID:    0x15
@@ -3444,7 +3445,7 @@ CPacketDescription = {
 
 ]]
 [SID_STARTADVEX] = { -- 0x08
-	uint32{"Password protected", nil, Descs.YesNo},
+	uint32("Password protected", nil, Descs.YesNo),
 	uint32("Unknown"),
 	uint32("Unknown"),
 	uint32("Unknown"),
@@ -4321,13 +4322,6 @@ CPacketDescription = {
 	iterator{label="Keys", refkey="numkeys", repeated={
 		stringz("Key"),
 	}}, 
-
-	--[[iterator{label="Keys", refkey="keys", repeated={
-			stringz("Key"),
-	}},--]]
-		
-	--stringz("[] Requested Accounts"),
-	--stringz("[] Requested Keys"),
 },
 --[[doc
     Message ID:    0x27
@@ -5066,6 +5060,7 @@ CPacketDescription = {
 			iterator{label="Game Information", refkey="num", repeated={
 				strdw("Request data"),
 				-- seems to be dword(0)
+				-- seems this is another war3 datatype, double strdw :)
 				uint32("Dword(0)"),
 			}},
 		},
@@ -5088,20 +5083,8 @@ CPacketDescription = {
 		uint32("Cookie"),
 	}},
 	oldwhen{ condition=Cond.equals("subcommand",0x0A),	block = { 			
-		uint32("Icon"),
+		strdw("Icon"),
 	}},
-	--[[doc DEL
-	uint32("Cookie"),
-	uint8("Number of types requested"),
-	uint32("[] Request data"),
-	uint32("Cookie"),
-	stringz("Account name"),
-	uint32("Product ID"),
-	uint32("Cookie"),
-	uint32("Clan Tag"),
-	uint32("Product ID"),
-	uint32("Cookie"),
-	uint32("Icon"), ]]
 },
 --[[doc
     Message ID:    0x45
@@ -5153,7 +5136,7 @@ CPacketDescription = {
 
 ]]
 [SID_NEWS_INFO] = { -- 0x46
-	uint32("News timestamp"),
+	posixtime("News timestamp"),
 },
 --[[doc
     Message ID:    0x4B
@@ -5721,28 +5704,24 @@ CPacketDescription = {
                    (BYTE) Packet Code
 
                    0x00 - Warden Module Info
-                   (BYTE) Success (0x00 = Don't have the module, 0x01 = Have
-                   the module)
-                   0x01 - Warden Module Data
-                   (BYTE) Success (0x00 = MD5 doesn't match, 0x01 = MD5
-                   matches)
-                   0x02 - Data Checker
+                   (BYTE) Success (0x00 = Don't have the module, 0x01 = Have the module)
+                   
+				   0x01 - Warden Module Data
+                   (BYTE) Success (0x00 = MD5 doesn't match, 0x01 = MD5 matches)
+                   
+				   0x02 - Data Checker
                    (WORD) String Length
-
-                   (DWORD) String Checksum
-
-                   (VOID) String Data
+				   (DWORD) String Checksum
+				   (VOID) String Data
 
                    MEM_CHECK:
 
-                   (BYTE) Success (0x00 = Read data, 0x01 = Unable to
-                   read)
+                   (BYTE) Success (0x00 = Read data, 0x01 = Unable to read)
 
                    (VOID) Data (0x00 only)
                    PAGE_CHECK_A:
 
-                   (BYTE) Success (0x00 = SHA1s match, 0x01 = SHA1s don't
-                   match)
+                   (BYTE) Success (0x00 = SHA1s match, 0x01 = SHA1s don't match)
 
                    (BYTE) IDXor
                    0x04 - Initialization
@@ -5884,8 +5863,11 @@ CPacketDescription = {
 	uint32("Cookie"),
 	stringz("Clan name"),
 	uint32("Clan tag"),
-	uint8("Number of users to invite"),
-	stringz("[] Usernames to invite"),
+	uint8{"Number of users to invite", key="numusers"},
+	iterator{label="Usernames to invite", refkey="numusers", repeated={
+		stringz("Account"),
+	}},
+	-- stringz("[] Usernames to invite"),
 },
 --[[doc
     Message ID:    0x72
@@ -6140,3 +6122,4 @@ CPacketDescription = {
 	stringz("Username"),
 },
 }
+-- End cpackets.lua
