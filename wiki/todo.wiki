@@ -42,6 +42,7 @@
   * [http://code.google.com/p/llvm-lua/ llvm-lua]: JIT/Static compiler for Lua using LLVM on the backend.
     * It may be worth to try to integrate a JIT compiler into Wireshark's Lua based plugins :)
   * Non-existing desc table in strdw(): no error message
+  * strdw(): key not exists in the table - display "Unknown" as for other types?
   * Specify length as key in array()
 
 ==done==
