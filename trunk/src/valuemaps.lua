@@ -412,6 +412,18 @@ local Descs = {
 		[0x05] = "Tournament",
 	},
 	
+	W3LadderType = {
+		['SOLO'] = 'SOLO', 
+		['TEAM'] = 'TEAM',
+		['FFA '] = 'FFA',
+	},
+	
+	W3TeamType = {
+		['2VS2'] = '2VS2',
+		['3VS3'] = '3VS3',
+		['4VS4'] = '4VS4',
+	},
+	
 	-- Friend online status
 	OnlineStatus = {
 		[0x00] = "Offline",
