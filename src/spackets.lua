@@ -3767,7 +3767,7 @@ WID_SETICON 0x0A SEND
 		strdw("Icon ID", Descs.W3IconNames),
 		uint8{"Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
-			strdw("Ladder type"),
+			strdw("Ladder type", Descs.W3LadderType),
 			uint16("Number of wins"),
 			uint16("Number of losses"),
 			uint8("Level"),
@@ -3782,7 +3782,7 @@ WID_SETICON 0x0A SEND
 		}},
 		uint8{"Number of team records", key="teams"},
 		iterator{label="Team Record", refkey="teams", repeated={
-			strdw("Type of team"),
+			strdw("Type of team", Descs.W3TeamType),
 			uint16("Number of wins"),
 			uint16("Number of losses"),
 			uint8("Level"),
@@ -3844,7 +3844,7 @@ WID_SETICON 0x0A SEND
 		uint32("Cookie"),
 		uint8{"Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
-			strdw("Ladder type"),
+			strdw("Ladder type", Descs.W3LadderType),
 			uint16("Number of wins"),
 			uint16("Number of losses"),
 			uint8("Level"),

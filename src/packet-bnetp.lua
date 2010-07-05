@@ -1328,6 +1328,18 @@ local Descs = {
 		[0x05] = "Tournament",
 	},
 	
+	W3LadderType = {
+		['SOLO'] = 'SOLO', 
+		['TEAM'] = 'TEAM',
+		['FFA '] = 'FFA',
+	},
+	
+	W3TeamType = {
+		['2VS2'] = '2VS2',
+		['3VS3'] = '3VS3',
+		['4VS4'] = '4VS4',
+	},
+	
 	-- Friend online status
 	OnlineStatus = {
 		[0x00] = "Offline",
@@ -2328,7 +2340,7 @@ SPacketDescription = {
 		strdw("Icon ID", Descs.W3IconNames),
 		uint8{"Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
-			strdw("Ladder type"),
+			strdw("Ladder type", Descs.W3LadderType),
 			uint16("Number of wins"),
 			uint16("Number of losses"),
 			uint8("Level"),
@@ -2343,7 +2355,7 @@ SPacketDescription = {
 		}},
 		uint8{"Number of team records", key="teams"},
 		iterator{label="Team Record", refkey="teams", repeated={
-			strdw("Type of team"),
+			strdw("Type of team", Descs.W3TeamType),
 			uint16("Number of wins"),
 			uint16("Number of losses"),
 			uint8("Level"),
@@ -2385,7 +2397,7 @@ SPacketDescription = {
 		uint32("Cookie"),
 		uint8{"Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
-			strdw("Ladder type"),
+			strdw("Ladder type", Descs.W3LadderType),
 			uint16("Number of wins"),
 			uint16("Number of losses"),
 			uint8("Level"),
