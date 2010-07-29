@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on %time%
+--[[ packet-bnetp.lua build on Thu Jul 29 20:40:21 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -1406,6 +1406,48 @@ Cond = {
 		end
 	end,
 }
+
+do
+	local CheckedTable = {
+		tableType = setmetatable({}, {
+			__mode = "k",
+			__index = function () return "'thing'" end }),
+		declaredNames = setmetatable({}, {
+			__mode = "k",
+			__index = function () return {} end } ), 
+	}
+
+	function CheckedTable.__newindex (t, n, v)
+		if not CheckedTable.declaredNames[t][n] then
+			error("attempt to write to undeclared var: "..n, 2)
+		else
+			CheckedTable.declaredNames[t][n] = true
+			rawset(t, n, v)   -- do the actual set
+		end
+	end
+
+	function CheckedTable.__index (t, n)
+		error("attempt to read undeclared "
+			.. CheckedTable.tableType[t]
+			.. ": " .. n, 2)
+	end
+
+	function CheckedTable.guard (self, t, description)
+		for k, _ in pairs(t) do
+			self.declaredNames[t][k] = true
+		end
+
+		if description then
+			self.tableType[t] = description
+		end
+
+		setmetatable(t, self)
+	end
+
+	CheckedTable:guard(Descs, "value description")
+	CheckedTable:guard(Cond, "condition function")
+end
+
 -- End valuemaps.lua
 
 	do
