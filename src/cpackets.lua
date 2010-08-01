@@ -5042,7 +5042,8 @@ CPacketDescription = {
                      *Not fully known yet.
 
     Related:         [0x44] SID_WARCRAFTGENERAL (S->C)
-
+]]
+--[[doc
 		SID_WARCRAFTGENERAL
 
 WID_GAMESEARCH 0x00 SEND
@@ -5186,27 +5187,73 @@ WID_SETICON 0x0A SEND
 ]]
 [SID_WARCRAFTGENERAL] = { -- 0x44
 	uint8{"Subcommand ID", key="subcommand", nil, Descs.WarcraftGeneralSubcommandId},
-	-- Subcommand ID 2: Request ladder map listing
-	oldwhen{ condition=Cond.equals("subcommand",0x02),
-		block = {  
-			uint32("Cookie"),
-			uint8{label="Number of types requested",key="num"},
-			iterator{label="Game Information", refkey="num", repeated={
-				strdw("Request data", Descs.WarcraftGeneralRequestType),
-				-- seems to be dword(0)
-				-- seems this is another war3 datatype, double strdw :)
-				uint32("Dword(0)"),
-			}},
-		},
+	--[[doc
+		WID_GAMESEARCH 0x00 SEND
+		(DWORD)	Cookie
+		(DWORD)	Unknown
+		(BYTE) 	Unknown
+		(BYTE)	Type
+			0x00: 1vs1
+			0x01: 2vs2
+			0x02: 3vs3
+			0x03: 4vs4
+			0x04: Free for All
+		(WORD) Enabled Maps (every bit is one map, from 0x0000 to 0x0FFF)
+		(WORD) Unknown
+		(BYTE) Unknown
+		(DWORD) TickCount
+		(DWORD) Race
+			0x00000001: Human
+			0x00000002: Orc
+			0x00000004: Night Elf
+			0x00000008: Undead
+			0x00000020: Random
+	]]
+	-- Subcommand ID 0: Game search?
+	oldwhen{ condition=Cond.equals("subcommand", 0),
+		uint32("Cookie"),
+		uint32("Unknown"),
+		uint8("Unknown"),
+		uint8("Type", nil, {
+			[0x00] = "1vs1",
+			[0x01] = "2vs2",
+			[0x02] = "3vs3",
+			[0x03] = "4vs4",
+			[0x04] = "Free for All",
+		}),
+		uint16("Enabled Maps (every bit is one map, from 0x0000 to 0x0FFF)"),
+		uint16("Unknown"),
+		uint8("Unknown"),
+		uint32("TickCount"),
+		-- TODO: Flags?
+		uint32("Race", nil, {
+			[0x01] = "Human",
+			[0x02] = "Orc",
+			[0x04] = "Night Elf",
+			[0x08] = "Undead",
+			[0x20] = "Random",
+		}),
 	},
 	
+	-- Subcommand ID 2: Request ladder map listing
+	oldwhen{ condition=Cond.equals("subcommand", 2), block = { 
+		uint32("Cookie"),
+		uint8{label="Number of types requested",key="num"},
+		iterator{label="Game Information", refkey="num", repeated={
+			strdw("Request data", Descs.WarcraftGeneralRequestType),
+			-- seems to be dword(0)
+			-- seems this is another war3 datatype, double strdw :)
+			uint32("Dword(0)"),
+		}},
+	}},
 	
-	oldwhen{ condition=Cond.equals("subcommand",0x03),
+	-- Subcommand ID 3: WID_CANCELSEARCH
+	oldwhen{ condition=Cond.equals("subcommand", 3),
 		block = {  },
 	},
 	
 	-- Subcommand ID 4: User stats request
-	oldwhen{ condition=Cond.equals("subcommand",0x04),	block = {  
+	oldwhen{ condition=Cond.equals("subcommand", 4),	block = {  
 		uint32("Cookie"),
 		stringz("Username"),
 		strdw("Product ID", Descs.ClientTag),
@@ -5218,7 +5265,7 @@ WID_SETICON 0x0A SEND
 	}},
 	
 	-- Subcommand ID 8: Clan stats request
-	oldwhen{ condition=Cond.equals("subcommand",0x08),	block = { 
+	oldwhen{ condition=Cond.equals("subcommand", 8),	block = { 
 		uint32("Cookie"),
 		stringz("Account name"),
 		-- TODO: "' in strings?
@@ -5226,12 +5273,12 @@ WID_SETICON 0x0A SEND
 	}}, 
 	
 	-- Subcommand ID 9: Icon list request
-	oldwhen{ condition=Cond.equals("subcommand",0x09),	block = { 			
+	oldwhen{ condition=Cond.equals("subcommand", 9),	block = { 			
 		uint32("Cookie"),
 	}},
 	
 	-- Subcommand ID 10: Change icon
-	oldwhen{ condition=Cond.equals("subcommand",0x0A),	block = { 			
+	oldwhen{ condition=Cond.equals("subcommand", 0x0A),	block = { 			
 		strdw("Icon", Descs.W3Icon),
 	}},
 },
@@ -5418,9 +5465,9 @@ WID_SETICON 0x0A SEND
 	strdw("Platform ID", Descs.PlatformID),
 	strdw("Product ID", Descs.ClientTag),
 	uint32("Version Byte", base.HEX),
-	strdw("Product language"),
+	strdw("Product language", Descs.LangId),
 	ipv4("Local IP for NAT compatibility"),
-	int32("Time zone bias"),
+	int32("Time zone bias", nil, Descs.TimeZoneBias),
 	uint32("Locale ID", nil, Descs.LocaleID),
 	uint32("Language ID", nil, Descs.LocaleID),
 	stringz("Country abreviation"),
@@ -5984,7 +6031,7 @@ WID_SETICON 0x0A SEND
 ]]
 [SID_CLANFINDCANDIDATES] = { -- 0x70
 	uint32("Cookie"),
-	uint32("Clan Tag"),
+	strdw("Clan Tag"),
 },
 --[[doc
     Message ID:    0x71
@@ -6155,7 +6202,7 @@ WID_SETICON 0x0A SEND
 ]]
 [SID_CLANINVITATIONRESPONSE] = { -- 0x79
 	uint32("Cookie"),
-	uint32("Clan tag"),
+	strdw("Clan tag"),
 	stringz("Inviter"),
 	uint8("Response"),
 },
@@ -6267,7 +6314,7 @@ WID_SETICON 0x0A SEND
 ]]
 [SID_CLANMEMBERINFORMATION] = { -- 0x82
 	uint32("Cookie"),
-	uint32("User's clan tag"),
+	strdw("User's clan tag"),
 	stringz("Username"),
 },
 }

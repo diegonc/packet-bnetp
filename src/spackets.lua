@@ -237,8 +237,9 @@ SPacketDescription = {
 
     Used By:         All Products
 
-    Format:          (DWORD[5]) The data hash.Optional:(DWORD) Cookie. Same as the cookie
-                     from the request.
+    Format:         (DWORD[5]) The data hash.
+					Optional:
+					(DWORD) Cookie. Same as the cookie from the request.
 
     Remarks:         This message contains the hashed data. Related Links: [C>0x0B]
                      BNLS_HASHDATA
@@ -246,7 +247,7 @@ SPacketDescription = {
 ]]
 [BNLS_HASHDATA] = { -- 0x0B
 	array("The data hash.Optional:", uint32, 5),
-	uint32("Cookie. Same as the cookie"),
+	uint32("Cookie"),
 },
 --[[doc
     Message ID:      0x0C
@@ -259,9 +260,14 @@ SPacketDescription = {
 
     Used By:         All Products
 
-    Format:          (DWORD) Cookie. (BYTE) Number of CD-keys requested.(BYTE) Number of
-                     successfully ecrypted CD-keys .(DWORD) Bit mask .For each successful
-                     CD Key:(DWORD) Client session key.(DWORD[9]) CD-key data.
+    Format:          (DWORD) Cookie. 
+					 (BYTE) Number of CD-keys requested.
+					 (BYTE) Number of successfully ecrypted CD-keys .
+					 (DWORD) Bit mask .
+					 
+					 For each successful CD Key:
+					 (DWORD) Client session key.
+					 (DWORD[9]) CD-key data.
 
     Remarks:         When the flags don't contain CDKEY_OLD_STYLE_RESPONSES (0x08), the
                      response is this message.
@@ -566,7 +572,7 @@ SPacketDescription = {
 	version("Version"),
 	uint32("Checksum", base.HEX),
 	stringz("Version check stat string"),
-	uint32("Cookie", base.HEX),
+	uint32("Cookie"),
 	uint32("The latest version code for this product", base.HEX),
 },
 --[[doc
@@ -2337,34 +2343,21 @@ SPacketDescription = {
                    For STAR/SEXP/SSHR/JSTR, Text is UTF-8 encoded (WIDESTRING).
 
                    Event IDs:
+				   
                    [0x01] EID_SHOWUSER: User in channel
-
                    [0x02] EID_JOIN: User joined channel
-
                    [0x03] EID_LEAVE: User left channel
-
                    [0x04] EID_WHISPER: Recieved whisper
-
                    [0x05] EID_TALK: Chat text
-
                    [0x06] EID_BROADCAST: Server broadcast
-
                    [0x07] EID_CHANNEL: Channel information
-
                    [0x09] EID_USERFLAGS: Flags update
-
                    [0x0A] EID_WHISPERSENT: Sent whisper
-
                    [0x0D] EID_CHANNELFULL: Channel full
-
                    [0x0E] EID_CHANNELDOESNOTEXIST: Channel doesn't exist
-
                    [0x0F] EID_CHANNELRESTRICTED: Channel is restricted
-
                    [0x12] EID_INFO: Information
-
                    [0x13] EID_ERROR: Error message
-
                    [0x17] EID_EMOTE: Emote
 
                    EID_SHOWUSER:
@@ -2434,42 +2427,69 @@ SPacketDescription = {
                    you whispered.
 
                    EID_CHANNELDOESNOTEXIST:
-                   See info on NoCreate Join in
-                   SID_JOINCHANNEL.
+                   See info on NoCreate Join in SID_JOINCHANNEL.
 
                    EID_CHANNELRESTRICTED:
-                   This is sent when attempting
-                   to join a channel which your
-                   client is not allowed to
-                   join.
+                   This is sent when attempting to join a channel which your
+                   client is not allowed to join.
 
                    EID_INFO:
-                   This is information
-                   supplied by
-                   Battle.net. This text
-                   is usually displayed
-                   by clients in yellow.
+                   This is information supplied by Battle.net. This text
+                   is usually displayed by clients in yellow.
 
                    EID_Error:
-                   This is error
-                   information
-                   supplied by
-                   Battle.net. This
-                   text is usually
-                   displayed by
-                   clients in red.
+                   This is error information supplied by Battle.net. This
+                   text is usually displayed by clients in red.
 
                    EID_Emote:
-                   This is
-                   sent when
-                   any user
-                   (including
-                   self) uses
-                   the emote
-                   feature in
-                   chat.
+                   This is sent when any user (including self) uses the emote
+                   feature in chat.
 
     Related:       [0x0E] SID_CHATCOMMAND (C->S), [0x0C] SID_JOINCHANNEL (C->S)
+--]]
+--[[doc
+	
+		Battle.net Flags
+
+		User Flags:
+
+		Since the game retrieves these flags automatically from the corresponding game icon file, they are liable to change.
+		0x00000001: Blizzard Representative
+		0x00000002: Channel Operator
+		0x00000004: Speaker
+		0x00000008: Battle.net Administrator
+		0x00000010: No UDP Support
+		0x00000020: Squelched
+		0x00000040: Special Guest
+		0x00000080: This flag has not been seen, however, it is logical to assume that it was once used since it is in the middle of a sequence.
+		0x00000100: Beep Enabled (Defunct)
+		0x00000200: PGL Player (Defunct)
+		0x00000400: PGL Official (Defunct)
+		0x00000800: KBK Player (Defunct)
+		0x00001000: WCG Official
+		0x00002000: KBK Singles (Defunct)
+		0x00002000: KBK Player (Defunct)
+		0x00010000: KBK Beginner (Defunct)
+		0x00020000: White KBK (1 bar) (Defunct)
+		0x00100000: GF Official
+		0x00200000: GF Player
+		0x02000000: PGL Player
+
+		Order of implementation: SQUELCHED, BLIZZREP, ADMIN, SPEAKER, GUEST, PGLOFFICIAL, WCGOFFICIAL, GFOFFICIAL, CHANNELOP, PGLPLAYER, WCGPLAYER, KBKPLAYER, KBKBEGINNER, KBKWHITE, GFPLAYER, BEEPENABLED, NOUDP.
+		
+		
+		Channel Flags:
+		
+		0x00001: Public Channel
+		0x00002: Moderated
+		0x00004: Restricted
+		0x00008: Silent
+		0x00010: System
+		0x00020: Product-Specific
+		0x01000: Globally Accessible
+		0x04000: Redirected
+		0x08000: Chat
+		0x10000: Tech Support
 
 ]]
 [SID_CHATEVENT] = { -- 0x0F
@@ -2490,20 +2510,34 @@ SPacketDescription = {
 		[0x13] = "EID_ERROR: Error message",
 		[0x17] = "EID_EMOTE: Emote",
 	}},
-	uint32("User's Flags", base.HEX),
+	when{
+		{Cond.equals("eid", 7), { -- Channel information
+			flags{of=uint32, label="Channel Flags", fields=Fields.ChannelFlags},
+		}},
+		{Cond.always(), { 		-- Otherwise
+			flags{of=uint32, label="User's Flags", fields=Fields.UserFlags},
+		}},
+	},
 	uint32("Ping"),
 	ipv4("IP Address (Defunct)"),
 	uint32("Account number (Defunct)", base.HEX),
 	uint32("Registration Authority (Defunct)", base.HEX),
 	stringz("Username"),
-	-- stringz("Text"),
-	-- TODO: set compare (in)
-	oldwhen{ condition=Cond.equals("eid", 1),
-		block = { stringz("Statstring") },
-		otherwise = { stringz("Text") }
-	}
-
-	
+	-- statstring: 1,2,9,
+	-- empty: 3,
+	-- text: 5,18
+	-- channel name: 7
+	when{ 
+		{Cond.inlist("eid", {1,2,9}), {
+			stringz("Statstring"),
+		}},
+		{Cond.equals("eid", 7), {
+			stringz("Channel name"),
+		}},
+		{Cond.always(), {
+			stringz("Text"),
+		}},
+	},
 },
 --[[doc
     Message ID:    0x13
@@ -2592,7 +2626,7 @@ SPacketDescription = {
 
 ]]
 [SID_REGISTRY] = { -- 0x18
-	uint32("Cookie", base.HEX),
+	uint32("Cookie"),
 	uint32("HKEY", base.HEX, {
 		[0x80000000] = "HKEY_CLASSES_ROOT",
 		[0x80000001] = "HKEY_CURRENT_USER",
@@ -3143,12 +3177,12 @@ SPacketDescription = {
 
 ]]
 [SID_PROFILE] = { -- 0x35
-	uint32("Cookie", base.HEX),
+	uint32("Cookie"),
 	uint8{"Success", key="status"},
 	oldwhen{condition=Cond.equals("status", 0), block={
 		stringz("Profile\\Description value"),
 		stringz("Profile\\Location value"),
-		uint32("Clan Tag"),
+		strdw("Clan Tag"),
 	}},
 },
 --[[doc
@@ -3341,7 +3375,7 @@ SPacketDescription = {
 
 ]]
 [SID_LOGONREALMEX] = { -- 0x3E
-	uint32("MCP Cookie", base.HEX),
+	uint32("MCP Cookie"),
 	uint32{"MCP Status", key="status"},
 	oldwhen{condition=Cond.equals("status", 0), block={
 		array("MCP Chunk 1", uint32, 2),
@@ -3711,6 +3745,22 @@ WID_SETICON 0x0A SEND
 [SID_WARCRAFTGENERAL] = { -- 0x44
 	uint8{"Subcommand ID", key="subcommand", nil, Descs.WarcraftGeneralSubcommandId},
 	--[[doc
+		WID_GAMESEARCH 0x00 RECV
+		(DWORD) Cookie
+		(BYTE) Status
+			0x00: Search Started
+			0x04: Banned CD Key
+	]]
+	-- Subcommand ID 0: Game search?
+	oldwhen{condition=Cond.equals("subcommand", 0), block = {
+		uint32("Cookie"),
+		uint8("Status", nil, {
+			[0x00] = "Search Started",
+			[0x04] = "Banned CD Key",
+		}),
+	}},
+	
+	--[[doc
 		WID_MAPLIST 0x02 RECV
 			(DWORD) Cookie
 			(Byte) Responses
@@ -3872,7 +3922,7 @@ WID_SETICON 0x0A SEND
 		(BYTE) Unknown
 	--]]
 	-- Subcommand ID 9: Icon list request
-	oldwhen{condition=Cond.equals("subcommand", 0x9), block={
+	oldwhen{condition=Cond.equals("subcommand", 9), block={
 		uint32("Cookie"),
 		uint32("Unknown", base.HEX),
 		uint8("Tiers"),
@@ -4318,7 +4368,9 @@ WID_SETICON 0x0A SEND
 		[0x0F] = "Custom error. A string at the end of this message contains the error",
 	}},
 	array("Server Password Proof", uint8, 20),
-	stringz("Additional information"),
+	oldwhen{condition=Cond.equals("status", 0xF), block={
+		stringz("Additional information"),
+	}},
 },
 --[[doc
     Message ID:    0x55
@@ -4867,8 +4919,10 @@ WID_SETICON 0x0A SEND
 
                    Valid Status codes:
 
-                   0x00: Successfully found candidate(s) 0x01: Clan tag already
-                   taken 0x08: Already in clan 0x0a: Invalid clan tag specified
+                   0x00: Successfully found candidate(s) 
+				   0x01: Clan tag already taken 
+				   0x08: Already in clan 
+				   0x0a: Invalid clan tag specified
 
     Related:       [0x70] SID_CLANFINDCANDIDATES (C->S), Clan Message Codes
 
@@ -4950,7 +5004,7 @@ WID_SETICON 0x0A SEND
 ]]
 [SID_CLANCREATIONINVITATION] = { -- 0x72
 	uint32("Cookie"),
-	uint32("Clan Tag"),
+	strdw("Clan Tag"),
 	stringz("Clan Name"),
 	stringz("Inviter's username"),
 	uint8{"Number of users being invited", key="users"},
@@ -5047,7 +5101,7 @@ WID_SETICON 0x0A SEND
 ]]
 [SID_CLANINFO] = { -- 0x75
 	uint8("Unknown"),
-	uint32("Clan tag"),
+	strdw("Clan tag"),
 	uint8("Rank", nil, Descs.ClanRank),
 },
 --[[doc
@@ -5160,7 +5214,7 @@ WID_SETICON 0x0A SEND
 ]]
 [SID_CLANINVITATIONRESPONSE] = { -- 0x79
 	uint32("Cookie"),
-	uint32("Clan tag"),
+	strdw("Clan tag"),
 	stringz("Clan name"),
 	stringz("Inviter"),
 },

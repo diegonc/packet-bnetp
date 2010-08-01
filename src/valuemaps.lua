@@ -36,7 +36,7 @@ local Descs = {
 		[0x06] = "Too many server requests",
 	},
 	
-	-- Locale ID (LCID)
+	-- International Locale ID (LCID)
 	-- http://support.microsoft.com/kb/221435
 	LocaleID = {
 		[11276] = "French (Cameroon)",
@@ -230,6 +230,79 @@ local Descs = {
 		[20490] = "Spanish (Puerto Rico)",
 	},
 	
+	-- TODO: what's the name of these codes?
+	LangId = {
+		['enUS'] = 'English (US)',
+		['enGB'] = 'English (UK)',
+		['frFR'] = 'French',
+		['deDE'] = 'German',
+		['esES'] = 'Spanish',
+		['itIT'] = 'Italian',
+		['csCZ'] = 'Czech',
+		['ruRU'] = 'Russian',
+		['plPL'] = 'Polish',
+		['ptBR'] = 'Portuguese (Brazilian)',
+		['ptPT'] = 'Portuguese (Portugal)',
+		['tkTK'] = 'Turkish',
+		['jaJA'] = 'Japanese',
+		['koKR'] = 'Korean',
+		['zhTW'] = 'Chinese (Traditional)',
+		['zhCN'] = 'Chinese (Simplified)',
+		['thTH'] = 'Thai',
+	},
+	
+	TimeZoneBias = {
+		[-720] = "UTC +12",
+		[-690] = "UTC +11.5",
+		[-660] = "UTC +11",
+		[-630] = "UTC +10.5",
+		[-600] = "UTC +10",
+		[-570] = "UTC +9.5",
+		[-540] = "UTC +9",
+		[-510] = "UTC +8.5",
+		[-480] = "UTC +8",
+		[-450] = "UTC +7.5",
+		[-420] = "UTC +7",
+		[-390] = "UTC +6.5",
+		[-360] = "UTC +6",
+		[-330] = "UTC +5.5",
+		[-300] = "UTC +5",
+		[-270] = "UTC +4.5",
+		[-240] = "UTC +4",
+		[-210] = "UTC +3.5",
+		[-180] = "UTC +3",
+		[-150] = "UTC +2.5",
+		[-120] = "UTC +2",
+		[-90]  = "UTC +1.5",
+		[-60]  = "UTC +1",
+		[-30]  = "UTC +0.5",
+		[0]    = "UTC +0",
+		[30]   = "UTC -0.5",
+		[60]   = "UTC -1",
+		[90]   = "UTC -1.5",
+		[120]  = "UTC -2",
+		[150]  = "UTC -2.5",
+		[180]  = "UTC -3",
+		[210]  = "UTC -3.5",
+		[240]  = "UTC -4",
+		[270]  = "UTC -4.5",
+		[300]  = "UTC -5",
+		[330]  = "UTC -5.5",
+		[360]  = "UTC -6",
+		[390]  = "UTC -6.5",
+		[420]  = "UTC -7",
+		[450]  = "UTC -7.5",
+		[480]  = "UTC -8",
+		[510]  = "UTC -8.5",
+		[540]  = "UTC -9",
+		[570]  = "UTC -9.5",
+		[600]  = "UTC -10",
+		[630]  = "UTC -10.5",
+		[660]  = "UTC -11",
+		[690]  = "UTC -11.5",
+		[720]  = "UTC -12",
+	},
+
 	ClanRank = {
 		[0x00] = "Initiate that has been in the clan for less than one week (Peon)",
 		[0x01] = "Initiate that has been in the clan for over one week (Peon)",
@@ -239,16 +312,17 @@ local Descs = {
 	},
 	
 	WarcraftGeneralSubcommandId = {
+		[0x00] = "WID_GAMESEARCH",
 		[0x01] = "",
-		[0x02] = "Request ladder map listing",
-		[0x03] = "Cancel ladder game search",
-		[0x04] = "User stats request",
+		[0x02] = "WID_MAPLIST: Request ladder map listing",
+		[0x03] = "WID_CANCELSEARCH: Cancel ladder game search",
+		[0x04] = "WID_USERRECORD: User stats request",
 		[0x05] = "",
 		[0x06] = "",
 		[0x07] = "WID_TOURNAMENT",
-		[0x08] = "Clan stats request",
-		[0x09] = "Icon list request",
-		[0x0A] = "Change icon",
+		[0x08] = "WID_CLANRECORD: Clan stats request",
+		[0x09] = "WID_ICONLIST: Icon list request",
+		[0x0A] = "WID_SETICON: Change icon",
 	},
 	
 	WarcraftGeneralRequestType = {
@@ -434,6 +508,53 @@ local Descs = {
 		[0x05] = "In a private game, and you are that person's friend",
 	},
 	
+}
+
+-- Flag fields
+local Fields = {
+	-- S> 0xff SID_CHATEVENT
+	UserFlags = {
+		{sname="Blizzard Representative",     mask=0x00000001, desc=Descs.YesNo},
+		{sname="Channel Operator",            mask=0x00000002, desc=Descs.YesNo},
+		{sname="Speaker",                     mask=0x00000004, desc=Descs.YesNo},
+		{sname="Battle.net Administrator",    mask=0x00000008, desc=Descs.YesNo},
+		{sname="No UDP Support",              mask=0x00000010, desc=Descs.YesNo},
+		{sname="Squelched",                   mask=0x00000020, desc=Descs.YesNo},
+		{sname="Special Guest",               mask=0x00000040, desc=Descs.YesNo},
+		{sname="Unknown",                     mask=0x00000080, desc=Descs.YesNo},
+		{sname="Beep Enabled (Defunct)",      mask=0x00000100, desc=Descs.YesNo},
+		{sname="PGL Player (Defunct)",        mask=0x00000200, desc=Descs.YesNo},
+		{sname="PGL Official (Defunct)",      mask=0x00000400, desc=Descs.YesNo},
+		{sname="KBK Player (Defunct)",        mask=0x00000800, desc=Descs.YesNo},
+		{sname="WCG Official",                mask=0x00001000, desc=Descs.YesNo},
+		{sname="KBK Singles (Defunct)",       mask=0x00002000, desc=Descs.YesNo},
+		{sname="KBK Player (Defunct)",        mask=0x00002000, desc=Descs.YesNo},
+		{sname="KBK Beginner (Defunct)",      mask=0x00010000, desc=Descs.YesNo},
+		{sname="White KBK (1 bar) (Defunct)", mask=0x00020000, desc=Descs.YesNo},
+		{sname="GF Official",                 mask=0x00100000, desc=Descs.YesNo},
+		{sname="GF Player",                   mask=0x00200000, desc=Descs.YesNo},
+		{sname="PGL Player",                  mask=0x02000000, desc=Descs.YesNo},
+	},
+	
+	-- S> 0xff SID_CHATEVENT
+	ChannelFlags = {
+		{sname="Public Channel",              mask=0x00001, desc=Descs.YesNo},
+		{sname="Moderated",                   mask=0x00002, desc=Descs.YesNo},
+		{sname="Restricted",                  mask=0x00004, desc=Descs.YesNo},
+		{sname="Silent",                      mask=0x00008, desc=Descs.YesNo},
+		{sname="System",                      mask=0x00010, desc=Descs.YesNo},
+		{sname="Product-Specific",            mask=0x00020, desc=Descs.YesNo},
+		{sname="Globally Accessible",         mask=0x01000, desc=Descs.YesNo},
+		{sname="Redirected",                  mask=0x04000, desc=Descs.YesNo},
+		{sname="Chat",                        mask=0x08000, desc=Descs.YesNo},
+		{sname="Tech Support",                mask=0x10000, desc=Descs.YesNo},	
+	},                               
+
+	-- Place iCCup / etc flags here if you want
+	--IccupUserFlags = {
+	
+	--},
+	--UserFlags = IccupUserFlags,
 }
 
 -- Common condition functions
