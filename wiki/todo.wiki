@@ -17,11 +17,14 @@
   * don't make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
     * Workaround: add alias="none" parameter to iterator constructor.
       * Readability?
+    * 2 keys
+      * Create a node for iterator?
+      * Create a node for every iteration?
     * There are 3 types of iterators:
-      * Flat, like S>0x0b channel list (if only 1 item in iterator)
-      * Nested, with 1 common tree per iterator (if only 1 item in iterator)
-      * Nested, with a tree for every iteration (if more than 1 item in iterator)
-    * Add a possibility to add count to labels, e.g. "%num%"
+      * (no, no) Flat, like S>0x0b channel list (if only 1 item in iterator)
+      * (yes, no) Nested, with 1 common tree per iterator (if only 1 item in iterator)
+      * (yes, yes) Nested, with a tree for every iteration (if more than 1 item in iterator)
+    * Add a possibility to add count to labels, e.g. "%num%". Numbers are counted from 1.
   * Allow field reuse
     * Keep a cache of fields used by packet descriptions.
     * When defining a field first look in the cache.
