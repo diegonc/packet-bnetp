@@ -2,7 +2,9 @@
 do
 	-- Plugin configurable parameters.
 	local Config = {
+		-- default port (changeable in "Decode as...")
 		server_port = 6112,
+		-- lite mode - decode only packet headers
 		lite = false,
 	}
 
@@ -905,7 +907,7 @@ do
 
 	-- After all the initialization is finished, register plugin
 	-- to default port.
-	local udp_encap_table = DissectorTable.get("udp.port")
+	--local udp_encap_table = DissectorTable.get("udp.port")
 	local tcp_encap_table = DissectorTable.get("tcp.port")
 	--udp_encap_table:add(6112,p_bnetp)
 	tcp_encap_table:add(Config.server_port,p_bnetp)

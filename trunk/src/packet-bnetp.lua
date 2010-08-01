@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Thu Jul 29 20:40:21 2010
+--[[ packet-bnetp.lua build on %time%
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -28,7 +28,9 @@ at the end of the file.
 do
 	-- Plugin configurable parameters.
 	local Config = {
+		-- default port (changeable in "Decode as...")
 		server_port = 6112,
+		-- lite mode - decode only packet headers
 		lite = false,
 	}
 
@@ -980,7 +982,7 @@ local Descs = {
 		[0x06] = "Too many server requests",
 	},
 	
-	-- Locale ID (LCID)
+	-- International Locale ID (LCID)
 	-- http://support.microsoft.com/kb/221435
 	LocaleID = {
 		[11276] = "French (Cameroon)",
@@ -1174,6 +1176,79 @@ local Descs = {
 		[20490] = "Spanish (Puerto Rico)",
 	},
 	
+	-- TODO: what's the name of these codes?
+	LangId = {
+		['enUS'] = 'English (US)',
+		['enGB'] = 'English (UK)',
+		['frFR'] = 'French',
+		['deDE'] = 'German',
+		['esES'] = 'Spanish',
+		['itIT'] = 'Italian',
+		['csCZ'] = 'Czech',
+		['ruRU'] = 'Russian',
+		['plPL'] = 'Polish',
+		['ptBR'] = 'Portuguese (Brazilian)',
+		['ptPT'] = 'Portuguese (Portugal)',
+		['tkTK'] = 'Turkish',
+		['jaJA'] = 'Japanese',
+		['koKR'] = 'Korean',
+		['zhTW'] = 'Chinese (Traditional)',
+		['zhCN'] = 'Chinese (Simplified)',
+		['thTH'] = 'Thai',
+	},
+	
+	TimeZoneBias = {
+		[-720] = "UTC +12",
+		[-690] = "UTC +11.5",
+		[-660] = "UTC +11",
+		[-630] = "UTC +10.5",
+		[-600] = "UTC +10",
+		[-570] = "UTC +9.5",
+		[-540] = "UTC +9",
+		[-510] = "UTC +8.5",
+		[-480] = "UTC +8",
+		[-450] = "UTC +7.5",
+		[-420] = "UTC +7",
+		[-390] = "UTC +6.5",
+		[-360] = "UTC +6",
+		[-330] = "UTC +5.5",
+		[-300] = "UTC +5",
+		[-270] = "UTC +4.5",
+		[-240] = "UTC +4",
+		[-210] = "UTC +3.5",
+		[-180] = "UTC +3",
+		[-150] = "UTC +2.5",
+		[-120] = "UTC +2",
+		[-90]  = "UTC +1.5",
+		[-60]  = "UTC +1",
+		[-30]  = "UTC +0.5",
+		[0]    = "UTC +0",
+		[30]   = "UTC -0.5",
+		[60]   = "UTC -1",
+		[90]   = "UTC -1.5",
+		[120]  = "UTC -2",
+		[150]  = "UTC -2.5",
+		[180]  = "UTC -3",
+		[210]  = "UTC -3.5",
+		[240]  = "UTC -4",
+		[270]  = "UTC -4.5",
+		[300]  = "UTC -5",
+		[330]  = "UTC -5.5",
+		[360]  = "UTC -6",
+		[390]  = "UTC -6.5",
+		[420]  = "UTC -7",
+		[450]  = "UTC -7.5",
+		[480]  = "UTC -8",
+		[510]  = "UTC -8.5",
+		[540]  = "UTC -9",
+		[570]  = "UTC -9.5",
+		[600]  = "UTC -10",
+		[630]  = "UTC -10.5",
+		[660]  = "UTC -11",
+		[690]  = "UTC -11.5",
+		[720]  = "UTC -12",
+	},
+
 	ClanRank = {
 		[0x00] = "Initiate that has been in the clan for less than one week (Peon)",
 		[0x01] = "Initiate that has been in the clan for over one week (Peon)",
@@ -1183,16 +1258,17 @@ local Descs = {
 	},
 	
 	WarcraftGeneralSubcommandId = {
+		[0x00] = "WID_GAMESEARCH",
 		[0x01] = "",
-		[0x02] = "Request ladder map listing",
-		[0x03] = "Cancel ladder game search",
-		[0x04] = "User stats request",
+		[0x02] = "WID_MAPLIST: Request ladder map listing",
+		[0x03] = "WID_CANCELSEARCH: Cancel ladder game search",
+		[0x04] = "WID_USERRECORD: User stats request",
 		[0x05] = "",
 		[0x06] = "",
 		[0x07] = "WID_TOURNAMENT",
-		[0x08] = "Clan stats request",
-		[0x09] = "Icon list request",
-		[0x0A] = "Change icon",
+		[0x08] = "WID_CLANRECORD: Clan stats request",
+		[0x09] = "WID_ICONLIST: Icon list request",
+		[0x0A] = "WID_SETICON: Change icon",
 	},
 	
 	WarcraftGeneralRequestType = {
@@ -1350,6 +1426,53 @@ local Descs = {
 		[0x05] = "In a private game, and you are that person's friend",
 	},
 	
+}
+
+-- Flag fields
+local Fields = {
+	-- S> 0xff 0xFF0F
+	UserFlags = {
+		{sname="Blizzard Representative",     mask=0x00000001, desc=Descs.YesNo},
+		{sname="Channel Operator",            mask=0x00000002, desc=Descs.YesNo},
+		{sname="Speaker",                     mask=0x00000004, desc=Descs.YesNo},
+		{sname="Battle.net Administrator",    mask=0x00000008, desc=Descs.YesNo},
+		{sname="No UDP Support",              mask=0x00000010, desc=Descs.YesNo},
+		{sname="Squelched",                   mask=0x00000020, desc=Descs.YesNo},
+		{sname="Special Guest",               mask=0x00000040, desc=Descs.YesNo},
+		{sname="Unknown",                     mask=0x00000080, desc=Descs.YesNo},
+		{sname="Beep Enabled (Defunct)",      mask=0x00000100, desc=Descs.YesNo},
+		{sname="PGL Player (Defunct)",        mask=0x00000200, desc=Descs.YesNo},
+		{sname="PGL Official (Defunct)",      mask=0x00000400, desc=Descs.YesNo},
+		{sname="KBK Player (Defunct)",        mask=0x00000800, desc=Descs.YesNo},
+		{sname="WCG Official",                mask=0x00001000, desc=Descs.YesNo},
+		{sname="KBK Singles (Defunct)",       mask=0x00002000, desc=Descs.YesNo},
+		{sname="KBK Player (Defunct)",        mask=0x00002000, desc=Descs.YesNo},
+		{sname="KBK Beginner (Defunct)",      mask=0x00010000, desc=Descs.YesNo},
+		{sname="White KBK (1 bar) (Defunct)", mask=0x00020000, desc=Descs.YesNo},
+		{sname="GF Official",                 mask=0x00100000, desc=Descs.YesNo},
+		{sname="GF Player",                   mask=0x00200000, desc=Descs.YesNo},
+		{sname="PGL Player",                  mask=0x02000000, desc=Descs.YesNo},
+	},
+	
+	-- S> 0xff 0xFF0F
+	ChannelFlags = {
+		{sname="Public Channel",              mask=0x00001, desc=Descs.YesNo},
+		{sname="Moderated",                   mask=0x00002, desc=Descs.YesNo},
+		{sname="Restricted",                  mask=0x00004, desc=Descs.YesNo},
+		{sname="Silent",                      mask=0x00008, desc=Descs.YesNo},
+		{sname="System",                      mask=0x00010, desc=Descs.YesNo},
+		{sname="Product-Specific",            mask=0x00020, desc=Descs.YesNo},
+		{sname="Globally Accessible",         mask=0x01000, desc=Descs.YesNo},
+		{sname="Redirected",                  mask=0x04000, desc=Descs.YesNo},
+		{sname="Chat",                        mask=0x08000, desc=Descs.YesNo},
+		{sname="Tech Support",                mask=0x10000, desc=Descs.YesNo},	
+	},                               
+
+	-- Place iCCup / etc flags here if you want
+	--IccupUserFlags = {
+	
+	--},
+	--UserFlags = IccupUserFlags,
 }
 
 -- Common condition functions
@@ -1694,7 +1817,7 @@ SPacketDescription = {
 },
 [0x700B] = { -- 0x0B
 	array("The data hash.Optional:", uint32, 5),
-	uint32("Cookie. Same as the cookie"),
+	uint32("Cookie"),
 },
 [0x700C] = { -- 0x0C
 	uint32("Cookie"),
@@ -1752,7 +1875,7 @@ SPacketDescription = {
 	version("Version"),
 	uint32("Checksum", base.HEX),
 	stringz("Version check stat string"),
-	uint32("Cookie", base.HEX),
+	uint32("Cookie"),
 	uint32("The latest version code for this product", base.HEX),
 },
 [0x8010] = { -- 0x10
@@ -2128,20 +2251,34 @@ SPacketDescription = {
 		[0x13] = "EID_ERROR: Error message",
 		[0x17] = "EID_EMOTE: Emote",
 	}},
-	uint32("User's Flags", base.HEX),
+	when{
+		{Cond.equals("eid", 7), { -- Channel information
+			flags{of=uint32, label="Channel Flags", fields=Fields.ChannelFlags},
+		}},
+		{Cond.always(), { 		-- Otherwise
+			flags{of=uint32, label="User's Flags", fields=Fields.UserFlags},
+		}},
+	},
 	uint32("Ping"),
 	ipv4("IP Address (Defunct)"),
 	uint32("Account number (Defunct)", base.HEX),
 	uint32("Registration Authority (Defunct)", base.HEX),
 	stringz("Username"),
-	-- stringz("Text"),
-	-- TODO: set compare (in)
-	oldwhen{ condition=Cond.equals("eid", 1),
-		block = { stringz("Statstring") },
-		otherwise = { stringz("Text") }
-	}
-
-	
+	-- statstring: 1,2,9,
+	-- empty: 3,
+	-- text: 5,18
+	-- channel name: 7
+	when{ 
+		{Cond.inlist("eid", {1,2,9}), {
+			stringz("Statstring"),
+		}},
+		{Cond.equals("eid", 7), {
+			stringz("Channel name"),
+		}},
+		{Cond.always(), {
+			stringz("Text"),
+		}},
+	},
 },
 [0xFF13] = { -- 0x13
 },
@@ -2153,7 +2290,7 @@ SPacketDescription = {
 	stringz("Link URL"),
 },
 [0xFF18] = { -- 0x18
-	uint32("Cookie", base.HEX),
+	uint32("Cookie"),
 	uint32("HKEY", base.HEX, {
 		[0x80000000] = "HKEY_CLASSES_ROOT",
 		[0x80000001] = "HKEY_CURRENT_USER",
@@ -2285,12 +2422,12 @@ SPacketDescription = {
 	}},
 },
 [0xFF35] = { -- 0x35
-	uint32("Cookie", base.HEX),
+	uint32("Cookie"),
 	uint8{"Success", key="status"},
 	oldwhen{condition=Cond.equals("status", 0), block={
 		stringz("Profile\\Description value"),
 		stringz("Profile\\Location value"),
-		uint32("Clan Tag"),
+		strdw("Clan Tag"),
 	}},
 },
 [0xFF36] = { -- 0x36
@@ -2332,7 +2469,7 @@ SPacketDescription = {
 	-- stringz("Account name suggestion"),
 },
 [0xFF3E] = { -- 0x3E
-	uint32("MCP Cookie", base.HEX),
+	uint32("MCP Cookie"),
 	uint32{"MCP Status", key="status"},
 	oldwhen{condition=Cond.equals("status", 0), block={
 		array("MCP Chunk 1", uint32, 2),
@@ -2363,6 +2500,15 @@ SPacketDescription = {
 },
 [0xFF44] = { -- 0x44
 	uint8{"Subcommand ID", key="subcommand", nil, Descs.WarcraftGeneralSubcommandId},
+	-- Subcommand ID 0: Game search?
+	oldwhen{condition=Cond.equals("subcommand", 0), block = {
+		uint32("Cookie"),
+		uint8("Status", nil, {
+			[0x00] = "Search Started",
+			[0x04] = "Banned CD Key",
+		}),
+	}},
+	
 	-- Subcommand ID 2: Request ladder map listing
 	oldwhen{condition=Cond.equals("subcommand", 2), block = {
 		uint32("Cookie"),
@@ -2455,7 +2601,7 @@ SPacketDescription = {
 	}},
 	
 	-- Subcommand ID 9: Icon list request
-	oldwhen{condition=Cond.equals("subcommand", 0x9), block={
+	oldwhen{condition=Cond.equals("subcommand", 9), block={
 		uint32("Cookie"),
 		uint32("Unknown", base.HEX),
 		uint8("Tiers"),
@@ -2579,7 +2725,9 @@ SPacketDescription = {
 		[0x0F] = "Custom error. A string at the end of this message contains the error",
 	}},
 	array("Server Password Proof", uint8, 20),
-	stringz("Additional information"),
+	oldwhen{condition=Cond.equals("status", 0xF), block={
+		stringz("Additional information"),
+	}},
 },
 [0xFF55] = { -- 0x55
 	uint32("Status", nil, {
@@ -2732,7 +2880,7 @@ SPacketDescription = {
 },
 [0xFF72] = { -- 0x72
 	uint32("Cookie"),
-	uint32("Clan Tag"),
+	strdw("Clan Tag"),
 	stringz("Clan Name"),
 	stringz("Inviter's username"),
 	uint8{"Number of users being invited", key="users"},
@@ -2757,7 +2905,7 @@ SPacketDescription = {
 },
 [0xFF75] = { -- 0x75
 	uint8("Unknown"),
-	uint32("Clan tag"),
+	strdw("Clan tag"),
 	uint8("Rank", nil, Descs.ClanRank),
 },
 [0xFF76] = { -- 0x76
@@ -2784,7 +2932,7 @@ SPacketDescription = {
 },
 [0xFF79] = { -- 0x79
 	uint32("Cookie"),
-	uint32("Clan tag"),
+	strdw("Clan tag"),
 	stringz("Clan name"),
 	stringz("Inviter"),
 },
@@ -3686,27 +3834,51 @@ CPacketDescription = {
 },
 [0xFF44] = { -- 0x44
 	uint8{"Subcommand ID", key="subcommand", nil, Descs.WarcraftGeneralSubcommandId},
-	-- Subcommand ID 2: Request ladder map listing
-	oldwhen{ condition=Cond.equals("subcommand",0x02),
-		block = {  
-			uint32("Cookie"),
-			uint8{label="Number of types requested",key="num"},
-			iterator{label="Game Information", refkey="num", repeated={
-				strdw("Request data", Descs.WarcraftGeneralRequestType),
-				-- seems to be dword(0)
-				-- seems this is another war3 datatype, double strdw :)
-				uint32("Dword(0)"),
-			}},
-		},
+	-- Subcommand ID 0: Game search?
+	oldwhen{ condition=Cond.equals("subcommand", 0),
+		uint32("Cookie"),
+		uint32("Unknown"),
+		uint8("Unknown"),
+		uint8("Type", nil, {
+			[0x00] = "1vs1",
+			[0x01] = "2vs2",
+			[0x02] = "3vs3",
+			[0x03] = "4vs4",
+			[0x04] = "Free for All",
+		}),
+		uint16("Enabled Maps (every bit is one map, from 0x0000 to 0x0FFF)"),
+		uint16("Unknown"),
+		uint8("Unknown"),
+		uint32("TickCount"),
+		-- TODO: Flags?
+		uint32("Race", nil, {
+			[0x01] = "Human",
+			[0x02] = "Orc",
+			[0x04] = "Night Elf",
+			[0x08] = "Undead",
+			[0x20] = "Random",
+		}),
 	},
 	
+	-- Subcommand ID 2: Request ladder map listing
+	oldwhen{ condition=Cond.equals("subcommand", 2), block = { 
+		uint32("Cookie"),
+		uint8{label="Number of types requested",key="num"},
+		iterator{label="Game Information", refkey="num", repeated={
+			strdw("Request data", Descs.WarcraftGeneralRequestType),
+			-- seems to be dword(0)
+			-- seems this is another war3 datatype, double strdw :)
+			uint32("Dword(0)"),
+		}},
+	}},
 	
-	oldwhen{ condition=Cond.equals("subcommand",0x03),
+	-- Subcommand ID 3: WID_CANCELSEARCH
+	oldwhen{ condition=Cond.equals("subcommand", 3),
 		block = {  },
 	},
 	
 	-- Subcommand ID 4: User stats request
-	oldwhen{ condition=Cond.equals("subcommand",0x04),	block = {  
+	oldwhen{ condition=Cond.equals("subcommand", 4),	block = {  
 		uint32("Cookie"),
 		stringz("Username"),
 		strdw("Product ID", Descs.ClientTag),
@@ -3718,7 +3890,7 @@ CPacketDescription = {
 	}},
 	
 	-- Subcommand ID 8: Clan stats request
-	oldwhen{ condition=Cond.equals("subcommand",0x08),	block = { 
+	oldwhen{ condition=Cond.equals("subcommand", 8),	block = { 
 		uint32("Cookie"),
 		stringz("Account name"),
 		-- TODO: "' in strings?
@@ -3726,12 +3898,12 @@ CPacketDescription = {
 	}}, 
 	
 	-- Subcommand ID 9: Icon list request
-	oldwhen{ condition=Cond.equals("subcommand",0x09),	block = { 			
+	oldwhen{ condition=Cond.equals("subcommand", 9),	block = { 			
 		uint32("Cookie"),
 	}},
 	
 	-- Subcommand ID 10: Change icon
-	oldwhen{ condition=Cond.equals("subcommand",0x0A),	block = { 			
+	oldwhen{ condition=Cond.equals("subcommand", 0x0A),	block = { 			
 		strdw("Icon", Descs.W3Icon),
 	}},
 },
@@ -3751,9 +3923,9 @@ CPacketDescription = {
 	strdw("Platform ID", Descs.PlatformID),
 	strdw("Product ID", Descs.ClientTag),
 	uint32("Version Byte", base.HEX),
-	strdw("Product language"),
+	strdw("Product language", Descs.LangId),
 	ipv4("Local IP for NAT compatibility"),
-	int32("Time zone bias"),
+	int32("Time zone bias", nil, Descs.TimeZoneBias),
 	uint32("Locale ID", nil, Descs.LocaleID),
 	uint32("Language ID", nil, Descs.LocaleID),
 	stringz("Country abreviation"),
@@ -3860,7 +4032,7 @@ CPacketDescription = {
 },
 [0xFF70] = { -- 0x70
 	uint32("Cookie"),
-	uint32("Clan Tag"),
+	strdw("Clan Tag"),
 },
 [0xFF71] = { -- 0x71
 	uint32("Cookie"),
@@ -3895,7 +4067,7 @@ CPacketDescription = {
 },
 [0xFF79] = { -- 0x79
 	uint32("Cookie"),
-	uint32("Clan tag"),
+	strdw("Clan tag"),
 	stringz("Inviter"),
 	uint8("Response"),
 },
@@ -3916,7 +4088,7 @@ CPacketDescription = {
 },
 [0xFF82] = { -- 0x82
 	uint32("Cookie"),
-	uint32("User's clan tag"),
+	strdw("User's clan tag"),
 	stringz("Username"),
 },
 }
@@ -3925,7 +4097,7 @@ CPacketDescription = {
 
 	-- After all the initialization is finished, register plugin
 	-- to default port.
-	local udp_encap_table = DissectorTable.get("udp.port")
+	--local udp_encap_table = DissectorTable.get("udp.port")
 	local tcp_encap_table = DissectorTable.get("tcp.port")
 	--udp_encap_table:add(6112,p_bnetp)
 	tcp_encap_table:add(Config.server_port,p_bnetp)
