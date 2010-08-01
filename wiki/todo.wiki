@@ -11,11 +11,17 @@
   * Support different sessions of the protocol in the same capture file.
      * Conversation API is no available in lua.
      * A session is identified by it's src/dst ip and src/dst port.
-     * At the init entry point, called when Wiresharks is going to load a new file, the structures to store the sessions' properties should be initialized.
+     * At the init entry point, called when Wireshark is going to load a new file, the structures to store the sessions' properties should be initialized.
      * New functions should allow a packet description to read or write those structures.
      * Existing functions that rely on keys (iterator, when) may need to be improved to support session's properties to be used.
-  * dont make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
+  * don't make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
     * Workaround: add alias="none" parameter to iterator constructor.
+      * Readability?
+    * There are 3 types of iterators:
+      * Flat, like S>0x0b channel list (if only 1 item in iterator)
+      * Nested, with 1 common tree per iterator (if only 1 item in iterator)
+      * Nested, with a tree for every iteration (if more than 1 item in iterator)
+    * Add a possibility to add count to labels, e.g. "%num%"
   * Allow field reuse
     * Keep a cache of fields used by packet descriptions.
     * When defining a field first look in the cache.
@@ -28,19 +34,18 @@
     * ~~strdw(label, value_string_map)~~
     * iterator
     * flags
-  * ~~Mixed parameter form in function call, like in python~~
-    * Done. Does it work?
-      * Yes, it does.
   * More Documentation?
     * Document API (data decoder API, like uint32())
     * LuaDoc
-  * Supress double value output in ipv4() and version()
+  * Suppress double value output in ipv4() and version()
     * In ipv4, one of the values got replaced with DNS if DNS resolving is turned on
+    * If workaround not found for version() - decode it manually?
   * Use Wireshark's "User Preferences" to allow run-time changes in the configuration.
   * Investigate GeoIP.
     * It only shows something in IPv4 Tree.
   * [http://code.google.com/p/llvm-lua/ llvm-lua]: JIT/Static compiler for Lua using LLVM on the backend.
     * It may be worth to try to integrate a JIT compiler into Wireshark's Lua based plugins :)
+      * Agree, lua plugins are hell slow, simplest dissector slows shark down 2-3 times.
   * Non-existing desc table in strdw(): no error message
     * As in `strdw("akj", Desc.NotDefined)`?
   * strdw(): key not exists in the table - display "Unknown" as for other types?
@@ -82,3 +87,6 @@
     * Bug of lua interpreter / wireshark lua interface / wireshark itself?
       * Crashed, if hash and usual forms were mixed in function call.
     * Crashed 1.2.3 and [http://www.wireshark.org/download/prerelease/wireshark-win32-1.2.7pre1-31873.exe latest pre-release win32-1.2.7pre1-31873]. I think, we need to report bug. 1.2.6 [https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=4176 didn't even worked on 2000]
+  * ~~Mixed parameter form in function call, like in python~~
+    * Done. Does it work?
+      * Yes, it does.
