@@ -2117,6 +2117,8 @@ SPacketDescription = {
 		[0x01] = "Success",
 	}),
 },
+
+
 [0xFF09] = { -- 0x09
 	uint32{label="Number of games", key="games"},
 	oldwhen{condition=Cond.equals("games", 0),
@@ -2127,8 +2129,14 @@ SPacketDescription = {
 			-- error in description?
 			-- pvpgn sux? but how starcraft handles both formats?
 			iterator{label="Game Information", refkey="games", repeated={
-				--uint32("Unknown"), -- seems to be bool32 - only on pvpgn
-				uint16{"Game Type", base.HEX, {
+				-- XXX: dirty PvPGN hack
+				-- for pvpgn, must be 0 or 1
+				-- for battle.net, must be >= 2
+				uint16{key="key", getvalueonly=true},
+				oldwhen{ condition=Cond.inlist("key", {0,1}), block={
+					uint32("Unknown (PvPGN)"), -- seems to be bool32 - only on pvpgn
+				}},
+				uint16{"Game Type", nil, {
 					[0x02] = "Melee",
 					[0x03] = "Free for all",
 					[0x04] = "one vs one",
@@ -2144,8 +2152,7 @@ SPacketDescription = {
 					[0x0F] = "Top vs Bottom",
 					[0x10] = "Iron man ladder",
 				}, key = "gametype"},
-				-- uint16("Parameter", base.HEX),
-				-- [[ source:unverified
+				-- source:unverified
 				when{ 
 				{Cond.inlist("gametype", {2, 3, 4, 5, 8}), { -- melee / ffa / 1 on 1 / CTF / suddenDeath
 					uint16("Penalty", nil, {
@@ -2191,13 +2198,13 @@ SPacketDescription = {
 				}},
 				{Cond.equals("gametype", 0xF), { -- Top vs Bottom
 					uint16("Teams", nil, { -- TODO: x vs the rest?
-						[1] = "1 vs 7",
-						[2] = "2 vs 6",
-						[3] = "3 vs 5",
-						[4] = "4 vs 4",
-						[5] = "5 vs 3",
-						[6] = "6 vs 2",
-						[7] = "7 vs 1",
+						[1] = "1 vs all",
+						[2] = "2 vs all",
+						[3] = "3 vs all",
+						[4] = "4 vs all",
+						[5] = "5 vs all",
+						[6] = "6 vs all",
+						[7] = "7 vs all",
 					})
 				}},
 				-- default block
@@ -2205,12 +2212,13 @@ SPacketDescription = {
 					uint16("Parameter", base.HEX) 
 				}}
 				},
-			--]]
-				uint32("Language ID", base.HEX, Descs.LocaleID), -- only on bnet - comment out for pvpgn
+				oldwhen{ condition=Cond.neg( Cond.inlist("key", {0,1}) ), block={
+					uint32("Language ID", nil, Descs.LocaleID), -- only on bnet - comment out for pvpgn
+				}},
 				--sockaddr("Game Host"),
 				sockaddr(),
 				uint32("Status", nil, Descs.GameStatus),
-				uint32("Elapsed time"),
+				uint32("Elapsed time (sec)"),
 				stringz("Game name"),
 				stringz("Game password"),
 				stringz("Game statstring"),
@@ -2326,7 +2334,7 @@ SPacketDescription = {
 	uint32{"Number of keys", key="numkeys"},
 	uint32("Request ID"),
 	iterator{label="Requested Account", refkey="numaccts", repeated={
-		iterator{label="Key Values", refkey="numkeys", repeated={
+		iterator{alias="none", label="Key Values", refkey="numkeys", repeated={
 			stringz("Requested Key Value"),
 		}},
 	}},
@@ -2407,8 +2415,8 @@ SPacketDescription = {
 	}),
 },
 [0xFF33] = { -- 0x33
-	uint32("Request ID", base.HEX),
-	uint32("Unknown", base.HEX),
+	uint32("Request ID"),
+	uint32("Unknown"),
 	wintime("Last update time"),
 	stringz("Filename"),
 },
@@ -3512,7 +3520,7 @@ CPacketDescription = {
 	stringz("Map name - 0x0d terminated"),
 },
 [0xFF09] = { -- 0x09
-	uint16("Product-specific condition 1, for STAR/SEXP/SSHR/JSTR and W2BN - game type", nil, {
+	uint16("For STAR/SEXP/SSHR/JSTR and W2BN - game type", nil, {
 		[0x00] = "All",
 		[0x02] = "Melee",
 		[0x03] = "Free for all",
@@ -3680,13 +3688,13 @@ CPacketDescription = {
 	uint32("Ping Value", base.HEX),
 },
 [0xFF26] = { -- 0x26
-	uint32{label="Number of Accounts", key="numaccts"},
-	uint32{label="Number of Keys", key="numkeys"},
-	uint32("Request ID", base.HEX),
-	iterator{label="Requested Account", refkey="numaccts", repeated={
+	uint32{"Number of Accounts", key="numaccts"},
+	uint32{"Number of Keys", key="numkeys"},
+	uint32("Request ID"),
+	iterator{alias="none", label="Requested Account", refkey="numaccts", repeated={
 		stringz("Account"),
 	}},
-	iterator{label="Keys", refkey="numkeys", repeated={
+	iterator{alias="none", label="Keys", refkey="numkeys", repeated={
 		stringz("Key"),
 	}}, 
 },
@@ -3694,7 +3702,7 @@ CPacketDescription = {
 	uint32{label="Number of accounts", key="numaccts"},	-- TODO: it works?
 	uint32{label="Number of keys", key="numkeys"},
 	iterator{label="Accounts to update", refkey="numaccts", repeated={
-		stringz("Account"),
+		stringz("Account" --[[,{[""] = "Own account",}]]),
 	}},
 	iterator{label="Keys to update", refkey="numkeys", repeated={
 		stringz("Key"),

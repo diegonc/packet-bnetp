@@ -3573,7 +3573,7 @@ CPacketDescription = {
 
 ]]
 [SID_GETADVLISTEX] = { -- 0x09
-	uint16("Product-specific condition 1, for STAR/SEXP/SSHR/JSTR and W2BN - game type", nil, {
+	uint16("For STAR/SEXP/SSHR/JSTR and W2BN - game type", nil, {
 		[0x00] = "All",
 		[0x02] = "Melee",
 		[0x03] = "Free for all",
@@ -4313,13 +4313,13 @@ CPacketDescription = {
 
 ]]
 [SID_READUSERDATA] = { -- 0x26
-	uint32{label="Number of Accounts", key="numaccts"},
-	uint32{label="Number of Keys", key="numkeys"},
-	uint32("Request ID", base.HEX),
-	iterator{label="Requested Account", refkey="numaccts", repeated={
+	uint32{"Number of Accounts", key="numaccts"},
+	uint32{"Number of Keys", key="numkeys"},
+	uint32("Request ID"),
+	iterator{alias="none", label="Requested Account", refkey="numaccts", repeated={
 		stringz("Account"),
 	}},
-	iterator{label="Keys", refkey="numkeys", repeated={
+	iterator{alias="none", label="Keys", refkey="numkeys", repeated={
 		stringz("Key"),
 	}}, 
 },
@@ -4354,7 +4354,7 @@ CPacketDescription = {
 	uint32{label="Number of accounts", key="numaccts"},	-- TODO: it works?
 	uint32{label="Number of keys", key="numkeys"},
 	iterator{label="Accounts to update", refkey="numaccts", repeated={
-		stringz("Account"),
+		stringz("Account" --[[,{[""] = "Own account",}]]),
 	}},
 	iterator{label="Keys to update", refkey="numkeys", repeated={
 		stringz("Key"),

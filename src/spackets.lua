@@ -2099,96 +2099,7 @@ SPacketDescription = {
     Related:       [0x09] SID_GETADVLISTEX (C->S)
 
 ]]
-[SID_GETADVLISTEX] = { -- 0x09
-	uint32{label="Number of games", key="games"},
-	oldwhen{condition=Cond.equals("games", 0),
-		block = {
-			uint32("Status", nil, Descs.GameStatus)
-		},
-		otherwise = {
-			-- error in description?
-			-- pvpgn sux? but how starcraft handles both formats?
-			iterator{label="Game Information", refkey="games", repeated={
-				--uint32("Unknown"), -- seems to be bool32 - only on pvpgn
-				uint16{"Game Type", base.HEX, {
-					[0x02] = "Melee",
-					[0x03] = "Free for all",
-					[0x04] = "one vs one",
-					[0x05] = "CTF",
-					[0x06] = "Greed",
-					[0x07] = "Slaughter",
-					[0x08] = "Sudden Death",
-					[0x09] = "Ladder",
-					[0x0A] = "Use Map Settings",
-					[0x0B] = "Team Melee",
-					[0x0C] = "Team FFA",
-					[0x0D] = "Team CTF",
-					[0x0F] = "Top vs Bottom",
-					[0x10] = "Iron man ladder",
-				}, key = "gametype"},
-				-- uint16("Parameter", base.HEX),
-				-- [[ source:unverified
-				when{ 
-				{Cond.inlist("gametype", {2, 3, 4, 5, 8}), { -- melee / ffa / 1 on 1 / CTF / suddenDeath
-					uint16("Penalty", nil, {
-						[1] = "Melee Disc",
-						[2] = "Loss",
-					})
-				}},
-				{Cond.equals("gametype", 6), { -- Greed
-					uint16("Resources", nil, {
-						[1] = 2500,
-						[2] = 5000,
-						[3] = 7500,
-						[4] = 10000,
-					})
-				}},
-				{Cond.equals("gametype", 7), { -- Slaughter
-					uint16("Minutes", nil, {
-						[1] = 15,
-						[2] = 30,
-						[3] = 45,
-						[4] = 60,
-						-- ["default"] = "Unlimited",
-					})
-				}},
-				{Cond.equals("gametype", 9), { -- Ladder
-					uint16("Penalty", nil, {
-						[1] = "Ladder Disc",
-						[2] = "Ladder Loss + Disc",
-					})
-				}},
-				{Cond.equals("gametype", 0xA), { -- UMS
-					uint16("Penalty", nil, {
-						[1] = "Draw",
-						[2] = "Draw",
-					})
-				}},
-				{Cond.inlist("gametype", {0xB,0xC,0xD}), { -- Team melee / team FFA / team CTF
-					uint16("Teams", nil, {
-						[1] = 2,
-						[2] = 3,
-						[3] = 4,
-					})
-				}},
-				{Cond.equals("gametype", 0xF), { -- Top vs Bottom
-					uint16("Teams", nil, { -- TODO: x vs the rest?
-						[1] = "1 vs 7",
-						[2] = "2 vs 6",
-						[3] = "3 vs 5",
-						[4] = "4 vs 4",
-						[5] = "5 vs 3",
-						[6] = "6 vs 2",
-						[7] = "7 vs 1",
-					})
-				}},
-				-- default block
-				{Cond.always(), { 
-					uint16("Parameter", base.HEX) 
-				}}
-				},
-			--]]
-				--[[doc
+--[[doc	from SCGP client
 	Select Case m_Game(i).GameType
         Case 2, 3, 4, 5, 8 'melee / ffa / 1 on 1 / CTF / suddenDeath
             Select Case m_Game(i).Penalty
@@ -2244,12 +2155,109 @@ SPacketDescription = {
             m_InfoA(8) = "???????:"
             m_InfoB(8) = "?"
     End Select
-				--]]
-				uint32("Language ID", base.HEX, Descs.LocaleID), -- only on bnet - comment out for pvpgn
+--]]
+
+
+[SID_GETADVLISTEX] = { -- 0x09
+	uint32{label="Number of games", key="games"},
+	oldwhen{condition=Cond.equals("games", 0),
+		block = {
+			uint32("Status", nil, Descs.GameStatus)
+		},
+		otherwise = {
+			-- error in description?
+			-- pvpgn sux? but how starcraft handles both formats?
+			iterator{label="Game Information", refkey="games", repeated={
+				-- XXX: dirty PvPGN hack
+				-- for pvpgn, must be 0 or 1
+				-- for battle.net, must be >= 2
+				uint16{key="key", getvalueonly=true},
+				oldwhen{ condition=Cond.inlist("key", {0,1}), block={
+					uint32("Unknown (PvPGN)"), -- seems to be bool32 - only on pvpgn
+				}},
+				uint16{"Game Type", nil, {
+					[0x02] = "Melee",
+					[0x03] = "Free for all",
+					[0x04] = "one vs one",
+					[0x05] = "CTF",
+					[0x06] = "Greed",
+					[0x07] = "Slaughter",
+					[0x08] = "Sudden Death",
+					[0x09] = "Ladder",
+					[0x0A] = "Use Map Settings",
+					[0x0B] = "Team Melee",
+					[0x0C] = "Team FFA",
+					[0x0D] = "Team CTF",
+					[0x0F] = "Top vs Bottom",
+					[0x10] = "Iron man ladder",
+				}, key = "gametype"},
+				-- source:unverified
+				when{ 
+				{Cond.inlist("gametype", {2, 3, 4, 5, 8}), { -- melee / ffa / 1 on 1 / CTF / suddenDeath
+					uint16("Penalty", nil, {
+						[1] = "Melee Disc",
+						[2] = "Loss",
+					})
+				}},
+				{Cond.equals("gametype", 6), { -- Greed
+					uint16("Resources", nil, {
+						[1] = 2500,
+						[2] = 5000,
+						[3] = 7500,
+						[4] = 10000,
+					})
+				}},
+				{Cond.equals("gametype", 7), { -- Slaughter
+					uint16("Minutes", nil, {
+						[1] = 15,
+						[2] = 30,
+						[3] = 45,
+						[4] = 60,
+						-- ["default"] = "Unlimited",
+					})
+				}},
+				{Cond.equals("gametype", 9), { -- Ladder
+					uint16("Penalty", nil, {
+						[1] = "Ladder Disc",
+						[2] = "Ladder Loss + Disc",
+					})
+				}},
+				{Cond.equals("gametype", 0xA), { -- UMS
+					uint16("Penalty", nil, {
+						[1] = "Draw",
+						[2] = "Draw",
+					})
+				}},
+				{Cond.inlist("gametype", {0xB,0xC,0xD}), { -- Team melee / team FFA / team CTF
+					uint16("Teams", nil, {
+						[1] = 2,
+						[2] = 3,
+						[3] = 4,
+					})
+				}},
+				{Cond.equals("gametype", 0xF), { -- Top vs Bottom
+					uint16("Teams", nil, { -- TODO: x vs the rest?
+						[1] = "1 vs all",
+						[2] = "2 vs all",
+						[3] = "3 vs all",
+						[4] = "4 vs all",
+						[5] = "5 vs all",
+						[6] = "6 vs all",
+						[7] = "7 vs all",
+					})
+				}},
+				-- default block
+				{Cond.always(), { 
+					uint16("Parameter", base.HEX) 
+				}}
+				},
+				oldwhen{ condition=Cond.neg( Cond.inlist("key", {0,1}) ), block={
+					uint32("Language ID", nil, Descs.LocaleID), -- only on bnet - comment out for pvpgn
+				}},
 				--sockaddr("Game Host"),
 				sockaddr(),
 				uint32("Status", nil, Descs.GameStatus),
-				uint32("Elapsed time"),
+				uint32("Elapsed time (sec)"),
 				stringz("Game name"),
 				stringz("Game password"),
 				stringz("Game statstring"),
@@ -2767,7 +2775,7 @@ SPacketDescription = {
 	uint32{"Number of keys", key="numkeys"},
 	uint32("Request ID"),
 	iterator{label="Requested Account", refkey="numaccts", repeated={
-		iterator{label="Key Values", refkey="numkeys", repeated={
+		iterator{alias="none", label="Key Values", refkey="numkeys", repeated={
 			stringz("Requested Key Value"),
 		}},
 	}},
@@ -3106,8 +3114,8 @@ SPacketDescription = {
 
 ]]
 [SID_GETFILETIME] = { -- 0x33
-	uint32("Request ID", base.HEX),
-	uint32("Unknown", base.HEX),
+	uint32("Request ID"),
+	uint32("Unknown"),
 	wintime("Last update time"),
 	stringz("Filename"),
 },
