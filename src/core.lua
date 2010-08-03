@@ -831,12 +831,12 @@ do
 						infostr = infostr .. v.sname .. ", "
 					end
 				end
-				state.bnet_node = bn
-				state:read(self.size())
 				if infostr ~= "" then
 					infostr = (string.gsub(infostr, "^(.*),%s*$", "%1"))
 					state.bnet_node:append_text(" (" .. infostr .. ")")
 				end
+				state.bnet_node = bn
+				state:read(self.size())
 			end
 			return tmp
 		end

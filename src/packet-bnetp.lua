@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on %time%
+--[[ packet-bnetp.lua build on Mon Aug  2 22:54:49 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -1707,12 +1707,12 @@ end
 						infostr = infostr .. v.sname .. ", "
 					end
 				end
-				state.bnet_node = bn
-				state:read(self.size())
 				if infostr ~= "" then
 					infostr = (string.gsub(infostr, "^(.*),%s*$", "%1"))
 					state.bnet_node:append_text(" (" .. infostr .. ")")
 				end
+				state.bnet_node = bn
+				state:read(self.size())
 			end
 			return tmp
 		end
