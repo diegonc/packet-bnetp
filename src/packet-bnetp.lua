@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Fri Aug  6 18:00:35 2010
+--[[ packet-bnetp.lua build on Fri Aug  6 19:34:08 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -1474,7 +1474,7 @@ local function define_integer(isize)
 
 	getfenv(2)[typename] = function(...)
 		local args = make_args_table_with_positional_map(
-				{"label", "base", "descs"}, unpack(arg))
+				{"label", "base", "desc"}, unpack(arg))
 
 		return create_proto_field(template, args)
 	end
@@ -1850,25 +1850,7 @@ do
 	end
 end
 
---[[
---  when
---
---  Selects a block of fields from a list when it's associated condition
---  is true.
---
---  Walks though the list of pairs received as argument sequentially evaluating
---  the first element and if it was true executing the second element of the
---  pair as a block of fields.
---
---  Only one block is executed.
---
---  Table call: { {condition, block}, ... )
---    @par condition Function that returns true if the block should be
---                   used given the current state.
---    @par block     Block of fields that will be executed when condition
---                   is true.
---
---]]
+
 do
 	local template = {
 		protofield_type = "none",
@@ -1883,7 +1865,26 @@ do
 		end
 	end
 
-  function when (...)
+	--[[
+	--  when
+	--
+	--  Selects a block of fields from a list when it's associated condition
+	--  is true.
+	--
+	--  Walks though the list of pairs received as argument sequentially evaluating
+	--  the first element and if it was true executing the second element of the
+	--  pair as a block of fields.
+	--
+	--  Only one block is executed.
+	--
+	--  Table call: { {condition, block}, ... }
+	--    @par condition Function that returns true if the block should be
+	--                   used given the current state.
+	--    @par block     Block of fields that will be executed when condition
+	--                   is true.
+	--
+	--]]
+	function when (...)
 		local tmp = create_proto_field(template, {})
 		if (#arg == 1) and arg[1].tests then
 			tmp.tests = arg[1].tests
@@ -1900,10 +1901,30 @@ do
 		end
 		return tmp
 	end
+
+	--[[
+	--  oldwhen
+	--
+	--  Selects a block of fields from two alternatives acording to a condition
+	--  function result.
+	--
+	--  Only one block is executed.
+	--
+	--  Quick call: ( condition, block, otherwise )
+	--  Table call: { condition=..., block=..., otherwise=... }
+	--    @par condition Function that returns true if the block should be
+	--                   used given the current state.
+	--    @par block     Block of fields that will be executed when condition
+	--                   is true.
+	--    @par otherwise Block of fields used when condition is false.
+	--
+	--]]
 	function oldwhen (...)
-		local par = { { arg[1].condition, arg[1].block } }
-		if arg[1].otherwise then
-			par[2] = { function() return true end, arg[1].otherwise }
+		local args = make_args_table_with_positional_map(
+				{"condition", "block", "otherwise"}, unpack(arg))
+		local par = { { args.condition, args.block } }
+		if args.otherwise then
+			par[2] = { function() return true end, args.otherwise }
 		end
 		return when (unpack(par))
 	end
