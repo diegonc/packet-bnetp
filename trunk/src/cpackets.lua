@@ -5210,7 +5210,7 @@ WID_SETICON 0x0A SEND
 			0x00000020: Random
 	]]
 	-- Subcommand ID 0: Game search?
-	oldwhen{ condition=Cond.equals("subcommand", 0),
+	oldwhen{ condition=Cond.equals("subcommand", 0), block={
 		uint32("Cookie"),
 		uint32("Unknown"),
 		uint8("Unknown"),
@@ -5233,7 +5233,7 @@ WID_SETICON 0x0A SEND
 			[0x08] = "Undead",
 			[0x20] = "Random",
 		}),
-	},
+	}},
 	
 	-- Subcommand ID 2: Request ladder map listing
 	oldwhen{ condition=Cond.equals("subcommand", 2), block = { 
