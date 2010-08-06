@@ -2501,7 +2501,7 @@ SPacketDescription = {
 
 ]]
 [SID_CHATEVENT] = { -- 0x0F
-	uint32{"Event ID", key="eid", nil, { -- TODO: hash name for base?
+	uint32{"Event ID", key="eid", filter="eid", nil, {
 		[0x01] = "EID_SHOWUSER: User in channel",
 		[0x02] = "EID_JOIN: User joined channel",
 		[0x03] = "EID_LEAVE: User left channel",
@@ -3250,11 +3250,8 @@ SPacketDescription = {
 
     Remarks:       Status:
                    0x00: Success
-
                    0x01: Account Does Not Exist
-
                    0x02: Invalid Password
-
                    0x06: Account Closed
                    The string containing the reason is only present when your account is
                    closed, if not, it should be empty.
@@ -3321,13 +3318,9 @@ SPacketDescription = {
 
                    Result:
                    0x00: Account created
-
                    0x02: Name contained invalid characters
-
                    0x03: Name contained a banned word
-
                    0x04: Account already exists
-
                    0x06: Name did not contain enough alphanumeric characters
 
     Related:       [0x3D] SID_CREATEACCOUNT2 (C->S)
@@ -3751,7 +3744,7 @@ WID_SETICON 0x0A SEND
 	(DWORD) Icon 
 ]]
 [SID_WARCRAFTGENERAL] = { -- 0x44
-	uint8{"Subcommand ID", key="subcommand", nil, Descs.WarcraftGeneralSubcommandId},
+	uint8{"Subcommand ID", key="subcommand", filter="wid", nil, Descs.WarcraftGeneralSubcommandId},
 	--[[doc
 		WID_GAMESEARCH 0x00 RECV
 		(DWORD) Cookie

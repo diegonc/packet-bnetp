@@ -2,7 +2,7 @@
 do
 	-- Plugin configurable parameters.
 	local Config = {
-		-- default port (changeable in "Decode as...")
+		-- default port (you can add another port with "Decode as...")
 		server_port = 6112,
 		-- lite mode - decode only packet headers
 		lite = false,
@@ -62,7 +62,7 @@ do
 		[0xF7] = "W3IGP",
 		[0xFF] = "BNCS",
 	})
-	local f_pid  = ProtoField.uint8("bnetp.pid")
+	local f_pid  = ProtoField.uint8("bnetp.pid", "Packet ID")
 	local f_plen = ProtoField.uint16("bnetp.plen","Packet Length",base.DEC)
 	local f_data = ProtoField.bytes("bnetp.unhandled","Unhandled Packet Data")
 	
