@@ -323,10 +323,26 @@ do
 			end
 		end,
 	}
-
+	local function check_table(t, pdesc)
+		if type(t) ~= "table" then
+			local str = "Wrong packet description {\n"
+			for k,v in pairs(pdesc) do
+				str = str .. "\t"
+				if type(k) ~= "number" then
+					str = str .. tostring(k) .. " = "
+				end
+				str = str .. tostring(v) .. ",\n"
+			end
+			str = str .. "}\n"
+			str = str .. package.loaded.debug.traceback()
+			print (str)
+			error(str)
+		end
+	end
 	-- Packet dissector
 	function dissect_packet(state, pdesc)
 		for k,v in pairs(pdesc) do
+			check_table(v, pdesc)
 			if v.key and v.value then
 				state.packet[v.key] = v:value(state)
 			elseif v.key then
