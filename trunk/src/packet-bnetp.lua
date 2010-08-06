@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Fri Aug  6 16:04:45 2010
+--[[ packet-bnetp.lua build on Fri Aug  6 18:00:35 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -457,6 +457,13 @@ do
 		end
 	end
 
+	local function add_filter_prefix(filter)
+		if filter == nil or string.find(filter, "^bnetp%.")
+			then return filter
+			else return "bnetp." .. filter
+		end
+	end
+
 	-- ProtoField wrapper
 	--   * Wireshar base types
 	local wireshark_base_types = {
@@ -490,7 +497,7 @@ do
 			-- and desc argument
 			if field then
 				verify_field_args(instance)
-				tmp.pf = field(instance.filter or "",
+				tmp.pf = field(add_filter_prefix(instance.filter) or "",
 					instance.label,
 					instance.display,
 					instance.desc,
