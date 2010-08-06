@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Mon Aug  2 22:54:49 2010
+--[[ packet-bnetp.lua build on %time%
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -28,7 +28,7 @@ at the end of the file.
 do
 	-- Plugin configurable parameters.
 	local Config = {
-		-- default port (changeable in "Decode as...")
+		-- default port (you can add another port with "Decode as...")
 		server_port = 6112,
 		-- lite mode - decode only packet headers
 		lite = false,
@@ -88,7 +88,7 @@ do
 		[0xF7] = "W3IGP",
 		[0xFF] = "BNCS",
 	})
-	local f_pid  = ProtoField.uint8("bnetp.pid")
+	local f_pid  = ProtoField.uint8("bnetp.pid", "Packet ID")
 	local f_plen = ProtoField.uint16("bnetp.plen","Packet Length",base.DEC)
 	local f_data = ProtoField.bytes("bnetp.unhandled","Unhandled Packet Data")
 	
@@ -2242,7 +2242,7 @@ SPacketDescription = {
 	}
 },
 [0xFF0F] = { -- 0x0F
-	uint32{"Event ID", key="eid", nil, { -- TODO: hash name for base?
+	uint32{"Event ID", key="eid", filter="eid", nil, {
 		[0x01] = "EID_SHOWUSER: User in channel",
 		[0x02] = "EID_JOIN: User joined channel",
 		[0x03] = "EID_LEAVE: User left channel",
@@ -2507,7 +2507,7 @@ SPacketDescription = {
 	stringz("Ad URL"),
 },
 [0xFF44] = { -- 0x44
-	uint8{"Subcommand ID", key="subcommand", nil, Descs.WarcraftGeneralSubcommandId},
+	uint8{"Subcommand ID", key="subcommand", filter="wid", nil, Descs.WarcraftGeneralSubcommandId},
 	-- Subcommand ID 0: Game search?
 	oldwhen{condition=Cond.equals("subcommand", 0), block = {
 		uint32("Cookie"),
