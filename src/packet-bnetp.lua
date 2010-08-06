@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Fri Aug  6 19:34:08 2010
+--[[ packet-bnetp.lua build on Fri Aug  6 20:48:11 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -349,10 +349,26 @@ do
 			end
 		end,
 	}
-
+	local function check_table(t, pdesc)
+		if type(t) ~= "table" then
+			local str = "Wrong packet description {\n"
+			for k,v in pairs(pdesc) do
+				str = str .. "\t"
+				if type(k) ~= "number" then
+					str = str .. tostring(k) .. " = "
+				end
+				str = str .. tostring(v) .. ",\n"
+			end
+			str = str .. "}\n"
+			str = str .. package.loaded.debug.traceback()
+			print (str)
+			error(str)
+		end
+	end
 	-- Packet dissector
 	function dissect_packet(state, pdesc)
 		for k,v in pairs(pdesc) do
+			check_table(v, pdesc)
 			if v.key and v.value then
 				state.packet[v.key] = v:value(state)
 			elseif v.key then
@@ -1922,6 +1938,9 @@ do
 	function oldwhen (...)
 		local args = make_args_table_with_positional_map(
 				{"condition", "block", "otherwise"}, unpack(arg))
+		if args.params then
+			error(package.loaded.debug.traceback())
+		end
 		local par = { { args.condition, args.block } }
 		if args.otherwise then
 			par[2] = { function() return true end, args.otherwise }
@@ -4222,7 +4241,7 @@ CPacketDescription = {
 [0xFF44] = { -- 0x44
 	uint8{"Subcommand ID", key="subcommand", nil, Descs.WarcraftGeneralSubcommandId},
 	-- Subcommand ID 0: Game search?
-	oldwhen{ condition=Cond.equals("subcommand", 0),
+	oldwhen{ condition=Cond.equals("subcommand", 0), block={
 		uint32("Cookie"),
 		uint32("Unknown"),
 		uint8("Unknown"),
@@ -4245,7 +4264,7 @@ CPacketDescription = {
 			[0x08] = "Undead",
 			[0x20] = "Random",
 		}),
-	},
+	}},
 	
 	-- Subcommand ID 2: Request ladder map listing
 	oldwhen{ condition=Cond.equals("subcommand", 2), block = { 

@@ -70,6 +70,9 @@ do
 	function oldwhen (...)
 		local args = make_args_table_with_positional_map(
 				{"condition", "block", "otherwise"}, unpack(arg))
+		if args.params then
+			error(package.loaded.debug.traceback())
+		end
 		local par = { { args.condition, args.block } }
 		if args.otherwise then
 			par[2] = { function() return true end, args.otherwise }
