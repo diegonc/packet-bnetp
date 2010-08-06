@@ -4,6 +4,7 @@
     * ~~Packet ID and direction~~
     * Other packet dependent information.
     * Some framework may be needed to specify this in the packet description.
+      * See iterator suggestion lower.
   * [http://code.google.com/p/ghostplusplus/source/browse/trunk/ghost/util.cpp?r=321#520 statstring decoder] game and user statstrings
     * Client dependent data types.
   * Add Config.client value to decide how to decode the raw data.
@@ -17,14 +18,15 @@
   * don't make dropdown list on iterator with counter if iterator's repeatable block consists of only one operator?
     * Workaround: add alias="none" parameter to iterator constructor.
       * Readability?
-    * 2 keys
-      * Create a node for iterator?
-      * Create a node for every iteration?
+    * 2 keys needed
+      * Create a node for iterator itself?
+      * Create a node for every iteration (mandatory if there are many items in iterator)?
     * There are 3 types of iterators:
       * (no, no) Flat, like S>0x0b channel list (if only 1 item in iterator)
       * (yes, no) Nested, with 1 common tree per iterator (if only 1 item in iterator)
       * (yes, yes) Nested, with a tree for every iteration (if more than 1 item in iterator)
     * Add a possibility to add count to labels, e.g. "%num%". Numbers are counted from 1.
+    * Usind variables in labels, like "%varname%" (format can vary). Variables are substituted after iteration.
   * Allow field reuse
     * Keep a cache of fields used by packet descriptions.
     * When defining a field first look in the cache.
@@ -37,6 +39,7 @@
     * ~~strdw(label, value_string_map)~~
     * iterator
     * flags
+    * when
   * More Documentation?
     * Document API (data decoder API, like uint32())
     * LuaDoc
@@ -44,17 +47,18 @@
     * In ipv4, one of the values got replaced with DNS if DNS resolving is turned on
     * If workaround not found for version() - decode it manually?
   * Use Wireshark's "User Preferences" to allow run-time changes in the configuration.
-  * Investigate GeoIP.
-    * It only shows something in IPv4 Tree.
   * [http://code.google.com/p/llvm-lua/ llvm-lua]: JIT/Static compiler for Lua using LLVM on the backend.
     * It may be worth to try to integrate a JIT compiler into Wireshark's Lua based plugins :)
       * Agree, lua plugins are hell slow, simplest dissector slows shark down 2-3 times.
-  * Non-existing desc table in strdw(): no error message
-    * As in `strdw("akj", Desc.NotDefined)`?
-  * strdw(): key not exists in the table - display "Unknown" as for other types?
-    * Other types display "Unknown"?
+  * strdw issues
+    * Non-existing desc table in strdw(): no error message
+      * As in `strdw("akj", Desc.NotDefined)`?
+    * strdw(): key not exists in the table - display "Unknown" as for other types?
+      * Other types display "Unknown"?
   * Specify length as key in array()
-  * SID_CHATEVENT event id and SID_WARCRAFTGENERAL subcommand id as filter?
+  * ~~SID_CHATEVENT event id and SID_WARCRAFTGENERAL subcommand id as filter?~~
+    * Authomatically append "bnetp." to filter name
+  * stringz valuemaps
 
 ==done==
 ===most important===
@@ -93,3 +97,5 @@
   * ~~Mixed parameter form in function call, like in python~~
     * Done. Does it work?
       * Yes, it does.
+  * Investigate GeoIP.
+    * It only shows something in IPv4 Tree.
