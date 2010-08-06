@@ -696,7 +696,8 @@ do
 
 	#include "constants.lua"
 	#include "valuemaps.lua"
-
+	#include "checkedtable.lua"
+	
 	do
 		local bytes = WProtoField.bytes
 		local uint64 = WProtoField.uint64

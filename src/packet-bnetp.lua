@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on %time%
+--[[ packet-bnetp.lua build on Fri Aug  6 01:51:30 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -1530,31 +1530,57 @@ Cond = {
 	end,
 }
 
+-- End valuemaps.lua
 do
+	--
+	-- CheckedTable
+	--
+	-- Metatable that implements the metamethods required for verifying
+	-- that a field is defined before it may be succesfully read.
+	--
+	-- ChackedTable may be used as the metatable of any amount of tables
+	-- at a time.
+	--
 	local CheckedTable = {
+		--
+		-- Maps a table for which CheckedTable is it's metatable to a string
+		-- that is used to refer to the table when reporting error.
+		--
+		-- The default value is 'thing'.
+		--
 		tableType = setmetatable({}, {
 			__mode = "k",
 			__index = function () return "'thing'" end }),
+		--
+		-- Maps a table for which CheckedTable is it's metatable to the set
+		-- of fields that are declared.
+		--
 		declaredNames = setmetatable({}, {
 			__mode = "k",
 			__index = function () return {} end } ), 
 	}
 
+	--
+	-- A table will be read only while it's guarded by CheckedTable.
+	-- No new field may be created.
+	--
 	function CheckedTable.__newindex (t, n, v)
-		if not CheckedTable.declaredNames[t][n] then
-			error("attempt to write to undeclared var: "..n, 2)
-		else
-			CheckedTable.declaredNames[t][n] = true
-			rawset(t, n, v)   -- do the actual set
-		end
+		error("attempt to write to a new field '"..n.."' in a read only table.", 2)
 	end
 
+	--
+	-- A table will not allow reading from non existant fields while it's
+	-- guarded by CheckedTable.
+	--
 	function CheckedTable.__index (t, n)
 		error("attempt to read undeclared "
 			.. CheckedTable.tableType[t]
 			.. ": " .. n, 2)
 	end
 
+	--
+	-- Make CheckedTable guard table @t.
+	--
 	function CheckedTable.guard (self, t, description)
 		for k, _ in pairs(t) do
 			self.declaredNames[t][k] = true
@@ -1567,12 +1593,14 @@ do
 		setmetatable(t, self)
 	end
 
+	--
+	-- Protect valuemaps.lua tables.
+	--
 	CheckedTable:guard(Descs, "value description")
 	CheckedTable:guard(Cond, "condition function")
 end
 
--- End valuemaps.lua
-
+	
 	do
 		local bytes = WProtoField.bytes
 		local uint64 = WProtoField.uint64
