@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Fri Aug  6 01:51:30 2010
+--[[ packet-bnetp.lua build on Fri Aug  6 16:04:45 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -372,214 +372,9 @@ do
 		end
 	end
 
-	-- Supported data types
-	local typemap = {
-		["bytes"] = {
-			["size"] = function(self, state)
-				return self.length
-			end,
-			["length"] = 1,
-		},
-		["uint64"] = {
-			["size"] = function(...) return 8 end,
-			value = function (self, state)
-				local val = state:peek(self.size())
-				if self.big_endian then
-					return val:uint64()
-				end
-				return val:le_uint64()
-			end,
-		},
-		["uint32"] = {
-			size = function(...) return 4 end,
-			value = function (self, state)
-				local val = state:peek(self.size())
-				if self.big_endian then
-					return val:uint()
-				end
-				return val:le_uint()
-			end,
-		},
-		["uint16"] = {
-			["size"] = function(...) return 2 end,
-			value = function (self, state)
-				local val = state:peek(self.size())
-				if self.big_endian then
-					return val:uint()
-				end
-				return val:le_uint()
-			end,
-		},
-		["uint8"]  = {
-			["size"] = function(...) return 1 end,
-			value = function (self, state)
-				local val = state:peek(self.size())
-				if self.big_endian then
-					return val:uint()
-				end
-				return val:le_uint()
-			end,
-		},
-		["int64"]  = {
-			["size"] = function(...) return 8 end,
-			value = function (self, state)
-				local val = state:peek(self.size())
-				if self.big_endian then
-					return val:int64()
-				end
-				return val:le_int64()
-			end,
-		},
-		["int32"]  = {
-			["size"] = function(...) return 4 end,
-			value = function (self, state)
-				local val = state:peek(self.size())
-				if self.big_endian then
-					return val:int()
-				end
-				return val:le_int()
-			end,
-		},
-		["int16"]  = {
-			["size"] = function(...) return 2 end,
-			value = function (self, state)
-				local val = state:peek(self.size())
-				if self.big_endian then
-					return val:int()
-				end
-				return val:le_int()
-			end,
-		},
-		["int8"]   = {
-			["size"] = function(...) return 1 end,
-			value = function (self, state)
-				local val = state:peek(self.size())
-				if self.big_endian then
-					return val:int()
-				end
-				return val:le_int()
-			end,
-		},
-		["ipv4"]   = {
-			["size"] = function(...) return 4 end,
-			value = function (self, state)
-				local val = state:peek(self.size())
-				return tostring(val:ipv4())
-			end,
-			big_endian = true,
-		},
-		["stringz"] = {
-			["alias"] = "string",
-			["size"] = function(self, state)
-				if (self.length == nil) or (self.length < 0) then
-					local eos = self.eos or 0 -- end of string
-					local buf = state:tvb()
-					local n = 0
-					while (n < buf:len()) and (buf(n,1):uint() ~= eos) do
-						n = n + 1
-					end
-					return n + 1
-				else
-					return self.length
-				end
-			end,
-			["length"] = -1,
-			dissect = function(self, state)
-				local size = self:size(state)
-				local str = state:peek(size):string()
-
-				if self.reversed then
-					str = string.reverse(str)
-				end
-
-				state.bnet_node:add(self.pf, state:read(size), str)
-			end,
-			value = function (self, state)
-				local val = state:peek(self:size(state))
-				return val:string()
-			end,
-		},
-		["filetime"] = {
-			["size"] = function(...) return 8 end,
-			["alias"] = "string",
-			dissect = function(self, state)
-				local size = self.size(state:tvb())
-				local node = state.bnet_node:add(self.pf, state:peek(8), "")
-				-- POSIX epoch filetime
-				local epoch = 0xd53e8000 + (0x100000000 * 0x019db1de)
-				-- Read filetime
-				local filetime = state:read(4):le_uint()
-					+ (0x100000000 * state:read(4):le_uint())
-				-- Convert to POSIX time if possible
-				if filetime > epoch then
-					-- Append text form of date to the node label.
-					node:append_text(os.date("%c", (filetime - epoch) * 1E-7))
-				end
-			end,
-		},
-		["posixtime"] = {
-			["size"] = function(...) return 4 end,
-			["alias"] = "string",
-			dissect = function(self, state)
-				local node = state.bnet_node:add(self.pf, state:peek(4), "")
-				local unixtime = os.date("%c", state:read(4):le_uint())
-				-- Append text form of date to the node label.
-				node:append_text(unixtime)
-			end,
-			value = function (self, state) return state:peek(4):uint() end,
-		},
-		iterator = {
-			alias = "bytes",
-			dissect = function(self, state)
-				self:initialize(state)
-				while self:condition(state) do
-					self:iteration(state)
-				end
-				self:finalize(state)
-			end,
-			initialize = function (self, state)
-				if self.refkey then
-					self.priv.count = state.packet[self.refkey]
-				end
-				self.priv.bn = state.bnet_node
-			end,
-			condition = function (self, state)
-				return (self.priv.count > 0)
-			end,
-			iteration = function (self, state)
-				local start = state.used
-				if self.pf then
-					state.bnet_node = self.priv.bn:add(self.pf, state:peek(1))
-				end
-				dissect_packet(state, self.repeated)
-				if self.pf and state.bnet_node.set_len then
-					state.bnet_node:set_len(state.used - start)
-				end
-				if self.refkey then
-					self.priv.count = self.priv.count - 1
-				end
-			end,
-			finalize = function (self, state)
-				state.bnet_node = self.priv.bn
-			end,
-			priv = {}, -- iterator state
-		},
-		when = {
-			alias = "none",
-			dissect = function(self, state)
-				for _, v in ipairs(self.tests) do
-					if v.condition(self, state) then
-						dissect_packet(state, v.block)
-						break
-					end
-				end
-			end,
-		},
-	}
-
 	--[[ make_args_table
 	--
-	--	Builds a table to be used by WProtoField.
+	--	Builds a table to be used by create_proto_field().
 	--	Positional parameters are moved to their corresponding named parameter.
 	--
 	--	This should be called in either of the following forms:
@@ -663,62 +458,74 @@ do
 	end
 
 	-- ProtoField wrapper
-	local WProtoField = {}
-	setmetatable(WProtoField, {
-		__index = function(t,k)
-				return function (...)
-					local typeinfo = typemap[k]
+	--   * Wireshar base types
+	local wireshark_base_types = {
+		bytes  = true,
+		uint64 = true, uint32 = true, uint16 = true, uint8  = true,
+		int64  = true, int32  = true, int16  = true, int8   = true,
+		ipv4   = true,
+		string = true,
+		none   = true,
+	}
+	--   * Creates proto fields and registers it automatically.
+	local function create_proto_field(template, instance)
+		if type(template) ~= "table" or type(instance) ~= "table" then
+			error ("invalid parameters "
+			.. "template: " .. type(template)
+			.. " instance: " .. type(instance) .. " "
+			.. package.loaded.debug.traceback())
+		end
+		local typename = instance.protofield_type or template.protofield_type
 					
-					if typeinfo then
-						local args = make_args_table(unpack(arg))
-						local tmp = {}
-						local field = nil
-						-- XXX: this getvalueonly thing is pretty hackish
-						--      no node is added to the tree unless an alias is
-						--      explicitly given.
-						if (not args.getvalueonly) or args.alias then
-							field = ProtoField[args.alias or typeinfo.alias or k]
-						end
-						-- TODO: some fields do not expect display
-						-- and desc argument
-						if field then
-							verify_field_args(args)
-							tmp.pf = field(args.filter or "",
-								args.label,
-								args.display,
-								args.desc,
-								unpack(args.params or {}))
-						end
-						-- Remove ProtoField arguments
-						args.label = nil
-						args.desc = nil
-						args.display = nil
-						args.params = nil
-						-- Copy other fields to the returned value
-						for k,v in pairs(args) do
-							tmp[k] = v
-						end
-						-- Grant access to the type methods
-						-- through the return value
-						for k,v in pairs(typeinfo) do
-							if tmp[k] == nil then
-								tmp[k] = v
-							end
-						end
-						-- Add the field to the protocol field list
-						if tmp.pf then
-							local n = table.getn(p_bnetp.fields) + 1
-							p_bnetp.fields[n] = tmp.pf
-						end
-						return tmp
-					end
-					error("unsupported field type: " .. k)
+		if wireshark_base_types[typename] then
+			local tmp = {}
+			local field = nil
+			-- XXX: this getvalueonly thing is pretty hackish
+			--      no node is added to the tree unless an alias is
+			--      explicitly given.
+			if (not instance.getvalueonly) or instance.protofield_type then
+				field = ProtoField[typename] -- XXX: "none" should be a special case
+			end
+			-- TODO: some fields do not expect display
+			-- and desc argument
+			if field then
+				verify_field_args(instance)
+				tmp.pf = field(instance.filter or "",
+					instance.label,
+					instance.display,
+					instance.desc,
+					unpack(instance.params or {}))
+			end
+			-- Remove ProtoField arguments
+			instance.label = nil
+			instance.desc = nil
+			instance.display = nil
+			instance.params = nil
+			-- Copy other fields to the returned value
+			for k,v in pairs(instance) do
+				tmp[k] = v
+			end
+			-- Grant access to the type methods
+			-- through the return value
+			for k,v in pairs(template) do
+				if tmp[k] == nil then
+					tmp[k] = v
 				end
-		end,
-		__newindex = function (t,k,v)
-          error("attempt to update a read-only table", 2)
-        end
-	})
+			end
+			-- Add the field to the protocol field list
+			if tmp.pf then
+				local n = table.getn(p_bnetp.fields) + 1
+				p_bnetp.fields[n] = tmp.pf
+			end
+			return tmp
+		end
+		error("unsupported field type: " .. tostring(typename)
+			.." " .. package.loaded.debug.traceback())
+	end
+
+	-- Avoid clobbering global environment
+	local global_environment = getfenv(1)
+	setfenv(1, setmetatable({}, {__index = global_environment}))
 
 packet_names = {
 [0x7000] = "BNLS_NULL",
@@ -1600,211 +1407,727 @@ do
 	CheckedTable:guard(Cond, "condition function")
 end
 
+--[[
+--  bytes
+--
+--  Creates a field for an array of bytes.
+--
+--  Quick call:
+--    @par label   Name of the field. It will be used as a label for the
+--                 field's node at the dissection tree.
+--    @par length  Length of the array. 
+--
+--]]
+do
+	local template = {
+		protofield_type = "bytes",
+		size = function(self, state)
+			return self.length
+		end,
+		length = 1,
+	}
+
+	function bytes(...)
+		local args = make_args_table_with_positional_map(
+				{"label", "length"}, unpack(arg))
+
+		return create_proto_field(template, args)
+	end
+end
+
+do
+-- Helper function to define integer api
+local function define_integer(isize)
+	local size = math.abs(isize)
+	local typename = "int"
+
+	if size == 8 then typename = typename .. "64" end
+	if isize > 0 then typename = "u" .. typename  end
 	
-	do
-		local bytes = WProtoField.bytes
-		local uint64 = WProtoField.uint64
-		local uint32 = WProtoField.uint32
-		local uint16 = WProtoField.uint16
-		local uint8 = WProtoField.uint8
-		local int64 = WProtoField.int64
-		local int32 = WProtoField.int32
-		local int16 = WProtoField.int16
-		local int8 = WProtoField.int8
-		local ipv4 = WProtoField.ipv4
-		local stringz = WProtoField.stringz
-		local wintime = WProtoField.filetime
-		local posixtime = WProtoField.posixtime
-		local iterator = WProtoField.iterator
-		local when = function(...)
-			local tmp = WProtoField.when {}
-			if (#arg == 1) and arg[1].tests then
-				tmp.tests = arg[1].tests
+	local be = typename
+	local le = "le_"..typename
+
+	if size ~= 8 then
+		typename = typename .. tostring(8*size)
+	end
+
+	local template = {
+		protofield_type = typename,
+		size = function(...) return size end,
+		value = function (self, state)
+			local val = state:peek(self.size())
+			if self.big_endian then
+				return val[be](val)
+			end
+			return val[le](val)
+		end,
+	}
+
+	print ("defining: " .. typename)
+
+	getfenv(2)[typename] = function(...)
+		local args = make_args_table_with_positional_map(
+				{"label", "base", "descs"}, unpack(arg))
+
+		return create_proto_field(template, args)
+	end
+end
+
+--[[
+--  uint64
+--
+--  Creates a field for a 64-bits unsigned integer.
+--
+--  Quick call: ( label, base, valuemap )
+--    @par label    Name of the field. It will be used as a label for the
+--                  field's node at the dissection tree.
+--    @par base     The base used to display the number.
+--    @par valuemap Friendly names assigned to the valid values of the field.
+--
+--  Table call: { }
+--
+--  @see Base
+--
+--]]
+define_integer(8)
+
+--[[
+--  uint32
+--
+--  Creates a field for a 32-bits unsigned integer.
+--
+--  Quick call: ( label, base, valuemap )
+--    @par label    Name of the field. It will be used as a label for the
+--                  field's node at the dissection tree.
+--    @par base     The base used to display the number.
+--    @par valuemap Friendly names assigned to the valid values of the field.
+--
+--  Table call: { }
+--
+--  @see Base
+--
+--]]
+define_integer(4)
+
+--[[
+--  uint16
+--
+--  Creates a field for a 16-bits unsigned integer.
+--
+--  Quick call: ( label, base, valuemap )
+--    @par label    Name of the field. It will be used as a label for the
+--                  field's node at the dissection tree.
+--    @par base     The base used to display the number.
+--    @par valuemap Friendly names assigned to the valid values of the field.
+--
+--  Table call: { }
+--
+--  @see Base
+--
+--]]
+define_integer(2)
+
+--[[
+--  uint8
+--
+--  Creates a field for a 8-bits unsigned integer.
+--
+--  Quick call: ( label, base, valuemap )
+--    @par label    Name of the field. It will be used as a label for the
+--                  field's node at the dissection tree.
+--    @par base     The base used to display the number.
+--    @par valuemap Friendly names assigned to the valid values of the field.
+--
+--  Table call: { }
+--
+--  @see Base
+--
+--]]
+define_integer(1)
+
+--[[
+--  int64
+--
+--  Creates a field for a 64-bits signed integer.
+--
+--  Quick call: ( label, base, valuemap )
+--    @par label    Name of the field. It will be used as a label for the
+--                  field's node at the dissection tree.
+--    @par base     The base used to display the number.
+--    @par valuemap Friendly names assigned to the valid values of the field.
+--
+--  Table call: { }
+--
+--  @see Base
+--
+--]]
+define_integer(-8)
+
+--[[
+--  int32
+--
+--  Creates a field for a 32-bits signed integer.
+--
+--  Quick call: ( label, base, valuemap )
+--    @par label    Name of the field. It will be used as a label for the
+--                  field's node at the dissection tree.
+--    @par base     The base used to display the number.
+--    @par valuemap Friendly names assigned to the valid values of the field.
+--
+--  Table call: { }
+--
+--  @see Base
+--
+--]]
+define_integer(-4)
+
+--[[
+--  int16
+--
+--  Creates a field for a 16-bits signed integer.
+--
+--  Quick call: ( label, base, valuemap )
+--    @par label    Name of the field. It will be used as a label for the
+--                  field's node at the dissection tree.
+--    @par base     The base used to display the number.
+--    @par valuemap Friendly names assigned to the valid values of the field.
+--
+--  Table call: { }
+--
+--  @see Base
+--
+--]]
+define_integer(-2)
+
+--[[
+--  int8
+--
+--  Creates a field for a 8-bits signed integer.
+--
+--  Quick call: ( label, base, valuemap )
+--    @par label    Name of the field. It will be used as a label for the
+--                  field's node at the dissection tree.
+--    @par base     The base used to display the number.
+--    @par valuemap Friendly names assigned to the valid values of the field.
+--
+--  Table call: { }
+--
+--  @see Base
+--
+--]]
+define_integer(-1)
+
+end
+--[[
+--  ipv4
+--
+--  Creates a field for an ip address.
+--
+--  Quick call: ( label, big_endian )
+--    @par label       Name of the field. It will be used as a label for the
+--                     field's node at the dissection tree.
+--    @par big_endian  Endianess used while decoding address. If it is true big
+--                     endian otherwise little endian.
+--
+--]]
+do
+	local template = {
+		protofield_type = "ipv4",
+		size = function(...) return 4 end,
+		value = function (self, state)
+			local val = state:peek(self.size())
+			return tostring(val:ipv4())
+		end,
+		big_endian = true,
+	}
+
+	function ipv4(...)
+		local args = make_args_table_with_positional_map(
+				{"label", "big_endian"}, unpack(arg))
+
+		return create_proto_field(template, args)
+	end
+end
+
+--[[
+--  stringz
+--
+--  Creates a field for a string.
+--
+--  Quick call: ( label, length, eos )
+--    @par label     Name of the field. It will be used as a label for the
+--                   field's node at the dissection tree.
+--    @par length    Length of the string. If it is -1, the string is `eos`
+--                   terminated. (Default: -1)
+--    @par eos       String terminator. (Default: null character )
+--
+--]]
+do
+	local template = {
+		protofield_type = "string",
+		size = function(self, state)
+			if (self.length == nil) or (self.length < 0) then
+				local eos = self.eos or 0 -- end of string
+				local buf = state:tvb()
+				local n = 0
+				while (n < buf:len()) and (buf(n,1):uint() ~= eos) do
+					n = n + 1
+				end
+				return n + 1
 			else
-				tmp.tests = {}
-				-- XXX: little hack to allow both syntax for calling a function
-				--      ( f() y f {} )
-				if #arg == 1 and type(arg[1][1])=="table" then arg = arg[1] end
-				for k, v in ipairs(arg) do
-					local test = make_args_table_with_positional_map(
-						{"condition", "block"}, v)
-					tmp.tests[k] = test
-				end
+				return self.length
 			end
-			return tmp
-		end
-		local oldwhen = function(...)
-			local par = { { arg[1].condition, arg[1].block } }
-			if arg[1].otherwise then
-				par[2] = { function() return true end, arg[1].otherwise }
-			end
-			return when (unpack(par))
-		end
-		local version = function(...)
-			local args = make_args_table(unpack(arg))
-			args.big_endian = false
-			return ipv4(args)
-		end
-		local strdw = function(...)
-			local args = make_args_table_with_positional_map(
-				{"label", "desc"}, unpack(arg))
-			args.reversed = true
-			args.length = 4
-			args.priv = { desc = args.desc }
-			args.desc = nil
-			args.dissect = function(self, state)
-				local size = self:size(state)
-				local str = state:peek(size):string()
+		end,
+		length = -1,
+		dissect = function(self, state)
+			local size = self:size(state)
+			local str = state:peek(size):string()
 
-				if self.reversed then
-					str = string.reverse(str)
-				end
+			if self.reversed then
+				str = string.reverse(str)
+			end
 
-				-- TODO: generalize lua based value/string maps
-				if self.priv.desc and self.priv.desc[str] then
-					str = self.priv.desc[str] .. " (" .. str .. ")"
-				end
-				state.bnet_node:add(self.pf, state:read(size), str)
+			state.bnet_node:add(self.pf, state:read(size), str)
+		end,
+		value = function (self, state)
+			local val = state:peek(self:size(state))
+			return val:string()
+		end,
+	}
+
+	function stringz(...)
+		local args = make_args_table_with_positional_map(
+				{"label", "length", "eos"}, unpack(arg))
+
+		return create_proto_field(template, args)
+	end
+end
+
+--[[
+--  wintime
+--
+--  Creates a field for a wintime value.
+--
+--  Quick call: ( label )
+--    @par label     Name of the field. It will be used as a label for the
+--                   field's node at the dissection tree.
+--
+--]]
+do
+	local template = {
+		size = function(...) return 8 end,
+		protofield_type = "string",
+		dissect = function(self, state)
+			local size = self.size(state:tvb())
+			local node = state.bnet_node:add(self.pf, state:peek(8), "")
+			-- POSIX epoch filetime
+			local epoch = 0xd53e8000 + (0x100000000 * 0x019db1de)
+			-- Read filetime
+			local filetime = state:read(4):le_uint()
+				+ (0x100000000 * state:read(4):le_uint())
+			-- Convert to POSIX time if possible
+			if filetime > epoch then
+				-- Append text form of date to the node label.
+				node:append_text(os.date("%c", (filetime - epoch) * 1E-7))
 			end
-			return stringz(args)
-		end
-		local array = function(...)
-			local args = make_args_table_with_positional_map(
-				{"label", "of", "num"}, unpack(arg))
-			if args.of ~= uint32 and args.of ~= uint8 then
-				error("Arrays of types other than uint32 or uint8 are not supported.")
-			end
-			args.of = args.of{alias="none"}
-			args.length = args.of:size() * args.num
-			args.dissect = function (self, state)
-				local str = ""
-				local isz = args.of:size()
-				-- local fmt = "%0" .. (isz * 2) .. "X "
-				local fmt = ""
-				if isz == 1 
-					then fmt = "%02X"
-					else fmt = "%08X "
-				end
-				local tail = state:tail()
-				for i=0, self.num - 1 do
-					str = str .. string.format(fmt,
-						args.of:value(tail))
-					tail:read(isz)
-				end
-				-- trim trailing space
-				str = (string.gsub(str, "^(.*)%s*$", "%1")) 
-				state.bnet_node:add(self.pf, state:read(args.length), str)
-			end
-			return stringz(args)
-		end
-		local flags = function(...)
-			local args = make_args_table_with_positional_map(
-				{"label", "of", "fields"}, unpack(arg))
-			args.filter = "hasflags"
-			local tmp = args.of(args)
-			local fields = {}
-			
-			for k,v in pairs(tmp.fields) do
-				local pfarg = make_args_table_with_positional_map(
-					{"label", "mask", "desc", "sname"}, v)
-				pfarg.label = pfarg.label or pfarg.sname
-				pfarg.params = { pfarg.mask }
-				pfarg.active = pfarg.active or function (self, state)
-					if bit.band(self:value(state), self.mask) ~= 0 then
-						return true
-					end
-					return false
-				end
-				fields[k] = tmp.of(pfarg)
-			end
-			tmp.fields = fields
-			tmp.dissect = function(self, state)
-				local infostr = ""
-				local bn = state.bnet_node
-				if self.big_endian then
-					state.bnet_node = bn:add(self.pf, state:peek(self.size()))
-				else
-					state.bnet_node = bn:add_le(self.pf, state:peek(self.size()))
-				end
-				for k,v in pairs(self.fields) do
-					local tail = state:tail()
-					local block = { v }
-					local active = v:active(tail)
-					dissect_packet(tail, block)
-					if v.sname and v.sname ~= "" and active then
-						infostr = infostr .. v.sname .. ", "
-					end
-				end
-				if infostr ~= "" then
-					infostr = (string.gsub(infostr, "^(.*),%s*$", "%1"))
-					state.bnet_node:append_text(" (" .. infostr .. ")")
-				end
-				state.bnet_node = bn
-				state:read(self.size())
-			end
-			return tmp
-		end
-		
-		--[[ sockaddr([label])
-		--
-		--	Displays sockaddr struct.
-		--	Is equals to the sequence
-		--
-		--		uint16("Address Family", nil, {[2]="AF_INET"}),
-		--		uint16("Port", big_endian=true},
-		--		ipv4("Host's IP"},
-		--		uint32("sin_zero"),
-		--		uint32("sin_zero"),
-		--
-		--	with some summary.
-		--
-		--]]
-		local sockaddr = function(...)
-			local args = make_args_table_with_positional_map(
+		end,
+	}
+
+	function wintime(...)
+		local args = make_args_table_with_positional_map(
 				{"label"}, unpack(arg))
 
-			--args.pf = bytes(args.label).pf
-			--args.pf = "dummy string"
-			args.pf = bytes("dummy string").pf
-			
-			args.imp = {
-				uint16{"Address Family", nil, {[2]="AF_INET"}, key="af"},
-				uint16{"Port", big_endian=true, key="port"},
-				ipv4{"Host's IP", key="ip"},
-				uint32{"sin_zero", key="sz1"},
-				uint32{"sin_zero", key="sz2"},
-			}
-			
-			function args:size()
-				return 16
-			end
+		return create_proto_field(template, args)
+	end
+end
 
-			function args:dissect(state)
-				local bn = state.bnet_node
-				if self.big_endian then
-					state.bnet_node = bn:add(self.pf, state:peek(self:size()))
-				else
-					state.bnet_node = bn:add_le(self.pf, state:peek(self:size()))
-				end
-				dissect_packet(state, self.imp)
-				if state.packet.sz1 ~= 0 or state.packet.sz2 ~= 0 then
-					state:error("sin_zero is not zero.");
-				end
-				if state.packet.af ~= 2 then
-					state:error("Adress Family is not AF_INET.")
-				end
-				local summary = string.format("IP: %s, Port: %d", state.packet.ip, state.packet.port)
-				if self.label ~= nil then
-					summary = self.label .. ": " .. summary 
-				end
-				state.bnet_node:set_text(summary)
-				--state.bnet_node:set_text(string.format("%s: IP: %s, Port: %d", self.label,
-				--	state.packet.ip,state.packet.port))
-				state.bnet_node = bn
-			end
-			return args
+--[[
+--  posixtime
+--
+--  Creates a field for a UNIX time value.
+--
+--  Quick call: ( label )
+--    @par label     Name of the field. It will be used as a label for the
+--                   field's node at the dissection tree.
+--
+--]]
+do
+	local template = {
+		size = function(...) return 4 end,
+		protofield_type = "string",
+		dissect = function(self, state)
+			local node = state.bnet_node:add(self.pf, state:peek(4), "")
+			local unixtime = os.date("%c", state:read(4):le_uint())
+			-- Append text form of date to the node label.
+			node:append_text(unixtime)
+		end,
+		value = function (self, state) return state:peek(4):uint() end,
+
+	}
+
+	function posixtime(...)
+		local args = make_args_table_with_positional_map(
+				{"label"}, unpack(arg))
+
+		return create_proto_field(template, args)
+	end
+end
+
+--[[
+--  iterator
+--
+--  It will repeat a block of fields for a given number of times.
+--
+--  Quick call: ( label, refkey, repeated )
+--    @par label     Name of the field. It will be used as a label for the
+--                   field's node at the dissection tree.
+--    @par refkey    Key that holds the number of repetitions. Must have
+--                   been initialized by a former field.
+--    @par repeated  Block of fields that will be repeated.
+--
+--]]
+do
+	local template = {
+		protofield_type = "bytes",
+		priv = {}, -- iterator state,
+	}
+
+	function template:dissect(state)
+		self:initialize(state)
+		while self:condition(state) do
+			self:iteration(state)
+		end
+		self:finalize(state)
+	end
+	
+	function template:initialize (state)
+		if self.refkey then
+			self.priv.count = state.packet[self.refkey]
+		end
+		self.priv.bn = state.bnet_node
+	end
+
+	function template:condition (state)
+		return (self.priv.count > 0)
+	end
+
+	function template:iteration (state)
+		local start = state.used
+		if self.pf then
+			state.bnet_node = self.priv.bn:add(self.pf, state:peek(1))
+		end
+		dissect_packet(state, self.repeated)
+		if self.pf and state.bnet_node.set_len then
+			state.bnet_node:set_len(state.used - start)
+		end
+		if self.refkey then
+			self.priv.count = self.priv.count - 1
+		end
+	end
+	
+	function template:finalize (state)
+		state.bnet_node = self.priv.bn
+	end
+
+	function iterator(...)
+		local args = make_args_table_with_positional_map(
+				{"label", "refkey", "repeated"}, unpack(arg))
+
+		-- translate alias to protofield_type
+		if args.alias then
+			args.protofield_type = args.alias
+			args.alias = nil
 		end
 
+		return create_proto_field(template, args)
+	end
+end
+
+--[[
+--  when
+--
+--  Selects a block of fields from a list when it's associated condition
+--  is true.
+--
+--  Walks though the list of pairs received as argument sequentially evaluating
+--  the first element and if it was true executing the second element of the
+--  pair as a block of fields.
+--
+--  Only one block is executed.
+--
+--  Table call: { {condition, block}, ... )
+--    @par condition Function that returns true if the block should be
+--                   used given the current state.
+--    @par block     Block of fields that will be executed when condition
+--                   is true.
+--
+--]]
+do
+	local template = {
+		protofield_type = "none",
+	}
+
+	function template:dissect(state)
+		for _, v in ipairs(self.tests) do
+			if v.condition(self, state) then
+				dissect_packet(state, v.block)
+				break
+			end
+		end
+	end
+
+  function when (...)
+		local tmp = create_proto_field(template, {})
+		if (#arg == 1) and arg[1].tests then
+			tmp.tests = arg[1].tests
+		else
+			tmp.tests = {}
+			-- XXX: little hack to allow both syntax for calling a function
+			--      ( f() y f {} )
+			if #arg == 1 and type(arg[1][1])=="table" then arg = arg[1] end
+			for k, v in ipairs(arg) do
+				local test = make_args_table_with_positional_map(
+					{"condition", "block"}, v)
+				tmp.tests[k] = test
+			end
+		end
+		return tmp
+	end
+	function oldwhen (...)
+		local par = { { arg[1].condition, arg[1].block } }
+		if arg[1].otherwise then
+			par[2] = { function() return true end, arg[1].otherwise }
+		end
+		return when (unpack(par))
+	end
+end
+
+--[[
+--  version
+--
+--  Creates a field for a version like data type.
+--
+--  @par label     Name of the field. It will be used as a label for the
+--                   field's node at the dissection tree.
+--
+--]]
+function version (...)
+	local args = make_args_table(unpack(arg))
+	args.big_endian = false
+	return ipv4(args)
+end
+--[[
+--  strdw
+--
+--  Creates a field for a 4 bytes string encoded in an integer.
+--
+--    @par label   Name of the field. It will be used as a label for the
+--                 field's node at the dissection tree.
+--    @par desc    Friendly names assigned to the valid values of the field.
+--
+--]]
+function strdw (...)
+	local args = make_args_table_with_positional_map(
+	                {"label", "desc"}, unpack(arg))
+	args.reversed = true
+	args.length = 4
+	args.priv = { desc = args.desc }
+	args.desc = nil
+	args.dissect = function(self, state)
+		local size = self:size(state)
+		local str = state:peek(size):string()
+		
+		if self.reversed then
+			str = string.reverse(str)
+		end
+
+		-- TODO: generalize lua based value/string maps
+		if self.priv.desc and self.priv.desc[str] then
+			str = self.priv.desc[str] .. " (" .. str .. ")"
+		end
+		state.bnet_node:add(self.pf, state:read(size), str)
+	end
+	return stringz(args)
+end
+
+--[[
+--  array
+--
+--  Creates a field for an array of other field types.
+--
+--  Currently only uint32 and uint8 are supported as base types.
+--
+--  Quick call:
+--    @par label   Name of the field. It will be used as a label for the
+--                 field's node at the dissection tree.
+--    @par of      Base type.
+--    @par num     Number of elements in the array.
+--
+--]]
+function array (...)
+	local args = make_args_table_with_positional_map(
+			{"label", "of", "num"}, unpack(arg))
+
+	if args.of ~= uint32 and args.of ~= uint8 then
+		error("Arrays of types other than uint32 or uint8 are not supported.")
+	end
+
+	args.of = args.of {protofield_type="none"}
+	args.length = args.of:size() * args.num
+	args.dissect = function (self, state)
+		local str = ""
+		local isz = args.of:size()
+		-- local fmt = "%0" .. (isz * 2) .. "X "
+		local fmt = ""
+
+		if isz == 1
+			then fmt = "%02X"
+			else fmt = "%08X "
+		end
+		local tail = state:tail()
+		for i=0, self.num - 1 do
+			str = str .. string.format(fmt,
+			args.of:value(tail))
+			tail:read(isz)
+		end
+		-- trim trailing space
+		str = (string.gsub(str, "^(.*)%s*$", "%1")) 
+		state.bnet_node:add(self.pf, state:read(args.length), str)
+	end
+	return stringz(args)
+end
+
+--[[
+--  flags
+--
+--  Creates a field for a set of flags encoded in an integer.
+--
+--  Currently only uint32 and uint8 are supported as base types.
+--
+--  Quick call:
+--    @par label   Name of the field. It will be used as a label for the
+--                 field's node at the dissection tree.
+--    @par of      Base type.
+--    @par fields  The set of flags inside a value of the base type.
+--
+--]]
+function flags (...)
+	local args = make_args_table_with_positional_map(
+			{"label", "of", "fields"}, unpack(arg))
+	
+	args.filter = "hasflags"
+
+	local tmp = args.of(args)
+	local fields = {}
+
+	for k,v in pairs(tmp.fields) do
+		local pfarg = make_args_table_with_positional_map(
+				{"label", "mask", "desc", "sname"}, v)
+		pfarg.label = pfarg.label or pfarg.sname
+		pfarg.params = { pfarg.mask }
+		pfarg.active = pfarg.active or function (self, state)
+			if bit.band(self:value(state), self.mask) ~= 0 then
+				return true
+			end
+			return false
+		end
+		fields[k] = tmp.of(pfarg)
+	end
+	tmp.fields = fields
+	tmp.dissect = function(self, state)
+		local infostr = ""
+		local bn = state.bnet_node
+		if self.big_endian then
+			state.bnet_node = bn:add(self.pf, state:peek(self.size()))
+		else
+			state.bnet_node = bn:add_le(self.pf, state:peek(self.size()))
+		end
+		for k,v in pairs(self.fields) do
+			local tail = state:tail()
+			local block = { v }
+			local active = v:active(tail)
+			dissect_packet(tail, block)
+			if v.sname and v.sname ~= "" and active then
+				infostr = infostr .. v.sname .. ", "
+			end
+		end
+		if infostr ~= "" then
+			infostr = (string.gsub(infostr, "^(.*),%s*$", "%1"))
+			state.bnet_node:append_text(" (" .. infostr .. ")")
+		end
+		state.bnet_node = bn
+		state:read(self.size())
+	end
+	return tmp
+end
+
+--[[
+--  sockaddr([label])
+--
+--
+--	Displays sockaddr struct.
+--	Is equals to the sequence
+--
+--		uint16("Address Family", nil, {[2]="AF_INET"}),
+--		uint16("Port", big_endian=true},
+--		ipv4("Host's IP"},
+--		uint32("sin_zero"),
+--		uint32("sin_zero"),
+--
+--	with some summary.
+--
+--  Quick call:
+--    @par label   Name of the field. It will be used as a label for the
+--                 field's node at the dissection tree.
+--
+--]]
+do
+	local template = {
+		protofield_type = "bytes",
+		imp = {
+			uint16 {"Address Family", nil, {[2]="AF_INET"}, key="af"},
+			uint16 {"Port", big_endian=true, key="port"},
+			ipv4   {"Host's IP", key="ip"},
+			uint32 {"sin_zero", key="sz1"},
+			uint32 {"sin_zero", key="sz2"},
+		},
+	}
+
+	function template:size()
+		return 16
+	end
+
+	function template:dissect(state)
+		local bn = state.bnet_node
+		if self.big_endian then
+			state.bnet_node = bn:add(self.pf, state:peek(self:size()))
+		else
+			state.bnet_node = bn:add_le(self.pf, state:peek(self:size()))
+		end
+		dissect_packet(state, self.imp)
+		if state.packet.sz1 ~= 0 or state.packet.sz2 ~= 0 then
+			state:error("sin_zero is not zero.");
+		end
+		if state.packet.af ~= 2 then
+			state:error("Adress Family is not AF_INET.")
+		end
+		local summary = string.format("IP: %s, Port: %d", state.packet.ip, state.packet.port)
+		if self.label ~= nil then
+			summary = self.label .. ": " .. summary 
+		end
+		state.bnet_node:set_text(summary)
+		state.bnet_node = bn
+	end
+
+	function sockaddr (...)
+		local args = make_args_table_with_positional_map(
+				{"real_label"}, unpack(arg))
+		args.label = "dummy string"
+		return create_proto_field(template, args)
+	end
+end
+
+	
 -- Begin spackets.lua
 -- Packets from server to client
 SPacketDescription = {
@@ -2115,7 +2438,7 @@ SPacketDescription = {
  		alias="bytes",
  		condition = function(self, state) return state.packet.srvr ~="" end,
  		repeated = {
- 			WProtoField.stringz{label="Server", key="srvr"},
+ 			stringz{label="Server", key="srvr"},
  		},
  	}
 },
@@ -4129,7 +4452,8 @@ CPacketDescription = {
 },
 }
 -- End cpackets.lua
-	end
+
+	setfenv(1, global_environment)
 
 	-- After all the initialization is finished, register plugin
 	-- to default port.

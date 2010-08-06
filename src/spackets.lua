@@ -1907,7 +1907,7 @@ SPacketDescription = {
  		alias="bytes",
  		condition = function(self, state) return state.packet.srvr ~="" end,
  		repeated = {
- 			WProtoField.stringz{label="Server", key="srvr"},
+ 			stringz{label="Server", key="srvr"},
  		},
  	}
 },
