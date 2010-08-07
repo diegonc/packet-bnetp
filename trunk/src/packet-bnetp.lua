@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sat Aug  7 01:55:24 2010
+--[[ packet-bnetp.lua build on Sat Aug  7 01:56:37 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -1490,7 +1490,7 @@ local function define_integer(isize)
 
 	getfenv(2)[typename] = function(...)
 		local args = make_args_table_with_positional_map(
-				{"label", "base", "desc"}, unpack(arg))
+				{"label", "display", "desc"}, unpack(arg))
 
 		return create_proto_field(template, args)
 	end

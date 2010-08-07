@@ -30,7 +30,7 @@ local function define_integer(isize)
 
 	getfenv(2)[typename] = function(...)
 		local args = make_args_table_with_positional_map(
-				{"label", "base", "desc"}, unpack(arg))
+				{"label", "display", "desc"}, unpack(arg))
 
 		return create_proto_field(template, args)
 	end
