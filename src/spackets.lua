@@ -4937,7 +4937,7 @@ WID_SETICON 0x0A SEND
 		[0x0a] = "Invalid clan tag specified",
 	}),
 	uint8{"Number of potential candidates", key="names"},
-	iterator{alias="none", refkey="names", repeted={
+	iterator{alias="none", refkey="names", repeated={
 		stringz("Username"),
 	}},
 },
