@@ -14,13 +14,34 @@ PKGNAME=packet-bnetp
 DISTNAME=packet-bnetp-src
 VERSION:=$(shell date +%Y%m%d)
 
-DIST = \
-	src \
+PKG = \
+	src/packet-bnetp.lua
+
+SOURCES = \
+	src/testpackets.lua \
 	src/constants.lua \
 	src/cpackets.lua \
-	src/packet-bnetp0.lua \
 	src/spackets.lua \
-	tools \
+	src/checkedtable.lua \
+	src/api/integer.lua \
+	src/api/array.lua \
+	src/api/stringz.lua \
+	src/api/time.lua \
+	src/api/strdw.lua \
+	src/api/when.lua \
+	src/api/flags.lua \
+	src/api/iterator.lua \
+	src/api/ipv4.lua \
+	src/api/sockaddr.lua \
+	src/api/bytes.lua \
+	src/api/version.lua \
+	src/valuemaps.lua \
+	src/banner.lua \
+	src/core.lua
+
+DIST = \
+	$(SOURCES) \
+	$(PKG) \
 	tools/filepp \
 	tools/filepp/filepp \
 	tools/filepp/modules \
@@ -50,16 +71,6 @@ DIST = \
 	tools/filepp/share/man/man1/filepp.1 \
 	Makefile
 
-PKG = \
-	src/packet-bnetp.lua
-
-SOURCES = \
-	src/banner.lua \
-	src/constants.lua \
-	src/cpackets.lua \
-	src/core.lua \
-	src/spackets.lua \
-	src/valuemaps.lua
 
 src/packet-bnetp.lua: $(SOURCES)
 	$(FILEPP) $(FILEPP_FLAGS) src/core.lua > src/packet-bnetp.lua
