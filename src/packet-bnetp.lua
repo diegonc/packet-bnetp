@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sat Aug  7 01:56:37 2010
+--[[ packet-bnetp.lua build on Sun Aug  8 03:00:09 2010
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -282,7 +282,9 @@ do
 			local pid = state:peek(1):uint()
 			local type_pid = ((0xFF * 256) + pid)
 			local pidnode = state.bnet_node:add(f_pid, state:read(1))
-			pidnode:set_text(pid_label(pid,packet_names[type_pid]))
+			local packet_name = packet_names[type_pid] or "Unkown Packet"
+
+			pidnode:set_text(pid_label(pid,packet_name))
 			
 			if state.isServerPacket then
 				state.bnet_node:append_text(" S>")
@@ -290,7 +292,7 @@ do
 				state.bnet_node:append_text(" C>")
 			end
 			do
-				local infomsg =  string.format(" %s (0x%02x)", packet_names[type_pid],  pid)
+				local infomsg =  string.format(" %s (0x%02x)", packet_name,  pid)
 				state.bnet_node:append_text(infomsg)
 				state.pkt.columns.info:append(infomsg)
 			end
@@ -327,7 +329,7 @@ do
 				if pd then
 					dissect_packet(st, pd)
 				else
-					st:error("Unssuported packet: " .. packet_names[type_pid])
+					st:error("Unssuported packet: " .. packet_name)
 				end
 			end)
 
