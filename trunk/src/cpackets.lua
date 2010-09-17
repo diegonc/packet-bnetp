@@ -3895,6 +3895,29 @@ CPacketDescription = {
 		[1] = "Client did not use SID_QUERYADURL",
 	}),
 },
+
+--[[doc
+    Message ID:    0x17
+
+    Message Name:  SID_READMEMORY
+
+    Direction:     Client -> Server (Sent)
+
+    Used By:       Starcraft Shareware, Starcraft Broodwar, Diablo Shareware, Diablo II,
+                   Warcraft II, Starcraft, Starcraft Japanese, Diablo, Diablo, 
+
+    Format:        (DWORD) Request ID
+                   (VOID)  Memory
+
+    Remarks:       Rudimentary hack detection system. Was never used probably due to terrible implementation with little security. Yes, it is possible for a PvPGN server to read _EVERYTHING_ that is in the process' memory, including sensitive information such as your CDKey.
+
+	Source: http://darkblizz.org/Forum2/starcraft/the-lost-packets/msg19580
+]]
+[SID_READMEMORY] = { -- 0x17
+	uint32("Request ID"),
+	bytes("Memory"), -- TODO: bytes till packet end
+}
+
 --[[doc
     Message ID:      0x18
 
@@ -4193,6 +4216,28 @@ CPacketDescription = {
 	stringz("Game Name"),
 	stringz("Game Password"),
 },
+
+--[[doc
+    Message ID:    0x24
+
+    Message Name:  SID_READCOOKIE
+
+    Direction:     Server -> Client (Received)
+
+    Format:        (DWORD) First DWORD from S -> C
+                   (DWORD) Second DWORD from S -> C
+                   (STRING) Registry key name
+                   (STRING) Registry key value
+	
+    Purpose:       Much like a website cookie, simply stores some arbitrary string to a 'cookie jar' to save preferences et al. which can be retrieved later by the server. Not used because it was quickly discovered that storing preferences produces less problems and were faster by storing them server-side, associating them with the account. It is somewhat curious that these packet IDs are close to SID_PROFILE/SID_WRITEPROFILE (0x26 & 0x27).
+]]
+[SID_READCOOKIE] = { -- 0x24
+	uint32("First DWORD from S -> C"),
+	uint32("Second DWORD from S -> C"),
+	stringz("Registry key name"),
+	stringz("Registry key value"),
+},
+
 --[[doc
     Message ID:    0x25
 
