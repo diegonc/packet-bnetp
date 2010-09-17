@@ -553,7 +553,7 @@ do
 	#include spackets_packet.lua
 	#include spackets_pkt.lua
 	#include spackets_sid.lua
-	},
+	}
 	
 	-- Packets from client to server
 	CPacketDescription = {
@@ -563,7 +563,7 @@ do
 	#include cpackets_packet.lua
 	#include cpackets_pkt.lua
 	#include cpackets_sid.lua
-	},
+	}
 	
 	setfenv(1, global_environment)
 
