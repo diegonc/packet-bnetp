@@ -2597,6 +2597,32 @@ SPacketDescription = {
 	stringz("Filename"),
 	stringz("Link URL"),
 },
+
+
+--[[doc
+    Message ID:    0x17
+
+    Message Name:  SID_READMEMORY
+
+    Direction:     Server -> Client (Received)
+
+    Used By:       Starcraft Shareware, Starcraft Broodwar, Diablo Shareware, Diablo II,
+                   Warcraft II, Starcraft, Starcraft Japanese, Diablo, Diablo, 
+
+    Format:        (DWORD) Request ID
+                   (DWORD) Address
+                   (DWORD) Length
+
+    Remarks:       Rudimentary hack detection system. Was never used probably due to terrible implementation with little security. Yes, it is possible for a PvPGN server to read _EVERYTHING_ that is in the process' memory, including sensitive information such as your CDKey.
+
+	Source: http://darkblizz.org/Forum2/starcraft/the-lost-packets/msg19580
+]]
+[SID_READMEMORY] = { -- 0x17
+	uint32("Request ID"),
+	uint32("Address", base.HEX),
+	uint32("Length"),
+}
+
 --[[doc
     Message ID:      0x18
 
@@ -2718,6 +2744,66 @@ SPacketDescription = {
 	uint32("UDP Token", base.HEX),
 	uint32("Server Token", base.HEX),
 },
+
+--[[doc
+    Message ID:    0x20
+
+    Message Name:  SID_ANNOUNCEMENT
+
+    Direction:     Server -> Client (Received)
+
+    Format:        (STRING) Text
+
+    Purpose:       Very simply prints out text with the string at 1903B9FBh (the default string, used anyway if the username field is NULL in the chat event struct -- currently a single 0x7F char) as the username. Used to send announcements and arbitrary messages to the user, but this was soon superseded by SID_CHAT subcommands such as EID_INFO, EID_ERROR, and EID_BROADCAST. Printed out with the same color and style as an EID_BROADCAST.
+]]
+[SID_ANNOUNCEMENT] = { -- 0x20
+	stringz("Text"),
+},
+
+--[[doc
+    Message ID:    0x23
+
+    Message Name:  SID_WRITECOOKIE
+
+    Direction:     Server -> Client (Received)
+
+    Format:        (DWORD) unknown/unparsed -- Flags, Request ID?
+                   (DWORD) unknown/unparsed -- Timestamp?
+                   (STRING) Registry key name
+                   (STRING) Registry key value
+
+    Purpose:       Much like a website cookie, simply stores some arbitrary string to a 'cookie jar' to save preferences et al. which can be retrieved later by the server. Not used because it was quickly discovered that storing preferences produces less problems and were faster by storing them server-side, associating them with the account. It is somewhat curious that these packet IDs are close to SID_PROFILE/SID_WRITEPROFILE (0x26 & 0x27).
+	
+	Source: http://darkblizz.org/Forum2/starcraft/the-lost-packets/msg19580
+]]
+[SID_WRITECOOKIE] = { -- 0x23
+	uint32("Flags, Request ID?"),
+	uint32("Timestamp?"),
+	stringz("Registry key name"),
+	stringz("Registry key value"),
+},
+
+--[[doc
+    Message ID:    0x24
+
+    Message Name:  SID_READCOOKIE
+
+    Direction:     Server -> Client (Received)
+
+    Format:        (DWORD) Echoed back, Request ID?
+                   (DWORD) Echoed back, Timestamp?
+                   (STRING) Registry key name
+
+    Purpose:       Much like a website cookie, simply stores some arbitrary string to a 'cookie jar' to save preferences et al. which can be retrieved later by the server. Not used because it was quickly discovered that storing preferences produces less problems and were faster by storing them server-side, associating them with the account. It is somewhat curious that these packet IDs are close to SID_PROFILE/SID_WRITEPROFILE (0x26 & 0x27).
+	
+	Source: http://darkblizz.org/Forum2/starcraft/the-lost-packets/msg19580
+]]
+[SID_READCOOKIE] = { -- 0x24
+	uint32("Request ID?"),
+	uint32("Timestamp?"),
+	stringz("Registry key name"),
+},
+
 --[[doc
     Message ID:    0x25
 
@@ -3937,6 +4023,24 @@ WID_SETICON 0x0A SEND
 		}},
 	}},
 },
+
+--[[doc
+    Message ID:    0x43
+
+    Message Name:  SID_WARCRAFTSOMETHING
+
+    Direction:     Server -> Client (Received)
+
+    Format:        (DWORD) Unknown (0)
+	
+    Purpose:       Unknown. I am unable to disassemble Warcraft 3's game.dll without a lot of trouble, and therefore I have limited knowledge of it. It has been seen once, after SID_LOGONPROOF (0x54) in the NLS logon sequence.
+	
+	source: http://darkblizz.org/Forum2/starcraft/the-lost-packets/msg19580
+]]
+[ SID_WARCRAFTSOMETHING] = { -- 0x43
+	uint32("Unknown (0)"),
+},
+
 --[[doc
     Message ID:    0x46
 
