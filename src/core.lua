@@ -542,9 +542,29 @@ do
 	#include "api/flags.lua"
 	#include "api/sockaddr.lua"
 	
-	#include "spackets.lua"
-	#include "cpackets.lua"
-
+	-- # include "spackets.lua"
+	-- # include "cpackets.lua"
+	
+	-- Packets from server to client
+	SPacketDescription = {
+	#include spackets_bnls.lua
+	#include spackets_d2gs.lua
+	#include spackets_mcp.lua
+	#include spackets_packet.lua
+	#include spackets_pkt.lua
+	#include spackets_sid.lua
+	},
+	
+	-- Packets from client to server
+	CPacketDescription = {
+	#include cpackets_bnls.lua
+	#include cpackets_d2gs.lua
+	#include cpackets_mcp.lua
+	#include cpackets_packet.lua
+	#include cpackets_pkt.lua
+	#include cpackets_sid.lua
+	},
+	
 	setfenv(1, global_environment)
 
 	-- After all the initialization is finished, register plugin
