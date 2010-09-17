@@ -2621,7 +2621,7 @@ SPacketDescription = {
 	uint32("Request ID"),
 	uint32("Address", base.HEX),
 	uint32("Length"),
-}
+},
 
 --[[doc
     Message ID:      0x18

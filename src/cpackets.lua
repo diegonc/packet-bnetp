@@ -3916,7 +3916,7 @@ CPacketDescription = {
 [SID_READMEMORY] = { -- 0x17
 	uint32("Request ID"),
 	bytes("Memory"), -- TODO: bytes till packet end
-}
+},
 
 --[[doc
     Message ID:      0x18

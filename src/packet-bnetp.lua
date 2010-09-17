@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sun Aug  8 03:00:09 2010
+--[[ packet-bnetp.lua build on %time%
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -694,6 +694,7 @@ packet_names = {
 [0xFF14] = "SID_UDPPINGRESPONSE",
 [0xFF15] = "SID_CHECKAD",
 [0xFF16] = "SID_CLICKAD",
+[0xFF17] = "SID_READMEMORY",
 [0xFF18] = "SID_REGISTRY",
 [0xFF19] = "SID_MESSAGEBOX",
 [0xFF1A] = "SID_STARTADVEX2",
@@ -702,8 +703,11 @@ packet_names = {
 [0xFF1D] = "SID_LOGONCHALLENGEEX",
 [0xFF1E] = "SID_CLIENTID2",
 [0xFF1F] = "SID_LEAVEGAME",
+[0xFF20] = "SID_ANNOUNCEMENT",
 [0xFF21] = "SID_DISPLAYAD",
 [0xFF22] = "SID_NOTIFYJOIN",
+[0xFF23] = "SID_WRITECOOKIE",
+[0xFF24] = "SID_READCOOKIE",
 [0xFF25] = "SID_PING",
 [0xFF26] = "SID_READUSERDATA",
 [0xFF27] = "SID_WRITEUSERDATA",
@@ -729,6 +733,7 @@ packet_names = {
 [0xFF3F] = "SID_STARTVERSIONING2",
 [0xFF40] = "SID_QUERYREALMS2",
 [0xFF41] = "SID_QUERYADURL",
+[0xFF43] = "SID_WARCRAFTSOMETHING",
 [0xFF44] = "SID_WARCRAFTGENERAL",
 [0xFF45] = "SID_NETGAMEPORT",
 [0xFF46] = "SID_NEWS_INFO",
@@ -2720,6 +2725,14 @@ SPacketDescription = {
 	stringz("Filename"),
 	stringz("Link URL"),
 },
+
+
+[0xFF17] = { -- 0x17
+	uint32("Request ID"),
+	uint32("Address", base.HEX),
+	uint32("Length"),
+},
+
 [0xFF18] = { -- 0x18
 	uint32("Cookie"),
 	uint32("HKEY", base.HEX, {
@@ -2749,6 +2762,24 @@ SPacketDescription = {
 	uint32("UDP Token", base.HEX),
 	uint32("Server Token", base.HEX),
 },
+
+[0xFF20] = { -- 0x20
+	stringz("Text"),
+},
+
+[0xFF23] = { -- 0x23
+	uint32("Flags, Request ID?"),
+	uint32("Timestamp?"),
+	stringz("Registry key name"),
+	stringz("Registry key value"),
+},
+
+[0xFF24] = { -- 0x24
+	uint32("Request ID?"),
+	uint32("Timestamp?"),
+	stringz("Registry key name"),
+},
+
 [0xFF25] = { -- 0x25
 	uint32("Ping Value", base.HEX),
 },
@@ -3046,6 +3077,11 @@ SPacketDescription = {
 		}},
 	}},
 },
+
+[ 0xFF43] = { -- 0x43
+	uint32("Unknown (0)"),
+},
+
 [0xFF46] = { -- 0x46
 	uint8{"Number of entries", key="news" },
 	posixtime("Last logon timestamp"),
@@ -4034,6 +4070,12 @@ CPacketDescription = {
 		[1] = "Client did not use SID_QUERYADURL",
 	}),
 },
+
+[0xFF17] = { -- 0x17
+	uint32("Request ID"),
+	bytes("Memory"), -- TODO: bytes till packet end
+},
+
 [0xFF18] = { -- 0x18
 	uint32("Cookie"),
 	stringz("Key Value"),
@@ -4107,6 +4149,14 @@ CPacketDescription = {
 	stringz("Game Name"),
 	stringz("Game Password"),
 },
+
+[0xFF24] = { -- 0x24
+	uint32("First DWORD from S -> C"),
+	uint32("Second DWORD from S -> C"),
+	stringz("Registry key name"),
+	stringz("Registry key value"),
+},
+
 [0xFF25] = { -- 0x25
 	uint32("Ping Value", base.HEX),
 },
