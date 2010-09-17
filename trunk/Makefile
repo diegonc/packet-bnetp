@@ -20,8 +20,6 @@ PKG = \
 SOURCES = \
 	src/testpackets.lua \
 	src/constants.lua \
-	src/cpackets.lua \
-	src/spackets.lua \
 	src/checkedtable.lua \
 	src/api/integer.lua \
 	src/api/array.lua \
@@ -37,7 +35,19 @@ SOURCES = \
 	src/api/version.lua \
 	src/valuemaps.lua \
 	src/banner.lua \
-	src/core.lua
+	src/core.lua \
+	src/cpackets_bnls.lua \
+	src/cpackets_d2gs.lua \
+	src/cpackets_mcp.lua \
+	src/cpackets_packet.lua \
+	src/cpackets_pkt.lua \
+	src/cpackets_sid.lua \
+	src/spackets_bnls.lua \
+	src/spackets_d2gs.lua \
+	src/spackets_mcp.lua \
+	src/spackets_packet.lua \
+	src/spackets_pkt.lua \
+	src/spackets_sid.lua
 
 DIST = \
 	$(SOURCES) \
