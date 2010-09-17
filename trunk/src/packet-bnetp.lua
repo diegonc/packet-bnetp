@@ -2205,9 +2205,12 @@ do
 end
 
 	
--- Begin spackets.lua
--- Packets from server to client
-SPacketDescription = {
+	-- # include "spackets.lua"
+	-- # include "cpackets.lua"
+	
+	-- Packets from server to client
+	SPacketDescription = {
+-- Begin spackets_bnls.lua
 [0x7001] = { -- 0x01
 	uint32("Result", nil, Descs.YesNo),
 	uint32("Client Token", base.HEX),
@@ -2306,6 +2309,8 @@ SPacketDescription = {
 	uint32("Cookie"),
 	uint32("The latest version code for this product", base.HEX),
 },
+-- End spackets_bnls.lua
+-- Begin spackets_d2gs.lua
 [0x8010] = { -- 0x10
 	uint8("Unknown"),
 	uint32("Player ID"),
@@ -2352,6 +2357,8 @@ SPacketDescription = {
 },
 [0x80AF] = { -- 0xAF
 },
+-- End spackets_d2gs.lua
+-- Begin spackets_mcp.lua
 [0x9001] = { -- 0x01
 	uint32("Result"),
 },
@@ -2451,6 +2458,8 @@ SPacketDescription = {
 	stringz("Character name"),
 	stringz("Character statstring"),
 },
+-- End spackets_mcp.lua
+-- Begin spackets_packet.lua
 [0xA000] = { -- 0x00
 },
 [0xA001] = { -- 0x01
@@ -2500,12 +2509,16 @@ SPacketDescription = {
 	uint8("Setting for whispers"),
 	uint8("Refuse all"),
 },
+-- End spackets_packet.lua
+-- Begin spackets_pkt.lua
 [0xB005] = { -- 0x05
 	uint32("UDP Code"),
 },
 [0xCE07] = { -- 0x07
 	uint32("Bot id"),
 },
+-- End spackets_pkt.lua
+-- Begin spackets_sid.lua
 [0xFF00] = { -- 0x00
 },
 [0xFF04] = { -- 0x04
@@ -3456,11 +3469,12 @@ SPacketDescription = {
 	uint8("User's rank"),
 	wintime("Date joined"),
 },
-}
--- End spackets.lua
--- Begin cpackets.lua
--- Packets from client to server
-CPacketDescription = {
+-- End spackets_sid.lua
+	},
+	
+	-- Packets from client to server
+	CPacketDescription = {
+-- Begin cpackets_bnls.lua
 [0x7000] = { -- 0x00
 },
 [0x7001] = { -- 0x01
@@ -3563,6 +3577,8 @@ CPacketDescription = {
 	stringz("Version check archive filename"),
 	stringz("Checksum formula"),
 },
+-- End cpackets_bnls.lua
+-- Begin cpackets_d2gs.lua
 [0x8101] = { -- 0x01
 	uint16("X coordinate"),
 	uint16("Y coordinate"),
@@ -3794,6 +3810,8 @@ CPacketDescription = {
 	uint32("Null"),
 	uint32("Null"),
 },
+-- End cpackets_d2gs.lua
+-- Begin cpackets_mcp.lua
 [0x9001] = { -- 0x01
 	uint32("MCP Cookie"),
 	uint32("MCP Status"),
@@ -3862,6 +3880,8 @@ CPacketDescription = {
 [0x9019] = { -- 0x19
 	uint32("Number of characters to list"),
 },
+-- End cpackets_mcp.lua
+-- Begin cpackets_packet.lua
 [0xA000] = { -- 0x00
 },
 [0xA001] = { -- 0x01
@@ -3921,12 +3941,14 @@ CPacketDescription = {
 	stringz("Account password"),
 },
 [0xA010] = { -- 0x10
-	uint8("SubcommandFor subcommand 0:"),
+	uint8("Subcommand"),
 	uint8("Setting for broadcast"),
 	uint8("Setting for database"),
 	uint8("Setting for whispers"),
 	uint8("Refuse all"),
 },
+-- End cpackets_packet.lua
+-- Begin cpackets_pkt.lua
 [0xB003] = { -- 0x03
 	uint32("Code"),
 },
@@ -3940,6 +3962,8 @@ CPacketDescription = {
 	uint32("Server Token"),
 	uint32("UDP Token"),
 },
+-- End cpackets_pkt.lua
+-- Begin cpackets_sid.lua
 [0xFF00] = { -- 0x00
 },
 [0xFF02] = { -- 0x02
@@ -4572,9 +4596,9 @@ CPacketDescription = {
 	strdw("User's clan tag"),
 	stringz("Username"),
 },
-}
--- End cpackets.lua
-
+-- End cpackets_sid.lua
+	},
+	
 	setfenv(1, global_environment)
 
 	-- After all the initialization is finished, register plugin
