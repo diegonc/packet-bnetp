@@ -1,4 +1,5 @@
 -- Begin cpackets_sid.lua
+-- Battle.net Messages
 --[[doc
     Message ID:    0x00
 
@@ -1988,7 +1989,7 @@ WID_SETICON 0x0A SEND
 			0x00000020: Random
 	]]
 	-- Subcommand ID 0: Game search?
-	oldwhen{ condition=Cond.equals("subcommand", 0), block={
+	when{Cond.equals("subcommand", 0), {
 		uint32("Cookie"),
 		uint32("Unknown"),
 		uint8("Unknown"),
@@ -2003,18 +2004,17 @@ WID_SETICON 0x0A SEND
 		uint16("Unknown"),
 		uint8("Unknown"),
 		uint32("TickCount"),
-		-- TODO: Flags?
-		uint32("Race", nil, {
-			[0x01] = "Human",
-			[0x02] = "Orc",
-			[0x04] = "Night Elf",
-			[0x08] = "Undead",
-			[0x20] = "Random",
-		}),
+		flags{label="Race", of=uint32, fields={
+			{sname="Human",     mask=0x01, desc=Descs.YesNo},
+			{sname="Orc",       mask=0x02, desc=Descs.YesNo},
+			{sname="Night Elf", mask=0x04, desc=Descs.YesNo},
+			{sname="Undead",    mask=0x08, desc=Descs.YesNo},
+			{sname="Random",    mask=0x20, desc=Descs.YesNo},
+		}},
 	}},
 	
 	-- Subcommand ID 2: Request ladder map listing
-	oldwhen{ condition=Cond.equals("subcommand", 2), block = { 
+	when{Cond.equals("subcommand", 2), { 
 		uint32("Cookie"),
 		uint8{label="Number of types requested",key="num"},
 		iterator{label="Game Information", refkey="num", repeated={
@@ -2026,24 +2026,24 @@ WID_SETICON 0x0A SEND
 	}},
 	
 	-- Subcommand ID 3: WID_CANCELSEARCH
-	oldwhen{ condition=Cond.equals("subcommand", 3),
-		block = {  },
+	when{Cond.equals("subcommand", 3),
+		{  },
 	},
 	
 	-- Subcommand ID 4: User stats request
-	oldwhen{ condition=Cond.equals("subcommand", 4),	block = {  
+	when{Cond.equals("subcommand", 4), {  
 		uint32("Cookie"),
 		stringz("Username"),
 		strdw("Product ID", Descs.ClientTag),
 	}},
 	
 	-- Subcommand ID 7: WID_TOURNAMENT
-	oldwhen{ condition=Cond.equals("subcommand", 7), block = {  
+	when{Cond.equals("subcommand", 7), {  
 		uint32("Cookie"),
 	}},
 	
 	-- Subcommand ID 8: Clan stats request
-	oldwhen{ condition=Cond.equals("subcommand", 8),	block = { 
+	when{Cond.equals("subcommand", 8), { 
 		uint32("Cookie"),
 		stringz("Account name"),
 		-- TODO: "' in strings?
@@ -2051,12 +2051,12 @@ WID_SETICON 0x0A SEND
 	}}, 
 	
 	-- Subcommand ID 9: Icon list request
-	oldwhen{ condition=Cond.equals("subcommand", 9),	block = { 			
+	when{Cond.equals("subcommand", 9), { 			
 		uint32("Cookie"),
 	}},
 	
 	-- Subcommand ID 10: Change icon
-	oldwhen{ condition=Cond.equals("subcommand", 0x0A),	block = { 			
+	when{Cond.equals("subcommand", 0x0A), { 			
 		strdw("Icon", Descs.W3Icon),
 	}},
 },
