@@ -243,9 +243,18 @@ do
 	end
 
 	handlers_by_type = {
-		[0x1] = noop_handler,
-		[0x2] = noop_handler,
-		[0x3] = noop_handler,
+		[0x1] = function (state) 
+			state.pkt.columns.info:append(" GAME_PROTOCOL")		
+			state.bnet_node:append_text(", Game Protocol byte")
+		end,
+		[0x2] = function (state) 
+			state.pkt.columns.info:append(" FTP_PROTOCOL")
+			state.bnet_node:append_text(", FTP Protocol byte")
+		end,
+		[0x3] = function (state) 
+			state.pkt.columns.info:append(" CHAT_PROTOCOL")
+			state.bnet_node:append_text(", Chat Protocol byte")
+		end,
 		[0xF7] = function (state)
 			state.bnet_node:add(f_pid, state:read(1))
 			local len = state:peek(2):le_uint()
@@ -542,26 +551,13 @@ do
 	#include "api/flags.lua"
 	#include "api/sockaddr.lua"
 	
-	-- # include "spackets.lua"
-	-- # include "cpackets.lua"
-	
 	-- Packets from server to client
 	SPacketDescription = {
-	#include spackets_bnls.lua
-	#include spackets_d2gs.lua
-	#include spackets_mcp.lua
-	#include spackets_packet.lua
-	#include spackets_pkt.lua
 	#include spackets_sid.lua
 	}
 	
 	-- Packets from client to server
 	CPacketDescription = {
-	#include cpackets_bnls.lua
-	#include cpackets_d2gs.lua
-	#include cpackets_mcp.lua
-	#include cpackets_packet.lua
-	#include cpackets_pkt.lua
 	#include cpackets_sid.lua
 	}
 	

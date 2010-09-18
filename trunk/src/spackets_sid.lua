@@ -1,4 +1,5 @@
 -- Begin spackets_sid.lua
+-- Battle.net Messages
 --[[doc
     Message ID:    0x00
 
@@ -49,7 +50,7 @@
  		alias="bytes",
  		condition = function(self, state) return state.packet.srvr ~="" end,
  		repeated = {
- 			stringz{label="Server", key="srvr"},
+ 			stringz{"Server", key="srvr"},
  		},
  	}
 },
@@ -301,8 +302,8 @@
 
 
 [SID_GETADVLISTEX] = { -- 0x09
-	uint32{label="Number of games", key="games"},
-	oldwhen{condition=Cond.equals("games", 0),
+	uint32{"Number of games", key="games"},
+	when{Cond.equals("games", 0),
 		block = {
 			uint32("Status", nil, Descs.GameStatus)
 		},
@@ -314,7 +315,7 @@
 				-- for pvpgn, must be 0 or 1
 				-- for battle.net, must be >= 2
 				uint16{key="key", getvalueonly=true},
-				oldwhen{ condition=Cond.inlist("key", {0,1}), block={
+				when{Cond.inlist("key", {0,1}), {
 					uint32("Unknown (PvPGN)"), -- seems to be bool32 - only on pvpgn
 				}},
 				uint16{"Game Type", nil, {
@@ -334,7 +335,7 @@
 					[0x10] = "Iron man ladder",
 				}, key = "gametype"},
 				-- source:unverified
-				when{ 
+				casewhen{ 
 				{Cond.inlist("gametype", {2, 3, 4, 5, 8}), { -- melee / ffa / 1 on 1 / CTF / suddenDeath
 					uint16("Penalty", nil, {
 						[1] = "Melee Disc",
@@ -393,7 +394,7 @@
 					uint16("Parameter", base.HEX) 
 				}}
 				},
-				oldwhen{ condition=Cond.neg( Cond.inlist("key", {0,1}) ), block={
+				when{Cond.neg(Cond.inlist("key", {0,1}) ), {
 					uint32("Language ID", nil, Descs.LocaleID), -- only on bnet - comment out for pvpgn
 				}},
 				--sockaddr("Game Host"),
@@ -660,7 +661,7 @@
 		[0x13] = "EID_ERROR: Error message",
 		[0x17] = "EID_EMOTE: Emote",
 	}},
-	when{
+	casewhen{
 		{Cond.equals("eid", 7), { -- Channel information
 			flags{of=uint32, label="Channel Flags", fields=Fields.ChannelFlags},
 		}},
@@ -677,7 +678,7 @@
 	-- empty: 3,
 	-- text: 5,18
 	-- channel name: 7
-	when{ 
+	casewhen{ 
 		{Cond.inlist("eid", {1,2,9}), {
 			stringz("Statstring"),
 		}},
@@ -1414,8 +1415,8 @@
 ]]
 [SID_PROFILE] = { -- 0x35
 	uint32("Cookie"),
-	uint8{"Success", key="status"},
-	oldwhen{condition=Cond.equals("status", 0), block={
+	uint8{"Success", nil, Descs.YesNo, key="status"},
+	when{Cond.equals("status", 0), {
 		stringz("Profile\\Description value"),
 		stringz("Profile\\Location value"),
 		strdw("Clan Tag"),
@@ -1494,7 +1495,7 @@
 		[0x02] = "Invalid Password",
 		[0x06] = "Account Closed",
 	}, key="res"},
-	oldwhen{condition=Cond.equals("res", 6), block={
+	when{Cond.equals("res", 6), {
 		stringz("Reason"),
 	}},
 },
@@ -1606,7 +1607,7 @@
 [SID_LOGONREALMEX] = { -- 0x3E
 	uint32("MCP Cookie"),
 	uint32{"MCP Status", key="status"},
-	oldwhen{condition=Cond.equals("status", 0), block={
+	when{Cond.equals("status", 0), {
 		array("MCP Chunk 1", uint32, 2),
 		ipv4("IP"),
 		uint16{"Port", big_endian=true},
@@ -1981,7 +1982,7 @@ WID_SETICON 0x0A SEND
 			0x04: Banned CD Key
 	]]
 	-- Subcommand ID 0: Game search?
-	oldwhen{condition=Cond.equals("subcommand", 0), block = {
+	when{Cond.equals("subcommand", 0), {
 		uint32("Cookie"),
 		uint8("Status", nil, {
 			[0x00] = "Search Started",
@@ -2001,7 +2002,7 @@ WID_SETICON 0x0A SEND
 			(BYTE) Remaining Packets
 	]]
 	-- Subcommand ID 2: Request ladder map listing
-	oldwhen{condition=Cond.equals("subcommand", 2), block = {
+	when{Cond.equals("subcommand", 2), {
 		uint32("Cookie"),
 		uint8("Responses"),
 		strdw("ID", Descs.WarcraftGeneralRequestType),
@@ -2041,7 +2042,7 @@ WID_SETICON 0x0A SEND
 		(STRING) Partner Account
 	]]
 	-- Subcommand ID 4: User stats request
-	oldwhen{condition=Cond.equals("subcommand", 4), block = {
+	when{Cond.equals("subcommand", 4), {
 		uint32("Cookie"),
 		strdw("Icon ID", Descs.W3IconNames),
 		uint8{"Number of ladder records", key="ladders"},
@@ -2097,7 +2098,7 @@ WID_SETICON 0x0A SEND
 		(BYTE) Unknown
 	]]
 	-- Subcommand ID 7: WID_TOURNAMENT
-	oldwhen{ condition=Cond.equals("subcommand", 7), block = {  
+	when{Cond.equals("subcommand", 7), {
 		uint32("Cookie"),
 		uint8("Status", nil, {
 			[0x00] = "No Tournament",
@@ -2119,7 +2120,7 @@ WID_SETICON 0x0A SEND
 	}},
 	
 	-- Subcommand ID 8: Clan stats request
-	oldwhen{condition=Cond.equals("subcommand", 8), block={
+	when{Cond.equals("subcommand", 8), {
 		uint32("Cookie"),
 		uint8{"Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
@@ -2151,7 +2152,7 @@ WID_SETICON 0x0A SEND
 		(BYTE) Unknown
 	--]]
 	-- Subcommand ID 9: Icon list request
-	oldwhen{condition=Cond.equals("subcommand", 9), block={
+	when{Cond.equals("subcommand", 9), {
 		uint32("Cookie"),
 		uint32("Unknown", base.HEX),
 		uint8("Tiers"),
@@ -2222,9 +2223,7 @@ WID_SETICON 0x0A SEND
 	posixtime("Newest news timestamp"),
 	iterator{label="News", refkey="news", repeated={
 		posixtime{"Timestamp", key="stamp"},
-		oldwhen{
-			-- condition=function(self, state) return state.packet.stamp == 0 end,
-			condition=Cond.equals("stamp", 0),
+		when{Cond.equals("stamp", 0),
 			block = { stringz("MOTD") },
 			otherwise = {stringz("News")},
 		},},
@@ -2405,7 +2404,7 @@ WID_SETICON 0x0A SEND
 	wintime("MPQ filetime"),
 	stringz("IX86ver filename"),
 	stringz("ValueString"),
-	oldwhen{ condition = Cond.equals("logontype", 2), block = {
+	when{Cond.equals("logontype", 2), {
 		 array("Server signature", uint8, 128),
 	}},
 },
@@ -2480,7 +2479,7 @@ WID_SETICON 0x0A SEND
 		[0x213] = "Wrong product for second CD key",
 	}},
 	
-	when{ 
+	casewhen{ 
 		{Cond.inlist("res", {0x100, 0x102}), {
 			stringz("MPQ Filename"),
 		}},
@@ -2615,7 +2614,7 @@ WID_SETICON 0x0A SEND
 		[0x0F] = "Custom error. A string at the end of this message contains the error",
 	}},
 	array("Server Password Proof", uint8, 20),
-	oldwhen{condition=Cond.equals("status", 0xF), block={
+	when{Cond.equals("status", 0xF), {
 		stringz("Additional information"),
 	}},
 },

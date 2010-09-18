@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Fri Sep 17 01:35:16 2010
+--[[ packet-bnetp.lua build on %time%
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -269,9 +269,23 @@ do
 	end
 
 	handlers_by_type = {
+		--[[
 		[0x1] = noop_handler,
 		[0x2] = noop_handler,
 		[0x3] = noop_handler,
+		--]]
+		[0x1] = function (state) 
+			state.pkt.columns.info:append(" GAME_PROTOCOL")		
+			state.bnet_node:append_text(", Game Protocol byte")
+		end,
+		[0x2] = function (state) 
+			state.pkt.columns.info:append(" FTP_PROTOCOL")
+			state.bnet_node:append_text(", FTP Protocol byte")
+		end,
+		[0x3] = function (state) 
+			state.pkt.columns.info:append(" CHAT_PROTOCOL")
+			state.bnet_node:append_text(", Chat Protocol byte")
+		end,
 		[0xF7] = function (state)
 			state.bnet_node:add(f_pid, state:read(1))
 			local len = state:peek(2):le_uint()
@@ -576,6 +590,8 @@ packet_names = {
 [0x7014] = "BNLS_SERVERLOGONPROOF",
 [0x7018] = "BNLS_VERSIONCHECKEX",
 [0x701A] = "BNLS_VERSIONCHECKEX2",
+
+
 [0x8010] = "D2GS_CHARTOOBJ",
 [0x8019] = "D2GS_SMALLGOLDPICKUP",
 [0x801D] = "D2GS_SETBYTEATTR",
@@ -640,6 +656,8 @@ packet_names = {
 [0x8168] = "D2GS_GAMELOGON",
 [0x816A] = "D2GS_ENTERGAMEENVIRONMENT",
 [0x816D] = "D2GS_PING",
+
+
 [0x9001] = "MCP_STARTUP",
 [0x9002] = "MCP_CHARCREATE",
 [0x9003] = "MCP_CREATEGAME",
@@ -655,6 +673,8 @@ packet_names = {
 [0x9017] = "MCP_CHARLIST",
 [0x9018] = "MCP_CHARUPGRADE",
 [0x9019] = "MCP_CHARLIST2",
+
+
 [0xA000] = "PACKET_IDLE",
 [0xA001] = "PACKET_LOGON",
 [0xA002] = "PACKET_STATSUPDATE",
@@ -669,12 +689,16 @@ packet_names = {
 [0xA00B] = "PACKET_BOTNETCHAT",
 [0xA00D] = "PACKET_ACCOUNT",
 [0xA010] = "PACKET_CHATDROPOPTIONS",
+
+
 [0xB003] = "PKT_CLIENTREQ",
 [0xB005] = "PKT_SERVERPING",
 [0xB007] = "PKT_KEEPALIVE",
 [0xB008] = "PKT_CONNTEST",
 [0xB009] = "PKT_CONNTEST2",
 [0xCE07] = "PACKET_USERLOGGINGOFF",
+
+
 [0xFF00] = "SID_NULL",
 [0xFF02] = "SID_STOPADV",
 [0xFF04] = "SID_SERVERLIST",
@@ -1912,7 +1936,7 @@ do
 	end
 
 	--[[
-	--  when
+	--  casewhen
 	--
 	--  Selects a block of fields from a list when it's associated condition
 	--  is true.
@@ -1923,6 +1947,9 @@ do
 	--
 	--  Only one block is executed.
 	--
+	--  This function actually emulates if (..) .. elseif (..) sequence. Use Cond.always()
+	--  as condition if you want to use final else.
+	--
 	--  Table call: { {condition, block}, ... }
 	--    @par condition Function that returns true if the block should be
 	--                   used given the current state.
@@ -1930,14 +1957,14 @@ do
 	--                   is true.
 	--
 	--]]
-	function when (...)
+	function casewhen (...)
 		local tmp = create_proto_field(template, {})
 		if (#arg == 1) and arg[1].tests then
 			tmp.tests = arg[1].tests
 		else
 			tmp.tests = {}
 			-- XXX: little hack to allow both syntax for calling a function
-			--      ( f() y f {} )
+			--      ( f() and f {} )
 			if #arg == 1 and type(arg[1][1])=="table" then arg = arg[1] end
 			for k, v in ipairs(arg) do
 				local test = make_args_table_with_positional_map(
@@ -1949,10 +1976,12 @@ do
 	end
 
 	--[[
-	--  oldwhen
+	--  when
 	--
 	--  Selects a block of fields from two alternatives acording to a condition
 	--  function result.
+	--
+	--  Emulates if(..) then .. else .. sequence
 	--
 	--  Only one block is executed.
 	--
@@ -1965,17 +1994,18 @@ do
 	--    @par otherwise Block of fields used when condition is false.
 	--
 	--]]
-	function oldwhen (...)
+	function when (...)
 		local args = make_args_table_with_positional_map(
 				{"condition", "block", "otherwise"}, unpack(arg))
 		if args.params then
 			error(package.loaded.debug.traceback())
 		end
 		local par = { { args.condition, args.block } }
+		-- call casewhen, use true function as condition for otherwise block
 		if args.otherwise then
 			par[2] = { function() return true end, args.otherwise }
 		end
-		return when (unpack(par))
+		return casewhen (unpack(par))
 	end
 end
 
@@ -2205,320 +2235,15 @@ do
 end
 
 	
-	-- # include "spackets.lua"
-	-- # include "cpackets.lua"
-	
 	-- Packets from server to client
 	SPacketDescription = {
--- Begin spackets_bnls.lua
-[0x7001] = { -- 0x01
-	uint32("Result", nil, Descs.YesNo),
-	uint32("Client Token", base.HEX),
-	array("CD key data for SID_AUTH_CHECK", uint32, 9),
-},
-[0x7002] = { -- 0x02
-	array("Data for SID_AUTH_ACCOUNTLOGON", uint32, 8),
-},
-[0x7003] = { -- 0x03
-	array("Data for SID_AUTH_ACCOUNTLOGONPROOF", uint32, 5),
-},
-[0x7004] = { -- 0x04
-	array("Data for Data for SID_AUTH_ACCOUNTCREATE", uint32, 16),
-},
-[0x7005] = { -- 0x05
-	array("Data for SID_AUTH_ACCOUNTCHANGE", uint32, 8),
-},
-[0x7006] = { -- 0x06
-	array("Data for SID_AUTH_ACCOUNTCHANGEPROOF", uint32, 21),
-},
-[0x7007] = { -- 0x07
-	uint32("Success code", nil, Descs.YesNo),
-},
-[0x7008] = { -- 0x08
-	array("Data for SID_AUTH_ACCOUNTUPGRADEPROOF", uint32, 22),
-},
-[0x7009] = { -- 0x09
-	uint32("Success", nil, Descs.YesNo),
-	uint32("Version"),
-	uint32("Checksum"),
-	stringz("Version check stat string"),
-},
-[0x700A] = { -- 0x0A
-	uint32("Success", nil, Descs.YesNo),
-},
-[0x700B] = { -- 0x0B
-	array("The data hash.Optional:", uint32, 5),
-	uint32("Cookie"),
-},
-[0x700C] = { -- 0x0C
-	uint32("Cookie"),
-	uint8("Number of CD-keys requested"),
-	uint8("Number of successfully ecrypted CD-keys"),
-	uint32("Bit mask"),
-	-- For each successful CD Key:
-	uint32("Client session key"),
-	array("CD-key data", uint32, 9),
-},
-[0x700D] = { -- 0x0D
-	uint32("Success code", nil, Descs.YesNo),
-},
-[0x700E] = { -- 0x0E
-	uint32("Server code"),
-},
-[0x700F] = { -- 0x0F
-	uint32("Status code"),
-},
-[0x7010] = { -- 0x10
-	uint32{label="Product", key="prod"},
-	oldwhen{
-		-- condition=function(...) return arg[2].packet.prod ~= 0 end,
-		condition = Cond.nequals("prod", 0),
-		block = {
-			uint32("Version byte", base.HEX)
-		},
-	}
-},
-[0x7011] = { -- 0x11
-	uint32("Success", nil, Descs.YesNo),
-},
-[0x7012] = { -- 0x12
-	uint32("Number of slots reserved"),
-},
-[0x7013] = { -- 0x13
-	uint32("Slot index"),
-	array("Data for server's SID_AUTH_ACCOUNTLOGON", uint32, 16),
-},
-[0x7014] = { -- 0x14
-	uint32("Slot index"),
-	uint32("Success", nil, Descs.YesNo),
-	array("Data server's SID_AUTH_ACCOUNTLOGONPROOF (0x54) response", uint32, 5),
-},
-[0x7018] = { -- 0x18
-	uint32("Success", nil, Descs.YesNo),
-	uint32("Version"),
-	uint32("Checksum"),
-	stringz("Version check"),
-	uint32("Cookie"),
-	uint32("The latest version code for this"),
-},
-[0x701A] = { -- 0x1A
-	uint32("Success", nil, Descs.YesNo),
-	version("Version"),
-	uint32("Checksum", base.HEX),
-	stringz("Version check stat string"),
-	uint32("Cookie"),
-	uint32("The latest version code for this product", base.HEX),
-},
--- End spackets_bnls.lua
--- Begin spackets_d2gs.lua
-[0x8010] = { -- 0x10
-	uint8("Unknown"),
-	uint32("Player ID"),
-	uint8("Movement Type"),
-	uint8("Destination Type"),
-	uint32("Object ID"),
-	uint16("X Coordinate"),
-	uint16("Y Coordinate"),
-},
-[0x8019] = { -- 0x19
-	uint8("Amount"),
-},
-[0x801D] = { -- 0x1D
-	uint8("Attribute"),
-	uint8("Amount"),
-},
-[0x801E] = { -- 0x1E
-	uint8("Attribute"),
-	uint16("Amount"),
-},
-[0x801F] = { -- 0x1F
-	uint8("Attribute - D2GS_SETWORDATTR"),
-	uint32("Amount"),
-},
-[0x8051] = { -- 0x51
-	uint8("Object Type - Any information appreciated"),
-	uint32("Object ID"),
-	uint16("Object unique code"),
-	uint16("X Coordinate"),
-	uint16("Y Coordinate"),
-	uint8("State"),
-	uint8("Interaction Condition"),
-},
-[0x805C] = { -- 0x5C
-},
-[0x8077] = { -- 0x77
-	uint8("Request Type"),
-},
-[0x807A] = { -- 0x7A
-	uint32("Unknown - Possible acceptance/request ID"),
-},
-[0x8089] = { -- 0x89
-	uint8("EventId // see below,"),
-},
-[0x80AF] = { -- 0xAF
-},
--- End spackets_d2gs.lua
--- Begin spackets_mcp.lua
-[0x9001] = { -- 0x01
-	uint32("Result"),
-},
-[0x9002] = { -- 0x02
-	uint32("Result"),
-},
-[0x9003] = { -- 0x03
-	uint16("Request Id"),
-	uint16("Game token"),
-	uint16("Unknown"),
-	uint32("Result"),
-},
-[0x9004] = { -- 0x04
-	uint16("Request ID", base.HEX),
-	uint16("Game token", base.HEX),
-	uint16("Unknown", base.HEX),
-	ipv4("IP of D2GS Server"),
-	uint32("Game hash"),
-	uint32("Result", base.HEX, {
-		[0x00] = "Game joining succeeded",
-		[0x29] = "Password incorrect",
-		[0x2A] = "Game does not exist",
-		[0x2B] = "Game is full",
-		[0x2C] = "You do not meet the level requirements for this game",
-		[0x6E] = "A dead hardcore character cannot join a game",
-		[0x71] = "A non-hardcore character cannot join a game created by a Hardcore character",
-		[0x73] = "Unable to join a Nightmare game",
-		[0x74] = "Unable to join a Hell game",
-		[0x78] = "A non-expansion character cannot join a game created by an Expansion character",
-		[0x79] = "A Expansion character cannot join a game created by a non-expansion character",
-		[0x7D] = "A non-ladder character cannot join a game created by a Ladder character",
-	}),
-},
-[0x9005] = { -- 0x05
-	uint16("Request Id"),
-	uint32("Index"),
-	uint8("Number of players in game"),
-	uint32("Status"),
-	stringz("Game name"),
-	stringz("Game description"),
-},
-[0x9006] = { -- 0x06
-	uint16("Request ID"),
-	uint32("Status"),
-	uint32("Game Uptime"),
-	uint16("Unknown"),
-	uint8("Maximum players allowed"),
-	uint8("Number of characters in the game"),
-	array("Classes of ingame characters", uint8, 16),
-	array("Levels of ingame characters", uint8, 16),
-	uint8("Unused"),
-	stringz("[16] Character names"),
-},
-[0x9007] = { -- 0x07
-	uint32("Result"),
-},
-[0x900A] = { -- 0x0A
-	uint32("Result"),
-},
-[0x9011] = { -- 0x11
-	uint8("Ladder type"),
-	uint16("Total response size"),
-	uint16("Current message size"),
-	uint16("Total size of unreceived messages"),
-	uint16("Rank of first entry"),
-	uint16("Unknown"),
-	uint32("Number of entries"),
-	uint32("Unknown"),
-	uint64("Character experience"),
-	uint8("Character Flags"),
-	uint8("Character title"),
-	uint16("Character level"),
-	array("Character name", uint8, 16),
-},
-[0x9012] = { -- 0x12
-	uint8("Unknown"),
-	stringz("MOTD"),
-},
-[0x9014] = { -- 0x14
-	uint32("Position"),
-},
-[0x9017] = { -- 0x17
-	uint16("Number of characters requested"),
-	uint32("Number of characters that exist on this account"),
-	uint16("Number of characters returned"),
-	stringz("Character name"),
-	stringz("Character statstring"),
-},
-[0x9018] = { -- 0x18
-	uint32("Result"),
-},
-[0x9019] = { -- 0x19
-	uint16("Number of characters requested"),
-	uint32("Number of characters that exist on this account"),
-	uint16("Number of characters returned"),
-	uint32("Expiration Date"),
-	stringz("Character name"),
-	stringz("Character statstring"),
-},
--- End spackets_mcp.lua
--- Begin spackets_packet.lua
-[0xA000] = { -- 0x00
-},
-[0xA001] = { -- 0x01
-	uint32("Result"),
-},
-[0xA002] = { -- 0x02
-	uint32("Result"),
-},
-[0xA003] = { -- 0x03
-	uint32("command"),
-	stringz("usermask"),
-	stringz("flags"),
-	stringz("usermask"),
-},
-[0xA004] = { -- 0x04
-	stringz("User"),
-	stringz("Command"),
-},
-[0xA005] = { -- 0x05
-	stringz("Channel"),
-},
-[0xA006] = { -- 0x06
-	uint32("Bot number"),
-	stringz("Bot name"),
-	stringz("Bot channel"),
-	uint32("Bot server"),
-	stringz("Unique account name"),
-	stringz("Current database"),
-},
-[0xA00A] = { -- 0x0A
-	uint32("Server Version"),
-},
-[0xA00B] = { -- 0x0B
-	uint32("Command"),
-	uint32("Action"),
-	uint32("ID of source bot"),
-	stringz("Message"),
-},
-[0xA00D] = { -- 0x0D
-	uint32("Command"),
-	uint32("Result"),
-},
-[0xA010] = { -- 0x10
-	uint8("SubcommandFor subcommand 0:"),
-	uint8("Setting for broadcast"),
-	uint8("Setting for database"),
-	uint8("Setting for whispers"),
-	uint8("Refuse all"),
-},
--- End spackets_packet.lua
--- Begin spackets_pkt.lua
-[0xB005] = { -- 0x05
-	uint32("UDP Code"),
-},
-[0xCE07] = { -- 0x07
-	uint32("Bot id"),
-},
--- End spackets_pkt.lua
+	-- # include spackets_bnls.lua
+	-- # include spackets_d2gs.lua
+	-- # include spackets_mcp.lua
+	-- # include spackets_packet.lua
+	-- # include spackets_pkt.lua
 -- Begin spackets_sid.lua
+-- Battle.net Messages
 [0xFF00] = { -- 0x00
 },
 [0xFF04] = { -- 0x04
@@ -2528,7 +2253,7 @@ end
  		alias="bytes",
  		condition = function(self, state) return state.packet.srvr ~="" end,
  		repeated = {
- 			stringz{label="Server", key="srvr"},
+ 			stringz{"Server", key="srvr"},
  		},
  	}
 },
@@ -2561,8 +2286,8 @@ end
 
 
 [0xFF09] = { -- 0x09
-	uint32{label="Number of games", key="games"},
-	oldwhen{condition=Cond.equals("games", 0),
+	uint32{"Number of games", key="games"},
+	when{Cond.equals("games", 0),
 		block = {
 			uint32("Status", nil, Descs.GameStatus)
 		},
@@ -2574,7 +2299,7 @@ end
 				-- for pvpgn, must be 0 or 1
 				-- for battle.net, must be >= 2
 				uint16{key="key", getvalueonly=true},
-				oldwhen{ condition=Cond.inlist("key", {0,1}), block={
+				when{Cond.inlist("key", {0,1}), {
 					uint32("Unknown (PvPGN)"), -- seems to be bool32 - only on pvpgn
 				}},
 				uint16{"Game Type", nil, {
@@ -2594,7 +2319,7 @@ end
 					[0x10] = "Iron man ladder",
 				}, key = "gametype"},
 				-- source:unverified
-				when{ 
+				casewhen{ 
 				{Cond.inlist("gametype", {2, 3, 4, 5, 8}), { -- melee / ffa / 1 on 1 / CTF / suddenDeath
 					uint16("Penalty", nil, {
 						[1] = "Melee Disc",
@@ -2653,7 +2378,7 @@ end
 					uint16("Parameter", base.HEX) 
 				}}
 				},
-				oldwhen{ condition=Cond.neg( Cond.inlist("key", {0,1}) ), block={
+				when{Cond.neg(Cond.inlist("key", {0,1}) ), {
 					uint32("Language ID", nil, Descs.LocaleID), -- only on bnet - comment out for pvpgn
 				}},
 				--sockaddr("Game Host"),
@@ -2700,7 +2425,7 @@ end
 		[0x13] = "EID_ERROR: Error message",
 		[0x17] = "EID_EMOTE: Emote",
 	}},
-	when{
+	casewhen{
 		{Cond.equals("eid", 7), { -- Channel information
 			flags{of=uint32, label="Channel Flags", fields=Fields.ChannelFlags},
 		}},
@@ -2717,7 +2442,7 @@ end
 	-- empty: 3,
 	-- text: 5,18
 	-- channel name: 7
-	when{ 
+	casewhen{ 
 		{Cond.inlist("eid", {1,2,9}), {
 			stringz("Statstring"),
 		}},
@@ -2898,8 +2623,8 @@ end
 },
 [0xFF35] = { -- 0x35
 	uint32("Cookie"),
-	uint8{"Success", key="status"},
-	oldwhen{condition=Cond.equals("status", 0), block={
+	uint8{"Success", nil, Descs.YesNo, key="status"},
+	when{Cond.equals("status", 0), {
 		stringz("Profile\\Description value"),
 		stringz("Profile\\Location value"),
 		strdw("Clan Tag"),
@@ -2922,7 +2647,7 @@ end
 		[0x02] = "Invalid Password",
 		[0x06] = "Account Closed",
 	}, key="res"},
-	oldwhen{condition=Cond.equals("res", 6), block={
+	when{Cond.equals("res", 6), {
 		stringz("Reason"),
 	}},
 },
@@ -2946,7 +2671,7 @@ end
 [0xFF3E] = { -- 0x3E
 	uint32("MCP Cookie"),
 	uint32{"MCP Status", key="status"},
-	oldwhen{condition=Cond.equals("status", 0), block={
+	when{Cond.equals("status", 0), {
 		array("MCP Chunk 1", uint32, 2),
 		ipv4("IP"),
 		uint16{"Port", big_endian=true},
@@ -2976,7 +2701,7 @@ end
 [0xFF44] = { -- 0x44
 	uint8{"Subcommand ID", key="subcommand", filter="wid", nil, Descs.WarcraftGeneralSubcommandId},
 	-- Subcommand ID 0: Game search?
-	oldwhen{condition=Cond.equals("subcommand", 0), block = {
+	when{Cond.equals("subcommand", 0), {
 		uint32("Cookie"),
 		uint8("Status", nil, {
 			[0x00] = "Search Started",
@@ -2985,7 +2710,7 @@ end
 	}},
 	
 	-- Subcommand ID 2: Request ladder map listing
-	oldwhen{condition=Cond.equals("subcommand", 2), block = {
+	when{Cond.equals("subcommand", 2), {
 		uint32("Cookie"),
 		uint8("Responses"),
 		strdw("ID", Descs.WarcraftGeneralRequestType),
@@ -2998,7 +2723,7 @@ end
 	}},
 	
 	-- Subcommand ID 4: User stats request
-	oldwhen{condition=Cond.equals("subcommand", 4), block = {
+	when{Cond.equals("subcommand", 4), {
 		uint32("Cookie"),
 		strdw("Icon ID", Descs.W3IconNames),
 		uint8{"Number of ladder records", key="ladders"},
@@ -3034,7 +2759,7 @@ end
 	}},
 	
 	-- Subcommand ID 7: WID_TOURNAMENT
-	oldwhen{ condition=Cond.equals("subcommand", 7), block = {  
+	when{Cond.equals("subcommand", 7), {
 		uint32("Cookie"),
 		uint8("Status", nil, {
 			[0x00] = "No Tournament",
@@ -3056,7 +2781,7 @@ end
 	}},
 	
 	-- Subcommand ID 8: Clan stats request
-	oldwhen{condition=Cond.equals("subcommand", 8), block={
+	when{Cond.equals("subcommand", 8), {
 		uint32("Cookie"),
 		uint8{"Number of ladder records", key="ladders"},
 		iterator{label="Ladder Record", refkey="ladders", repeated={
@@ -3076,7 +2801,7 @@ end
 	}},
 	
 	-- Subcommand ID 9: Icon list request
-	oldwhen{condition=Cond.equals("subcommand", 9), block={
+	when{Cond.equals("subcommand", 9), {
 		uint32("Cookie"),
 		uint32("Unknown", base.HEX),
 		uint8("Tiers"),
@@ -3102,9 +2827,7 @@ end
 	posixtime("Newest news timestamp"),
 	iterator{label="News", refkey="news", repeated={
 		posixtime{"Timestamp", key="stamp"},
-		oldwhen{
-			-- condition=function(self, state) return state.packet.stamp == 0 end,
-			condition=Cond.equals("stamp", 0),
+		when{Cond.equals("stamp", 0),
 			block = { stringz("MOTD") },
 			otherwise = {stringz("News")},
 		},},
@@ -3140,7 +2863,7 @@ end
 	wintime("MPQ filetime"),
 	stringz("IX86ver filename"),
 	stringz("ValueString"),
-	oldwhen{ condition = Cond.equals("logontype", 2), block = {
+	when{Cond.equals("logontype", 2), {
 		 array("Server signature", uint8, 128),
 	}},
 },
@@ -3164,7 +2887,7 @@ end
 		[0x213] = "Wrong product for second CD key",
 	}},
 	
-	when{ 
+	casewhen{ 
 		{Cond.inlist("res", {0x100, 0x102}), {
 			stringz("MPQ Filename"),
 		}},
@@ -3205,7 +2928,7 @@ end
 		[0x0F] = "Custom error. A string at the end of this message contains the error",
 	}},
 	array("Server Password Proof", uint8, 20),
-	oldwhen{condition=Cond.equals("status", 0xF), block={
+	when{Cond.equals("status", 0xF), {
 		stringz("Additional information"),
 	}},
 },
@@ -3474,496 +3197,13 @@ end
 	
 	-- Packets from client to server
 	CPacketDescription = {
--- Begin cpackets_bnls.lua
-[0x7000] = { -- 0x00
-},
-[0x7001] = { -- 0x01
-	uint32("Server Token"),
-	stringz("CD key"),
-},
-[0x7002] = { -- 0x02
-	stringz("Account name"),
-	stringz("Password"),
-},
-[0x7003] = { -- 0x03
-	array("Data from SID_AUTH_ACCOUNTLOGON", uint32, 16),
-},
-[0x7004] = { -- 0x04
-	stringz("Account name"),
-	stringz("Account password"),
-},
-[0x7005] = { -- 0x05
-	stringz("Account name"),
-	stringz("Account old password"),
-	stringz("Account"),
-},
-[0x7006] = { -- 0x06
-	array("Data from SID_AUTH_ACCOUNTCHANGE", uint32, 16),
-},
-[0x7007] = { -- 0x07
-	stringz("Account name"),
-	stringz("Account old password"),
-	stringz("Account"),
-},
-[0x7008] = { -- 0x08
-	uint32("Session key from SID_AUTH_ACCOUNTUPGRADE"),
-},
-[0x7009] = { -- 0x09
-	strdw("Product ID", Descs.ClientTag),
-	uint32("Version DLL digit"),
-	stringz("Checksum formula"),
-},
-[0x700A] = { -- 0x0A
-	array("Password proof from Battle.net", uint32, 5),
-},
-[0x700B] = { -- 0x0B
-	uint32("Size of Data"),
-	uint32("Flags"),
-	bytes("Data to be hashed"),
-	uint32("Client Key"),
-	uint32("Server Key"),
-	uint32("Cookie"),
-},
-[0x700C] = { -- 0x0C
-	uint32("Cookie"),
-	uint8("Number of CD-keys to encrypt"),
-	uint32("Flags"),
-	uint32("Server session key"), 		-- todo: verify array length
-	uint32("Client session key"), -- todo: verify array length
-	stringz("CD-keys No"), 				-- todo: verify array length
-},
-[0x700D] = { -- 0x0D
-	uint32("NLS revision number"),
-},
-[0x700E] = { -- 0x0E
-	stringz("Bot ID"),
-},
-[0x700F] = { -- 0x0F
-	uint32("Checksum"),
-},
-[0x7010] = { -- 0x10
-	strdw("ProductID", Descs.ClientTag),
-},
-[0x7011] = { -- 0x11
-	uint32("Server IP"),
-	array("Signature", uint8, 128),
-},
-[0x7012] = { -- 0x12
-	uint32("Number of slots to reserve"),
-},
-[0x7013] = { -- 0x13
-	uint32("Slot index"),
-	uint32("NLS revision number"),
-	array("Data from account database", uint32, 16),
-	array("Data client's SID_AUTH_ACCOUNTLOGON", uint32, 8),
-},
-[0x7014] = { -- 0x14
-	uint32("Slot index"),
-	array("Data from client's SID_AUTH_ACCOUNTLOGONPROOF (0x54)", uint32, 5),
-	stringz("Client's account name"),
-},
-[0x7018] = { -- 0x18
-	strdw("Product ID", Descs.ClientTag),
-	uint32("Version DLL digit"),
-	uint32("Flags"),
-	uint32("Cookie"),
-	stringz("Checksum formula"),
-},
-[0x701A] = { -- 0x1A
-	strdw("Product ID", Descs.ClientTag),
-	uint32("Flags"),
-	uint32("Cookie"),
-	uint64("Timestamp for version check archive"),
-	stringz("Version check archive filename"),
-	stringz("Checksum formula"),
-},
--- End cpackets_bnls.lua
--- Begin cpackets_d2gs.lua
-[0x8101] = { -- 0x01
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x8102] = { -- 0x02
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x8103] = { -- 0x03
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x8104] = { -- 0x04
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x8105] = { -- 0x05
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x8106] = { -- 0x06
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x8107] = { -- 0x07
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x8108] = { -- 0x08
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x8109] = { -- 0x09
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x810A] = { -- 0x0A
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x810C] = { -- 0x0C
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x810D] = { -- 0x0D
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x810E] = { -- 0x0E
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x810F] = { -- 0x0F
-	uint16("X coordinate"),
-	uint16("Y coordinate"),
-},
-[0x8110] = { -- 0x10
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x8111] = { -- 0x11
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x8113] = { -- 0x13
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x8114] = { -- 0x14
-	uint16("Unknown (0)"),
-	stringz("Message"),
-	uint8("Unused (0)"),
-	uint16("Unknown (0)"),
-},
-[0x8115] = { -- 0x15
-	uint8("Message Type"),
-	uint8("Unknown"),
-	stringz("Message"),
-	uint8("Unknown"),
-	uint16("Unknown - Only if normal chat"),
-	stringz("Player to whisper to - Only if whispering"),
-	uint8("Unknown - Only if whispering"),
-},
-[0x8116] = { -- 0x16
-	uint32("Unit Type"),
-	uint32("Unit ID"),
-	uint32("Action ID"),
-},
-[0x8117] = { -- 0x17
-	uint32("Item ID"),
-},
-[0x8118] = { -- 0x18
-	uint32("Item ID"),
-	uint32("X coordinate"),
-	uint32("Y coordinate"),
-	uint32("Buffer Type"),
-},
-[0x8119] = { -- 0x19
-	uint32("Item ID"),
-},
-[0x811A] = { -- 0x1A
-	uint32("Item ID"),
-	uint32("Body Location"),
-},
-[0x811B] = { -- 0x1B
-	uint32("Item ID"),
-	uint32("Body Location"),
-},
-[0x811C] = { -- 0x1C
-	uint16("Body Location"),
-},
-[0x811D] = { -- 0x1D
-	uint32("Item ID"),
-	uint32("Body Location"),
-},
-[0x811F] = { -- 0x1F
-	uint32("Item ID - Item to place in inventory"),
-	uint32("Item ID - Item to be replaced"),
-	uint32("X coordinate for replace"),
-	uint32("Y coordinate for replace"),
-},
-[0x8120] = { -- 0x20
-	uint32("Item ID"),
-	uint32("X coordinate"),
-	uint32("Y coordinate"),
-},
-[0x8121] = { -- 0x21
-	uint32("Item ID - Stack item"),
-	uint32("Item ID - Target item"),
-},
-[0x8122] = { -- 0x22
-	uint32("Item ID"),
-},
-[0x8123] = { -- 0x23
-	uint32("Item ID"),
-	uint32("Belt Location"),
-},
-[0x8124] = { -- 0x24
-	uint32("Item ID"),
-},
-[0x8125] = { -- 0x25
-	uint32("Item ID - Cursor buffer"),
-	uint32("Item ID - Item to be replaced"),
-},
-[0x8126] = { -- 0x26
-	uint32("Item ID"),
-	uint32("Unknown - Possibly unused"),
-	uint32("Unknown - Possibly unused"),
-},
-[0x8128] = { -- 0x28
-	uint32("Item ID - Item to place in socket"),
-	uint32("Item ID - Socketed item"),
-},
-[0x8129] = { -- 0x29
-	uint32("Item ID - Scroll"),
-	uint32("Item ID - Tome"),
-},
-[0x812A] = { -- 0x2A
-	uint32("Item ID"),
-	uint32("Cube ID"),
-},
-[0x812D] = { -- 0x2D
-},
-[0x812F] = { -- 0x2F
-	uint32("Entity Type"),
-	uint32("Entity ID"),
-},
-[0x8130] = { -- 0x30
-	uint32("Entity Type"),
-	uint32("NPC ID"),
-},
-[0x8132] = { -- 0x32
-	uint32("NPC ID - Unconfirmed"),
-	uint32("Item ID - Unconfirmed"),
-	uint32("Buffer Type - Unconfirmed"),
-	uint32("Cost"),
-},
-[0x8133] = { -- 0x33
-	uint32("NPC ID - Unconfirmed"),
-	uint32("Item ID - Unconfirmed"),
-	uint32("Buffer ID - Unconfirmed - Possible value 0x04"),
-	uint32("Cost"),
-},
-[0x8138] = { -- 0x38
-	uint32("Trade Type - Unconfirmed"),
-	uint32("NPC ID - Unconfirmed"),
-	uint32("Unknown - Unconfirmed - Possible value 0x00"),
-},
-[0x813F] = { -- 0x3F
-	uint16("Phrase ID"),
-},
-[0x8149] = { -- 0x49
-	uint8("Waypoint ID"),
-	uint8("Unknown - Appears to be random"),
-	uint16("Unknown - 0x00"),
-	uint8("Level number"),
-	uint16("Unknown - 0x00"),
-},
-[0x814F] = { -- 0x4F
-	uint32("Request ID"),
-	uint16("Gold Amount"),
-},
-[0x8150] = { -- 0x50
-	uint32("PlayerID"),
-	uint32("GoldAmount"),
-},
-[0x815E] = { -- 0x5E
-	uint16("Action ID"),
-	uint32("Player ID"),
-},
-[0x8161] = { -- 0x61
-	uint16("Unknown - 0x00"),
-},
-[0x8168] = { -- 0x68
-	uint32("D2GS Server Hash"),
-	uint16("D2GS Server Token"),
-	uint8("Character ID"),
-	uint32("Version byte"),
-	uint32("Unknown - Suggested Const"),
-	uint32("Unknown - Suggested Const"),
-	uint8("Unknown - Suggested"),
-	stringz("Character name"),
-	bytes("See user-comment below"),
-},
-[0x816A] = { -- 0x6A
-},
-[0x816D] = { -- 0x6D
-	uint32("Tick Count"),
-	uint32("Null"),
-	uint32("Null"),
-},
--- End cpackets_d2gs.lua
--- Begin cpackets_mcp.lua
-[0x9001] = { -- 0x01
-	uint32("MCP Cookie"),
-	uint32("MCP Status"),
-	array("MCP Chunk 1", uint32, 2),
-	array("MCP Chunk 2", uint32, 12),
-	stringz("Battle.net Unique Name"),
-},
-[0x9002] = { -- 0x02
-	uint32("Character class", nil, {
-		[0x00] = "Amazon", 
-		[0x01] = "Sorceress", 
-		[0x02] = "Necromancer", 
-		[0x03] = "Paladin",
-		[0x04] = "Barbarian", 
-		[0x05] = "Druid", 
-		[0x06] = "Assassin",
-	}),
-	uint16("Character flags"),
-	stringz("Character name"),
-},
-[0x9003] = { -- 0x03
-	uint16("Request Id"),
-	uint32("Difficulty"),
-	uint8("Unknown - 1"),
-	uint8("Player difference"),
-	uint8("Maximum players"),
-	stringz("Game name"),
-	stringz("Game password"),
-	stringz("Game description"),
-},
-[0x9004] = { -- 0x04
-	uint16("Request ID"),
-	stringz("Game name"),
-	stringz("Game Password"),
-},
-[0x9005] = { -- 0x05
-	uint16("Request ID"),
-	uint32("Unknown"),
-	stringz("Search String"),
-},
-[0x9006] = { -- 0x06
-	uint16("Request ID"),
-	stringz("Game name"),
-},
-[0x9007] = { -- 0x07
-	stringz("Character name"),
-},
-[0x900A] = { -- 0x0A
-	uint16("Unknown"),
-	stringz("Character name"),
-},
-[0x9011] = { -- 0x11
-	uint8("Ladder type"),
-	uint16("Starting position"),
-},
-[0x9012] = { -- 0x12
-},
-[0x9013] = { -- 0x13
-},
-[0x9017] = { -- 0x17
-	uint32("Number of characters to list"),
-},
-[0x9018] = { -- 0x18
-	stringz("Character Name"),
-},
-[0x9019] = { -- 0x19
-	uint32("Number of characters to list"),
-},
--- End cpackets_mcp.lua
--- Begin cpackets_packet.lua
-[0xA000] = { -- 0x00
-},
-[0xA001] = { -- 0x01
-	stringz("BotID"),
-	stringz("Bot Password"),
-},
-[0xA002] = { -- 0x02
-	stringz("Unique username on Battle.net"),
-	stringz("Current channel on Battle.net"),
-	uint32("Battle.net server IP address"),
-	stringz("DatabaseID"),
-	uint32("Cycle status"),
-},
-[0xA003] = { -- 0x03
-	uint32("Command"),
-	stringz("Usermask"),
-	stringz("Flags"),
-	stringz("Usermask"),
-},
-[0xA004] = { -- 0x04
-	stringz("User"),
-	stringz("Command"),
-},
-[0xA005] = { -- 0x05
-	uint32("Count"),
-	stringz("Usernames to cycle"), -- TODO: maybe iterator
-},
-[0xA006] = { -- 0x06
-},
-[0xA007] = { -- 0x07
-	stringz("User"),
-	stringz("Command"),
-},
-[0xA008] = { -- 0x08
-	uint32("Target BotID"),
-	stringz("Sending User"),
-	stringz("Command"),
-},
-[0xA009] = { -- 0x09
-	uint32("Password to change"),
-	stringz("New password"),
-},
-[0xA00B] = { -- 0x0B
-	uint32("Command"),
-	uint32("Action"),
-	uint32("For Command 2, ID of destination"),
-	stringz("Message"),
-},
-[0xA00D] = { -- 0x0D
-	uint32("Command"),
-	stringz("Account name"),
-	stringz("Account password"),
-	stringz("Account"),
-	stringz("Old password"),
-	stringz("New password"),
-	stringz("Account name"),
-	stringz("Account password"),
-},
-[0xA010] = { -- 0x10
-	uint8("Subcommand"),
-	uint8("Setting for broadcast"),
-	uint8("Setting for database"),
-	uint8("Setting for whispers"),
-	uint8("Refuse all"),
-},
--- End cpackets_packet.lua
--- Begin cpackets_pkt.lua
-[0xB003] = { -- 0x03
-	uint32("Code"),
-},
-[0xB007] = { -- 0x07
-	uint32("Tick count"),
-},
-[0xB008] = { -- 0x08
-	uint32("Server Token"),
-},
-[0xB009] = { -- 0x09
-	uint32("Server Token"),
-	uint32("UDP Token"),
-},
--- End cpackets_pkt.lua
+	-- # include cpackets_bnls.lua
+	-- # include cpackets_d2gs.lua
+	-- # include cpackets_mcp.lua
+	-- # include cpackets_packet.lua
+	-- # include cpackets_pkt.lua
 -- Begin cpackets_sid.lua
+-- Battle.net Messages
 [0xFF00] = { -- 0x00
 },
 [0xFF02] = { -- 0x02
@@ -4340,7 +3580,7 @@ end
 [0xFF44] = { -- 0x44
 	uint8{"Subcommand ID", key="subcommand", nil, Descs.WarcraftGeneralSubcommandId},
 	-- Subcommand ID 0: Game search?
-	oldwhen{ condition=Cond.equals("subcommand", 0), block={
+	when{Cond.equals("subcommand", 0), {
 		uint32("Cookie"),
 		uint32("Unknown"),
 		uint8("Unknown"),
@@ -4355,18 +3595,17 @@ end
 		uint16("Unknown"),
 		uint8("Unknown"),
 		uint32("TickCount"),
-		-- TODO: Flags?
-		uint32("Race", nil, {
-			[0x01] = "Human",
-			[0x02] = "Orc",
-			[0x04] = "Night Elf",
-			[0x08] = "Undead",
-			[0x20] = "Random",
-		}),
+		flags{label="Race", of=uint32, fields={
+			{sname="Human",     mask=0x01, desc=Descs.YesNo},
+			{sname="Orc",       mask=0x02, desc=Descs.YesNo},
+			{sname="Night Elf", mask=0x04, desc=Descs.YesNo},
+			{sname="Undead",    mask=0x08, desc=Descs.YesNo},
+			{sname="Random",    mask=0x20, desc=Descs.YesNo},
+		}},
 	}},
 	
 	-- Subcommand ID 2: Request ladder map listing
-	oldwhen{ condition=Cond.equals("subcommand", 2), block = { 
+	when{Cond.equals("subcommand", 2), { 
 		uint32("Cookie"),
 		uint8{label="Number of types requested",key="num"},
 		iterator{label="Game Information", refkey="num", repeated={
@@ -4378,24 +3617,24 @@ end
 	}},
 	
 	-- Subcommand ID 3: WID_CANCELSEARCH
-	oldwhen{ condition=Cond.equals("subcommand", 3),
-		block = {  },
+	when{Cond.equals("subcommand", 3),
+		{  },
 	},
 	
 	-- Subcommand ID 4: User stats request
-	oldwhen{ condition=Cond.equals("subcommand", 4),	block = {  
+	when{Cond.equals("subcommand", 4), {  
 		uint32("Cookie"),
 		stringz("Username"),
 		strdw("Product ID", Descs.ClientTag),
 	}},
 	
 	-- Subcommand ID 7: WID_TOURNAMENT
-	oldwhen{ condition=Cond.equals("subcommand", 7), block = {  
+	when{Cond.equals("subcommand", 7), {  
 		uint32("Cookie"),
 	}},
 	
 	-- Subcommand ID 8: Clan stats request
-	oldwhen{ condition=Cond.equals("subcommand", 8),	block = { 
+	when{Cond.equals("subcommand", 8), { 
 		uint32("Cookie"),
 		stringz("Account name"),
 		-- TODO: "' in strings?
@@ -4403,12 +3642,12 @@ end
 	}}, 
 	
 	-- Subcommand ID 9: Icon list request
-	oldwhen{ condition=Cond.equals("subcommand", 9),	block = { 			
+	when{Cond.equals("subcommand", 9), { 			
 		uint32("Cookie"),
 	}},
 	
 	-- Subcommand ID 10: Change icon
-	oldwhen{ condition=Cond.equals("subcommand", 0x0A),	block = { 			
+	when{Cond.equals("subcommand", 0x0A), { 			
 		strdw("Icon", Descs.W3Icon),
 	}},
 },
