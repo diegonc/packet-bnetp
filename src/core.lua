@@ -243,9 +243,9 @@ do
 	end
 
 	do
-	local bncs_like_header = function()
+	local bncs_like_header = function(protocol_id)
 		local pid = state:peek(1):uint()
-		local type_pid = ((0xFF * 256) + pid)
+		local type_pid = ((protocol_id * 256) + pid)
 		local pidnode = state.bnet_node:add(f_pid, state:read(1))
 		local packet_name = packet_names[type_pid] or "Unkown Packet"
 
@@ -330,13 +330,10 @@ do
 			state.bnet_node:append_text(", Chat Protocol byte")
 		end,
 		[0xF7] = function (state)
-			state.bnet_node:add(f_pid, state:read(1))
-			local len = state:peek(2):le_uint()
-			state.bnet_node:add_le(f_plen, state:read(2))
-			state.bnet_node:add(f_data, state:read(len - 4))
+			bncs_like_header(0xF7)
 		end,
 		[0xFF] = function (state)
-			bncs_like_header()
+			bncs_like_header(0xFF)
 		end,
 	}
 	end
