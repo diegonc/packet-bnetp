@@ -2,8 +2,6 @@
 
 use strict;
 use HTML::TreeBuilder;
-use XML::XPath;
-use XML::XPath::XMLParser;
 use HTML::FormatText;
 use HTML::FormatText::WithLinks::AndTables;
 
