@@ -1,0 +1,103 @@
+ 9379  cd floss/packet-bnetp/
+ 9380  cd trunk/
+ 9381  cd tools/
+ 9382  cd htmlimport/
+ 9383  for page in \@op=packet*; do echo $(sed 's/.*pid=\([0-9]*\)$/\1/'); done
+ 9384  for page in \@op=packet*; do echo $page | sed 's/.*pid=\([0-9]*\)$/\1/'; done
+ 9385  (for page in \@op=packet*; do echo $page | sed 's/.*pid=\([0-9]*\)$/\1/'; done ) | sort -n > ../old_packets.txt
+ 9386  (for page in index.html\?op=packet*; do echo $page | sed 's/.*pid=\([0-9]*\)$/\1/'; done ) | sort -n > ../new_packets.txt
+ 9387  ls -l
+ 9388  vi bnetdocs.com/\@op\=packet\&pid\=138 
+ 9389  grep ACCOUNT_CREATE index.html\?op\=packet\&pid\=*
+ 9390  grep ACCOUNT_CREATE \@op\=packet\&pid\=*
+ 9391  grep ACCOUNTCREATE \@op\=packet\&pid\=*
+ 9392  grep ACCOUNTCREATE index.html\?op\=packet\&pid\=*
+ 9393  vi index.html
+ 9394  rm bnetdocs.com/index.html
+ 9395  wget --exclude-directories=forums,archives -nc -r bnetdocs.com
+ 9396  echo 138 >> new_packets.txt 
+ 9397  sort -n new_packets.txt 
+ 9398  sort -n new_packets.txt >a
+ 9399  mv a new_packets.txt 
+ 9400  diff -u old_packets.txt new_packets.txt 
+ 9401  vi bnetdocs.com/\@op\=packet\&pid\=180
+ 9402  vi bnetdocs.com/index.html
+ 9403  mkdir old
+ 9404  cd old
+ 9405  7z x ../bnetdocs.com
+ 9406  7z x ../bnetdocs.com.7z 
+ 9407  cd bnetdocs.com/
+ 9408  vi index.html 
+ 9409  grep "\@op=packet" index.html | sed 's/.*href="\([^"]*\)"><[^>]*>\(.*\)</font>.*/\1\t\2/'
+ 9410  grep "\@op=packet" index.html | sed 's/.*href="\([^"]*\)"><[^>]*>\(.*\)<\/font>.*/\1\t\2/'
+ 9411  grep "\@op=packet" index.html | sed 's/.*href="\([^"]*\)"><[^>]*>\(.*?\)<\/font>.*/\1\t\2/'
+ 9412  grep "\@op=packet" index.html | sed 's/.*href="\([^"]*?\)"><[^>]*?>\(.*?\)<\/font>.*/\1\t\2/'
+ 9413  grep "\@op=packet" index.html | sed 's/.*href="\([^"]*\?\)"><[^>]*\?>\(.*\?\)<\/font>.*/\1\t/'
+ 9414  grep "\@op=packet" index.html | sed 's/.*href="\([^"]*\?\)"><[^>]*\?>\(.*\?\)<\/font>.*/\1\t\2/'
+ 9415  grep "\@op=packet" index.html | sed 's/.*href="\([^"]*\?\)"><[^>]*\?>\(.*\?\)<\/font>.*\(\?<\/font>\)*.*/\1\t\2/'
+ 9416  grep "\@op=packet" index.html | sed 's/.*href="\([^"]*\?\)"><[^>]*\?>\(.*\?\)<\/font>.*\(\?<\/font>\)\?.*/\1\t\2/'
+ 9417  grep "\@op=packet" index.html 
+ 9418  grep "\@op=packet" index.html | sed 's/.*href="\([^"]*\?\)"><[^>]*\?>\(.*\?\)<\/font></a>.*/\1\t\2/'
+ 9419  grep "\@op=packet" index.html | sed 's/.*href="\([^"]*\?\)"><[^>]*\?>\(.*\?\)<\/font><\/a>.*/\1\t\2/'
+ 9420  grep "\@op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\?\)"><[^>]*\?>\(.*\?\)<\/font><\/a>.*/\1\t\2/'
+ 9421  grep "\@op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\?\)"><[^>]*\?>\(.*\?\)<\/font><\/a>.*/\1\t\2/' > ../../old_packets_names.txt 
+ 9422  grep "\/op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\?\)"><[^>]*\?>\(.*\?\)<\/font><\/a>.*/\1\t\2/'
+ 9423  grep "\/\?op=packet" index.html
+ 9424  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)">\(<[^>]*>\)\?\(.*\)\(<\/font>\)\?<\/a>.*/\1\t\3/'
+ 9425  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)">\(<[^>]*>\?\)\(.*\)\(<\/font><\/a>|<\/a>\).*/\1\t\3/'
+ 9426  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)">\(<[^>]*>\?\)\(.*\)\(<\/font><\/a>\|<\/a>\).*/\1\t\3/'
+ 9427  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\?\)"><[^>]*\?>\(.*\?\)<\/font><\/a>.*/\1\t\2/'
+ 9428  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)">\(<[^>]*\?>\)\?\(.*\?\)<\/font><\/a>.*/\1\t\2/'
+ 9429  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)">\(<[^>]*\?>\)\?\(.*\?\)<\/font><\/a>.*/\1\t\3/'
+ 9430  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)">\(<[^>]*\?>\)\?\(.*\?\)<\/font><\/a>.*?/\1\t\3/'
+ 9431  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)">\(<[^>]*\?>\)\?\(.*\?\)\(<\/font>\)\?<\/a>.*\?/\1\t\3/'
+ 9432  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)">\(<[^>]*\?>\)\?\(.*\?\)\(<\/font>\)\?<\/a>.*/\1\t\3/'
+ 9433  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)">\(<[^>]*\?>\)\?\(.*\?\)\(<\/font>\|<\/a>\).*/\1\t\3/'
+ 9434  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)">\(<[^>]*\?>\)\?\(.*\?\)<\/font><\/a>.*\?/\1\t\3/'
+ 9435  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)"><[^>]*>\(.*\)<\/font><\/a>.*/\1\t\2/' 
+ 9436  grep "\/\?op=packet" index.html | sed 's/.*href=".*pid=\([^"]*\)"><[^>]*>\(.*\)<\/font><\/a>.*/\1\t\2/' | sed 's/.*href=".*pid=\([^"]*\)">\(.*\)<\/a>.*/\1\t\2/'
+ 9437  grep "\/\?op=packet" index.html | sed -e 's/.*href=".*pid=\([^"]*\)"><[^>]*>\(.*\)<\/font><\/a>.*/\1\t\2/' -e 's/.*href=".*pid=\([^"]*\)">\(.*\)<\/a>.*/\1\t\2/'
+ 9438  grep "\/\?op=packet" index.html | sed -e 's/.*href=".*pid=\([^"]*\)"><[^>]*>\(.*\)<\/font><\/a>.*/\1\t\2/' -e 's/.*href=".*pid=\([^"]*\)">\(.*\)<\/a>.*/\1\t\2/' -e '1/d'
+ 9439  grep "\/\?op=packet" index.html | sed -e 's/.*href=".*pid=\([^"]*\)"><[^>]*>\(.*\)<\/font><\/a>.*/\1\t\2/' -e 's/.*href=".*pid=\([^"]*\)">\(.*\)<\/a>.*/\1\t\2/' -e '1d'
+ 9440  grep "\/\?op=packet" index.html | sed -e 's/.*href=".*pid=\([^"]*\)"><[^>]*>\(.*\)<\/font><\/a>.*/\1\t\2/' -e 's/.*href=".*pid=\([^"]*\)">\(.*\)<\/a>.*/\1\t\2/' -e '1d' -e 's/\([SC]\)>\([SC]\)/\1 > \2/'
+ 9441  grep "\/\?op=packet" index.html | sed -e 's/.*href=".*pid=\([^"]*\)"><[^>]*>\(.*\)<\/font><\/a>.*/\1\t\2/' -e 's/.*href=".*pid=\([^"]*\)">\(.*\)<\/a>.*/\1\t\2/' -e '1d' -e 's/\([SC]\)>\([SC]\) \(0x[0-9A-F]*\) /\1 > \2 [\3] /'
+ 9442  grep "\/\?op=packet" index.html | sed -e 's/.*href=".*pid=\([^"]*\)"><[^>]*>\(.*\)<\/font><\/a>.*/\1\t\2/' -e 's/.*href=".*pid=\([^"]*\)">\(.*\)<\/a>.*/\1\t\2/' -e '1d' -e 's/\([SC]\)>\([SC]\) \(0x[0-9A-F]*\) /\1 > \2 [\3] /' > ../new_packets_names.txt 
+ 9443  sort -n new_packets_names.txt 
+ 9444  sort -n new_packets_names.txt  | wc
+ 9445  sort -nu new_packets_names.txt  | wc
+ 9446  sort -nu new_packets_names.txt  > a
+ 9447  mv a new_packets_names.txt 
+ 9448  sort -n old_packets_names.txt 
+ 9449  sort -n old_packets_names.txt |wc
+ 9450  sort -nu old_packets_names.txt |wc
+ 9451  sort -nu old_packets_names.txt > a
+ 9452  mv a old_packets_names.txt 
+ 9453  diff -u old_packets_names.txt new_packets_names.txt | less
+ 9454  diff -u old_packets_names.txt new_packets_names.txt | less | grep "^+"
+ 9455  diff -u old_packets_names.txt new_packets_names.txt | less | sed -n -e '1d' -e '/^+/p'
+ 9456  diff -u old_packets_names.txt new_packets_names.txt | less | sed -n -e '/^+/p' -e '1d'
+ 9457  diff -u old_packets_names.txt new_packets_names.txt | sed -n -e '/^+/p'
+ 9458  diff -u old_packets_names.txt new_packets_names.txt | sed -n -e '/^+/p' -e '1d'
+ 9459  diff -u old_packets_names.txt new_packets_names.txt | sed -n -e '/^+/p' | sed -e '1d'
+ 9460  diff -u old_packets_names.txt new_packets_names.txt | sed -n -e '/^+/p' | sed -e '1d' -e 's/^+\([0-9]*\)\t.*/\1/'
+ 9461  diff -u old_packets_names.txt new_packets_names.txt | sed -n -e '/^+/p' | sed -e '1d' -e 's/^+\([0-9]*\)\t.*/index.html?op=packet&pid=\1/'
+ 9462  diff -u old_packets_names.txt new_packets_names.txt | sed -n -e '/^+/p' | sed -e '1d' -e 's/^+\([0-9]*\)\t.*/index.html?op=packet\&pid=\1/'
+ 9463  mkdir new
+ 9464  diff -u old_packets_names.txt new_packets_names.txt | sed -n -e '/^+/p' | sed -e '1d' -e 's/^+\([0-9]*\)\t.*/cp "index.html?op=packet\&pid=\1" ..\/new\//'
+ 9465  diff -u old_packets_names.txt new_packets_names.txt | sed -n -e '/^+/p' | sed -e '1d' -e 's/^+\([0-9]*\)\t.*/cp "index.html?op=packet\&pid=\1" ..\/new\//' > cp.sh
+ 9466  cd bnetdocs.com
+ 9467  sh -x ../cp.sh 
+ 9468  cd new
+ 9469  pacman -Ss perl TreeBuilder
+ 9470  sudo pacman -S perl-html-tree
+ 9471  sudo pacman -Ql perl-html-tree
+ 9472  vi ../split.pl 
+ 9473  pacman -Ss perl html
+ 9474  pacman -Ss perl format
+ 9475  cat * | perl ../split.pl 
+ 9476  vi constants.lua 
+ 9477  vi cpackets.lua 
+ 9478  vi spackets.lua 
+ 9479  cd ..
+ 9480  ls
+ 9481  history > history.txt
