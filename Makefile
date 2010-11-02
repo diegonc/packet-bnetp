@@ -75,6 +75,14 @@ DIST = \
 src/packet-bnetp.lua: $(SOURCES)
 	$(FILEPP) $(FILEPP_FLAGS) src/core.lua > src/packet-bnetp.lua
 
+tools/xmlexport/export.lua: tools/xmlexport/export.lua.filepp
+	$(FILEPP) $(FILEPP_FLAGS) -Itools/xmlexport -Isrc tools/xmlexport/export.lua.filepp > tools/xmlexport/export.lua
+
+.PHONY: run-xmlexport
+run-xmlexport: tools/xmlexport/export.lua
+	LUA_PATH="./tools/xmlexport/lib/LuaExpatUtils/lua/?.lua;./tools/xmlexport/?.lua" lua tools/xmlexport/export.lua
+
+
 .PHONY: pkg upload clean
 
 $(PKGNAME)-$(VERSION).zip: $(PKG)

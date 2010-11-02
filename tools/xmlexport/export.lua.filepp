@@ -1,0 +1,62 @@
+require "api.array"
+require "api.bytes"
+require "api.flags"
+require "api.integer"
+require "api.ipv4"
+require "api.iterator"
+require "api.sockaddr"
+require "api.strdw"
+require "api.stringz"
+require "api.time"
+require "api.version"
+require "api.when"
+
+require "doc"
+
+require "wireshark.compat"
+
+#include "constants.lua"
+-- TODO: reference valuemaps and conditions by name
+#include "valuemaps.lua"
+#include "checkedtable.lua"
+
+-- Packets from server to client
+SPacketDescription = {
+#include spackets_sid.lua
+}
+
+-- Packets from client to server
+CPacketDescription = {
+#include cpackets_sid.lua
+}
+
+local packets = doc.new "packets"
+local server = doc.new "server"
+local client = doc.new "client"
+
+local function add_packets(root, packets_table)
+	for k,v in pairs(packets_table) do
+		local packet = doc.new("packet", {id=k})
+		for _,field in ipairs(v) do
+			packet:add_direct_child(field)
+		end
+		root:add_direct_child(packet)
+	end
+end
+
+add_packets(server, SPacketDescription)
+add_packets(client, CPacketDescription)
+
+packets:add_direct_child(server)
+packets:add_direct_child(client)
+
+doc.walk(packets, false, function(tag, node)
+	for k,v in pairs(node.attr) do
+		if type(k) ~= "number" then
+			node.attr[k] = tostring(v)
+		end
+	end
+end)
+
+xml = doc.tostring(packets, "", "    ")
+print(xml)
