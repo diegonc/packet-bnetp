@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sat Oct 30 21:22:43 2010
+--[[ packet-bnetp.lua build on Tue Feb  1 16:39:00 2011
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -48,7 +48,7 @@ do
 	-- the folowing line.
 	--local info = function(...) end
 
-	-- A BitOp library replacement is needed for the wireshark's stable version
+	-- A BitOp library replacement is needed for wireshark's stable version
 	--     http://lua-users.org/wiki/BitUtils
 	-- 32-bit only
 	local bit = bit or {
@@ -669,7 +669,40 @@ packet_names = {
 [0xFF7F] = "SID_CLANMEMBERSTATUSCHANGE",
 [0xFF81] = "SID_CLANMEMBERRANKCHANGE",
 [0xFF82] = "SID_CLANMEMBERINFORMATION",
-}
+[0xF701] = "W3GS_PING_FROM_HOST",
+[0xF704] = "W3GS_SLOTINFOJOIN",
+[0xF705] = "W3GS_REJECTJOIN",
+[0xF706] = "W3GS_PLAYERINFO",
+[0xF707] = "W3GS_PLAYERLEFT",
+[0xF708] = "W3GS_PLAYERLOADED",
+[0xF709] = "W3GS_SLOTINFO",
+[0xF70A] = "W3GS_COUNTDOWN_START",
+[0xF70B] = "W3GS_COUNTDOWN_END",
+[0xF70C] = "W3GS_INCOMING_ACTION",
+[0xF70F] = "W3GS_CHAT_FROM_HOST",
+[0xF71B] = "W3GS_LEAVERES",
+[0xF71E] = "W3GS_REQJOIN",
+[0xF721] = "W3GS_LEAVEREQ",
+[0xF723] = "W3GS_GAMELOADED_SELF",
+[0xF726] = "W3GS_OUTGOING_ACTION",
+[0xF727] = "W3GS_OUTGOING_KEEPALIVE",
+[0xF728] = "W3GS_CHAT_TO_HOST",
+[0xF72F] = "W3GS_SEARCHGAME",
+[0xF730] = "W3GS_GAMEINFO",
+[0xF731] = "W3GS_CREATEGAME",
+[0xF732] = "W3GS_REFRESHGAME",
+[0xF733] = "W3GS_DECREATEGAME",
+[0xF735] = "W3GS_PING_FROM_OTHERS",
+[0xF736] = "W3GS_PONG_TO_OTHERS",
+[0xF737] = "W3GS_CLIENTINFO",
+[0xF73D] = "W3GS_MAPCHECK",
+[0xF73F] = "W3GS_STARTDOWNLOAD",
+[0xF742] = "W3GS_MAPSIZE",
+[0xF743] = "W3GS_MAPPART",
+[0xF744] = "W3GS_MAPPARTOK",
+[0xF745] = "W3GS_MAPPARTNOTOK",
+[0xF746] = "W3GS_PONG_TO_HOST",
+[0xF748] = "W3GS_INCOMING_ACTION2",}
 -- Begin valuemaps.lua
 -- Common value descriptions
 local Descs = {
@@ -3053,6 +3086,168 @@ end
 	wintime("Date joined"),
 },
 -- End spackets_sid.lua
+[0xF701] = { -- 0x01
+},
+[0xF704] = { -- 0x04
+	uint16("Length of Slot Info"),
+	uint8("Number of slots"),
+	uint8("[] Slot data"),
+	uint32("Random seed"),
+	uint8("Game type"),
+	uint8("Number of player slots without observers"),
+	uint8("Player number"),
+	uint32("Port"),
+	uint32("External IP"),
+	uint32("Unknown"),
+	uint32("Unknown"),
+	uint8("Player number"),
+	uint8("Download status"),
+	uint8("Slot status"),
+	uint8("Computer status"),
+	uint8("Team"),
+	uint8("Color"),
+	uint8("Race"),
+	uint8("Computer type"),
+	uint8("Handicap"),
+},
+[0xF705] = { -- 0x05
+	uint32("Reason"),
+},
+[0xF706] = { -- 0x06
+	uint32("Player Counter"),
+	uint8("Player number"),
+	stringz("Player name"),
+	uint16("Unknown"),
+	uint16("AF_INET"),
+	uint16("Port"),
+	uint32("External IP"),
+	uint32("Unknown"),
+	uint32("Unknown"),
+	uint16("AF_INET"),
+	uint16("Port"),
+	uint32("Internal IP"),
+	uint32("Unknown"),
+	uint32("Unknown"),
+},
+[0xF707] = { -- 0x07
+	uint8("Player number"),
+	uint32("Reason"),
+},
+[0xF708] = { -- 0x08
+	uint8("Player number"),
+},
+[0xF709] = { -- 0x09
+	uint16("Length of Slot Info"),
+	uint8("Player number"),
+	uint8("Download status"),
+	uint8("Slot status"),
+	uint8("Computer status"),
+	uint8("Team"),
+	uint8("Color"),
+	uint8("Race"),
+	uint8("Computer type"),
+	uint8("Handicap"),
+},
+[0xF70A] = { -- 0x0A
+},
+[0xF70B] = { -- 0x0B
+},
+[0xF70C] = { -- 0x0C
+	uint16("Send interval"),
+	uint16("CRC-16 encryption"),
+	uint8("Player number"),
+	uint16("Length of action data"),
+	bytes("Action data"),
+},
+[0xF70F] = { -- 0x0F
+	uint8("Player count"),
+	uint8("[] Player numbers that will receive the message"),
+	uint8("Player number that sent the message"),
+	uint8("Flags"),
+	uint32("Extra Flags"),
+	stringz("Message"),
+},
+[0xF71B] = { -- 0x1B
+},
+[0xF72F] = { -- 0x2F
+	uint32("Product"),
+	uint32("Version"),
+	uint32("Unknown"),
+},
+[0xF730] = { -- 0x30
+	uint32("Product"),
+	uint32("Host Counter"),
+	uint32("Players In Game"),
+	stringz("Game name"),
+	uint8("Unknown"),
+	stringz("Statstring"),
+	uint32("Slots total"),
+	uint8("[] Game Type Info"),
+	uint32("Slots available"),
+	uint32("Time since creation"),
+	uint16("Game Port"),
+},
+[0xF731] = { -- 0x31
+	uint32("Product"),
+	uint32("Host Counter"),
+	uint32("Players In Game"),
+},
+[0xF732] = { -- 0x32
+	uint32("Host Counter"),
+	uint32("Players In Game"),
+	uint32("Slots available"),
+},
+[0xF733] = { -- 0x33
+	uint32("Host Counter"),
+},
+[0xF736] = { -- 0x36
+},
+[0xF73D] = { -- 0x3D
+	uint32("Unknown"),
+	stringz("File Path"),
+	uint32("File size"),
+	uint32("Map info"),
+	uint32("File CRC encryption"),
+	uint32("File SHA-1 hash"),
+},
+[0xF73F] = { -- 0x3F
+	uint32("Unknown"),
+	uint8("Player number"),
+},
+[0xF743] = { -- 0x43
+	uint8("To player number"),
+	uint8("From player number"),
+	uint32("Unknown"),
+	uint32("Chunk position in file"),
+	uint32("CRC-32 encryption"),
+	uint8("[1442] Data"),
+},
+[0xF748] = { -- 0x48
+	uint16("Send interval"),
+	uint16("CRC-16 encryption"),
+	uint8("Player number"),
+	uint16("Length of action data"),
+	bytes("Action data"),
+},
+[0xFF17] = { -- 0x17
+	uint32("Request ID"),
+	uint32("Address"),
+	uint32("Length"),
+},
+[0xFF20] = { -- 0x20
+	stringz("Text"),
+},
+[0xFF23] = { -- 0x23
+	uint32("unknown/unparsed -- Flags, Request ID?"),
+	uint32("unknown/unparsed -- Timestamp?"),
+	stringz("Registry key name"),
+	stringz("Registry key value"),
+},
+[0xFF24] = { -- 0x24
+	uint32("Echoed back, Request ID?"),
+	uint32("Echoed back, Timestamp?"),
+	stringz("Registry key name"),
+},
 	}
 	
 	-- Packets from client to server
@@ -3691,6 +3886,83 @@ end
 	stringz("Username"),
 },
 -- End cpackets_sid.lua
+[0xF71E] = { -- 0x1E
+	uint32("Host Counter"),
+	uint32("Entry Key"),
+	uint8("Unknown"),
+	uint16("Listen Port"),
+	uint32("Peer Key"),
+	stringz("Player name"),
+	uint32("Unknown"),
+	uint16("Internal Port"),
+	uint32("Internal IP"),
+},
+[0xF721] = { -- 0x21
+	uint32("Reason"),
+},
+[0xF723] = { -- 0x23
+},
+[0xF726] = { -- 0x26
+	uint32("CRC-32 encryption"),
+	bytes("Action data"),
+},
+[0xF727] = { -- 0x27
+	uint32("Unknown"),
+},
+[0xF728] = { -- 0x28
+	uint8("Total"),
+	uint8("To player number"),
+	uint8("From player number"),
+	uint8("Flags"),
+	stringz("Message"),
+	uint8("Team"),
+	uint8("Color"),
+	uint8("Race"),
+	uint8("Handicap"),
+	uint32("Extra Flags"),
+	stringz("Message"),
+},
+[0xF72F] = { -- 0x2F
+	uint32("Product"),
+	uint32("Version"),
+	uint32("Unknown"),
+},
+[0xF735] = { -- 0x35
+},
+[0xF737] = { -- 0x37
+	uint32("Player Counter"),
+	uint32("Unknown"),
+	uint8("Player number"),
+	uint8("[5] Unknown"),
+},
+[0xF73F] = { -- 0x3F
+},
+[0xF742] = { -- 0x42
+	uint32("Unknown"),
+	uint8("Size Flag"),
+	uint32("Map Size"),
+},
+[0xF744] = { -- 0x44
+	uint8("To player number"),
+	uint8("From player number"),
+	uint32("Unknown"),
+	uint32("Chunk position in file"),
+},
+[0xF745] = { -- 0x45
+},
+[0xF746] = { -- 0x46
+	uint32("tickCount"),
+},
+[0xFF17] = { -- 0x17
+	uint32("Request ID"),
+	bytes("Memory"),
+},
+[0xFF24] = { -- 0x24
+	uint32("First DWORD from S -> C"),
+	uint32("Second DWORD from S -> C"),
+	stringz("Registry key name"),
+	stringz("Registry key value"),
+},
 	}
 	
 	setfenv(1, global_environment)

@@ -22,7 +22,7 @@ do
 	-- the folowing line.
 	--local info = function(...) end
 
-	-- A BitOp library replacement is needed for the wireshark's stable version
+	-- A BitOp library replacement is needed for wireshark's stable version
 	--     http://lua-users.org/wiki/BitUtils
 	-- 32-bit only
 	local bit = bit or {
@@ -556,11 +556,13 @@ do
 	-- Packets from server to client
 	SPacketDescription = {
 	#include spackets_sid.lua
+	#include spackets_w3gs.lua
 	}
 	
 	-- Packets from client to server
 	CPacketDescription = {
 	#include cpackets_sid.lua
+	#include cpackets_w3gs.lua
 	}
 	
 	setfenv(1, global_environment)
