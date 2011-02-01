@@ -36,8 +36,12 @@ SOURCES = \
 	src/valuemaps.lua \
 	src/banner.lua \
 	src/core.lua \
+	src/constants_sid.lua \
 	src/cpackets_sid.lua \
-	src/spackets_sid.lua
+	src/spackets_sid.lua \
+	src/constants_w3gs.lua \
+	src/cpackets_w3gs.lua \
+	src/spackets_w3gs.lua
 
 DIST = \
 	$(SOURCES) \
