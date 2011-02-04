@@ -1,3 +1,6 @@
+<wiki:gadget border="0" width="100%" url="http://packet-bnetp.googlecode.com/svn/resources/gadgets/message.xml" up_class="noteimportant" up_message="This document is not complete. In the meanwhile, some documentation can be found in the source code.
+See: <a href='http://code.google.com/p/packet-bnetp/source/browse/#svn/trunk/src/api'>http://code.google.com/p/packet-bnetp/source/browse/#svn/trunk/src/api</a>"/>
+
 <wiki:toc max_depth="2" />
 
 =Constructor functions=
