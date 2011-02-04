@@ -5,7 +5,7 @@
 == Requirements ==
 
 The main design requirement was that the only knowledge to write the protocol
-format specification should be the knowdlege about the protocol itself.
+format specification should be the knowledge about the protocol itself.
 
 Which means that the protocol format specification language:
   * Should be as isolated as possible from the Wireshark plugin interface.
@@ -37,7 +37,7 @@ at the data without advancing it.
 
 Most instructions allow to describe a piece of the packet by assigning a label
 and displaying its value inside Wireshark's details pane. Thus they are named
-after the underlaying data type.  There are also some instructions providing
+after the underlying data type.  There are also some instructions providing
 limited control flow:
 
   * Field Description: uint16, posixtime, stringz, ipv4, ...
