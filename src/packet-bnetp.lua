@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Wed Feb  2 01:59:21 2011
+--[[ packet-bnetp.lua build on Sat Feb  5 11:39:33 2011
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -74,8 +74,9 @@ do
 	}
 
 	-- Constants for TCP reassembly and packet rejecting
-	local ACCEPTED  = true
-	local REJECTED  = false
+	local ACCEPTED   = 0
+	local REJECTED   = 1
+	local REASSEMBLE = 2
 
 	local p_bnetp = Proto("bnetp","Battle.net Protocol");
 
@@ -130,7 +131,8 @@ do
 					.. count .. " "
 					.. missing)
 				if (missing > 0) then
-					error(missing)
+					o.missing = missing
+					error(REASSEMBLE)
 				end
 			end,
 			["tvb"] = function(o) return o.buf(o.used):tvb() end,
@@ -208,10 +210,10 @@ do
 			while state.used < available do
 				local pdu_start = state.used
 				local success, ret = pcall(do_dissection, state)
-				if (not success) then
+				if (not success) and ret == REASSEMBLE then
 					state:error("This is an incomplete packet. Refer to next pdu")
-					if ret then
-						pkt.desegment_len = ret
+					if state.missing then
+						pkt.desegment_len = state.missing
 					else
 						pkt.desegment_len = DESEGMENT_ONE_MORE_SEGMENT
 					end
@@ -222,6 +224,9 @@ do
 							.. " deseg_len: " .. tostring(pkt.desegment_len))
 					available  = pdu_start
 					state.used = pdu_start
+				elseif not success
+					-- propagate error. TODO: meaningful traceback
+					error(ret)
 				elseif success and (ret==REJECTED) then
 					-- Packet was rejected. Make the loop end.
 					rejected = true
