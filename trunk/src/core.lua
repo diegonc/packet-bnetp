@@ -99,11 +99,6 @@ do
 			end,
 			["request"] = function(o, count)
 				local missing = count - (o.buf:len() - o.used)
-				info ("request: "
-					.. o.buf:len() .. " "
-					.. o.used .. " "
-					.. count .. " "
-					.. missing)
 				if (missing > 0) then
 					o.missing = missing
 					error(REASSEMBLE)
