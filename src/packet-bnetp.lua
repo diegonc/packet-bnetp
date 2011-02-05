@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sat Feb  5 11:39:33 2011
+--[[ packet-bnetp.lua build on Sat Feb  5 11:41:47 2011
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -125,11 +125,6 @@ do
 			end,
 			["request"] = function(o, count)
 				local missing = count - (o.buf:len() - o.used)
-				info ("request: "
-					.. o.buf:len() .. " "
-					.. o.used .. " "
-					.. count .. " "
-					.. missing)
 				if (missing > 0) then
 					o.missing = missing
 					error(REASSEMBLE)
