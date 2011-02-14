@@ -193,7 +193,7 @@ do
 							.. " deseg_len: " .. tostring(pkt.desegment_len))
 					available  = pdu_start
 					state.used = pdu_start
-				elseif not success
+				elseif not success then
 					-- propagate error. TODO: meaningful traceback
 					error(ret)
 				elseif success and (ret==REJECTED) then
