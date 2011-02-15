@@ -48,10 +48,9 @@ do
 	}
 
 	-- Constants for TCP reassembly and packet rejecting
-	local ENOUGH    = false
-	local NEED_MORE = true
-	local ACCEPTED  = true
-	local REJECTED  = false
+	local ACCEPTED   = 0
+	local REJECTED   = 1
+	local REASSEMBLE = 2
 
 	local p_bnetp = Proto("bnetp","Battle.net Protocol");
 
@@ -100,13 +99,9 @@ do
 			end,
 			["request"] = function(o, count)
 				local missing = count - (o.buf:len() - o.used)
-				info ("request: "
-					.. o.buf:len() .. " "
-					.. o.used .. " "
-					.. count .. " "
-					.. missing)
 				if (missing > 0) then
-					coroutine.yield(NEED_MORE, missing)
+					o.missing = missing
+					error(REASSEMBLE)
 				end
 			end,
 			["tvb"] = function(o) return o.buf(o.used):tvb() end,
@@ -142,10 +137,10 @@ do
 			if state.bnet_node.set_len then
 				state.bnet_node:set_len(state.used - pdu_start)
 			end
-			return ENOUGH, ACCEPTED
+			return ACCEPTED
 		else
 			-- If no handler is found the packet is rejected.
-			return ENOUGH, REJECTED
+			return REJECTED
 		end
 	end
 
@@ -183,29 +178,28 @@ do
 
 			while state.used < available do
 				local pdu_start = state.used
-				local thread = coroutine.create(do_dissection)
-				local r, need_more, missing = coroutine.resume(thread, state)
-				if (r and (need_more == NEED_MORE)) then
+				local success, ret = pcall(do_dissection, state)
+				if (not success) and ret == REASSEMBLE then
 					state:error("This is an incomplete packet. Refer to next pdu")
-					if missing then
-						pkt.desegment_len = missing
+					if state.missing then
+						pkt.desegment_len = state.missing
 					else
 						pkt.desegment_len = DESEGMENT_ONE_MORE_SEGMENT
 					end
 					pkt.desegment_offset = pdu_start
 					info ("dissector: requesting data -" 
-							.. " r: " .. tostring(r)
-							.. " need_more: " .. tostring(need_more)
-							.. " missing: " .. tostring(missing)
+							.. " success: " .. tostring(success)
+							.. " missing: " .. tostring(ret)
 							.. " deseg_len: " .. tostring(pkt.desegment_len))
 					available  = pdu_start
 					state.used = pdu_start
-				elseif r and (need_more==ENOUGH) and (missing==REJECTED) then
+				elseif not success then
+					-- propagate error. TODO: meaningful traceback
+					error(ret)
+				elseif success and (ret==REJECTED) then
 					-- Packet was rejected. Make the loop end.
 					rejected = true
 					available = state.used
-				elseif not r then
-					error(need_more)
 				end
 			end
 			if state.used > available then
@@ -248,7 +242,7 @@ do
 				local pid = state:peek(1):uint()
 				local type_pid = ((protocol_id * 256) + pid)
 				local pidnode = state.bnet_node:add(f_pid, state:read(1))
-				local packet_name = packet_names[type_pid] or "Unkown Packet"
+				local packet_name = packet_names[type_pid] or "Unknown Packet"
 
 				pidnode:set_text(pid_label(pid,packet_name))
 				
@@ -290,21 +284,18 @@ do
 					pdesc = CPacketDescription[type_pid]
 				end
 
-				local worker = coroutine.create(function (st, pd)
+				-- launch worker in protected mode and catch its return value
+				local success, missing = pcall(function (st, pd)
 					if Config.lite then return end
 					if pd then
 						dissect_packet(st, pd)
 					else
 						st:error("Unssuported packet: " .. packet_name)
 					end
-				end)
+				end, substate, pdesc)
 
-				-- launch worker in substate and catch its return value
-				local r, need_more, missing = coroutine.resume(worker, substate, pdesc)
-				if (r and (need_more == NEED_MORE)) then
+				if (not success) then
 					state:error("packet is too short to complete dissection.")
-				elseif not r then
-					error(need_more)
 				end
 
 				-- Update the state
