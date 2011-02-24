@@ -248,7 +248,7 @@ do
 				local pid = state:peek(1):uint()
 				local type_pid = ((protocol_id * 256) + pid)
 				local pidnode = state.bnet_node:add(f_pid, state:read(1))
-				local packet_name = packet_names[type_pid] or "Unkown Packet"
+				local packet_name = packet_names[type_pid] or "Unknown Packet"
 
 				pidnode:set_text(pid_label(pid,packet_name))
 				
