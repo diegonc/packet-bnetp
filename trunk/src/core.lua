@@ -496,6 +496,14 @@ do
 			if (not instance.getvalueonly) or instance.protofield_type then
 				field = ProtoField[typename] -- XXX: "none" should be a special case
 			end
+
+			--XXX: A filter string is required in newer versions of Wireshark.
+			-- We generate one automatically if none is provided.
+			if (instance.filter == nil) then
+				local n = table.getn(p_bnetp.fields) + 1
+				instance.filter = "filter" .. n
+			end
+
 			-- TODO: some fields do not expect display
 			-- and desc argument
 			if field then

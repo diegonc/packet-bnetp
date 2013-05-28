@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Tue Feb  1 16:39:00 2011
+--[[ packet-bnetp.lua build on Mon May 27 21:22:22 2013
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -522,6 +522,14 @@ do
 			if (not instance.getvalueonly) or instance.protofield_type then
 				field = ProtoField[typename] -- XXX: "none" should be a special case
 			end
+
+			--XXX: A filter string is required in newer versions of Wireshark.
+			-- We generate one automatically if none is provided.
+			if (instance.filter == nil) then
+				local n = table.getn(p_bnetp.fields) + 1
+				instance.filter = "filter" .. n
+			end
+
 			-- TODO: some fields do not expect display
 			-- and desc argument
 			if field then
