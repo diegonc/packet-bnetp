@@ -10,7 +10,13 @@
 --]]
 function strdw (...)
 	local args = make_args_table_with_positional_map(
-	                {"label", "desc"}, unpack(arg))
+	                {"label", "desc"},
+#if LUA_VERSION >= 510
+			...
+#else
+			unpack(arg)
+#endif
+	)
 	args.reversed = true
 	args.length = 4
 	args.priv = { desc = args.desc }

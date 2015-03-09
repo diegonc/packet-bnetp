@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Mon May 27 21:22:22 2013
+--[[ packet-bnetp.lua build on Sun Mar  8 23:43:57 2015
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -104,6 +104,7 @@ do
 
 	local function State(...)
 		local base = {}
+		local arg = {...}
 		if arg and type(arg[1]) == "table" then
 			base = arg[1]
 		end
@@ -417,23 +418,28 @@ do
 	--	positional parameter.
 	--]]
 	local function make_args_table_with_positional_map(pmap, ...)
+		local arg = {...}
 		local args = {}
-		local size = table.getn(arg)
+		local size = #arg
 		if size > 0 then
 			local orig = arg
 			if type(arg[1]) == "table"  then
 				-- Mixed
 				orig = arg[1]
-				size = table.getn(orig)
+				size = #orig
 			elseif type(arg[1]) ~= "string"  then
 				error("make_args_table called with wrong arguments types.")
 			end
 			-- Process positional parameters
-			for i=1, table.getn(pmap) do
+			local pmap_size = #pmap
+			for i=1, pmap_size do
 				args[pmap[i]] = orig[i]
 			end
-			if size > table.getn(pmap) then
-				args[pmap.unpacked or "params"] = { n=(size - table.getn(pmap)), unpack(orig, table.getn(pmap)) }
+			if size > pmap_size then
+				args[pmap.unpacked or "params"] = {
+					n=(size - pmap_size),
+					table.unpack(orig, pmap_size)
+				}
 			end
 			-- Wipe positional parameters
 			-- for i=1, size do
@@ -450,11 +456,14 @@ do
 	end
 	
 	local function make_args_table(...)
+		local arg = {...}
 		return make_args_table_with_positional_map({
 			"label",
 			"display",
 			"desc",
-			["unpacked"] = "params",}, unpack(arg))
+			["unpacked"] = "params",},
+			table.unpack(arg)
+		)
 	end
 
 	local function verify_field_args(args)
@@ -526,7 +535,7 @@ do
 			--XXX: A filter string is required in newer versions of Wireshark.
 			-- We generate one automatically if none is provided.
 			if (instance.filter == nil) then
-				local n = table.getn(p_bnetp.fields) + 1
+				local n = # (p_bnetp.fields) + 1
 				instance.filter = "filter" .. n
 			end
 
@@ -538,7 +547,8 @@ do
 					instance.label,
 					instance.display,
 					instance.desc,
-					unpack(instance.params or {}))
+					table.unpack(instance.params or {})
+				)
 			end
 			-- Remove ProtoField arguments
 			instance.label = nil
@@ -558,7 +568,7 @@ do
 			end
 			-- Add the field to the protocol field list
 			if tmp.pf then
-				local n = table.getn(p_bnetp.fields) + 1
+				local n = # (p_bnetp.fields) + 1
 				p_bnetp.fields[n] = tmp.pf
 			end
 			return tmp
@@ -567,9 +577,9 @@ do
 			.." " .. package.loaded.debug.traceback())
 	end
 
-	-- Avoid clobbering global environment
-	local global_environment = getfenv(1)
-	setfenv(1, setmetatable({}, {__index = global_environment}))
+	-- Wireshark 1.6.11 moved to Lua 5.2 which no longer has
+	-- getfenv/setfenv functions.
+	-- TODO: does the global environment get clobbered in Lua 5.2?
 
 packet_names = {
 [0xFF00] = "SID_NULL",
@@ -1389,7 +1399,9 @@ do
 
 	function bytes(...)
 		local args = make_args_table_with_positional_map(
-				{"label", "length"}, unpack(arg))
+				{"label", "length"},
+				...
+		)
 
 		return create_proto_field(template, args)
 	end
@@ -1423,11 +1435,11 @@ local function define_integer(isize)
 		end,
 	}
 
-	print ("defining: " .. typename)
-
-	getfenv(2)[typename] = function(...)
+	return function(...)
 		local args = make_args_table_with_positional_map(
-				{"label", "display", "desc"}, unpack(arg))
+				{"label", "display", "desc"},
+				...
+		)
 
 		return create_proto_field(template, args)
 	end
@@ -1449,7 +1461,7 @@ end
 --  @see Base
 --
 --]]
-define_integer(8)
+uint64 = define_integer(8)
 
 --[[
 --  uint32
@@ -1467,7 +1479,7 @@ define_integer(8)
 --  @see Base
 --
 --]]
-define_integer(4)
+uint32 = define_integer(4)
 
 --[[
 --  uint16
@@ -1485,7 +1497,7 @@ define_integer(4)
 --  @see Base
 --
 --]]
-define_integer(2)
+uint16 = define_integer(2)
 
 --[[
 --  uint8
@@ -1503,7 +1515,7 @@ define_integer(2)
 --  @see Base
 --
 --]]
-define_integer(1)
+uint8 = define_integer(1)
 
 --[[
 --  int64
@@ -1521,7 +1533,7 @@ define_integer(1)
 --  @see Base
 --
 --]]
-define_integer(-8)
+int64 = define_integer(-8)
 
 --[[
 --  int32
@@ -1539,7 +1551,7 @@ define_integer(-8)
 --  @see Base
 --
 --]]
-define_integer(-4)
+int32 = define_integer(-4)
 
 --[[
 --  int16
@@ -1557,7 +1569,7 @@ define_integer(-4)
 --  @see Base
 --
 --]]
-define_integer(-2)
+int16 = define_integer(-2)
 
 --[[
 --  int8
@@ -1575,7 +1587,7 @@ define_integer(-2)
 --  @see Base
 --
 --]]
-define_integer(-1)
+int8 = define_integer(-1)
 
 end
 --[[
@@ -1603,7 +1615,9 @@ do
 
 	function ipv4(...)
 		local args = make_args_table_with_positional_map(
-				{"label", "big_endian"}, unpack(arg))
+				{"label", "big_endian"},
+				...
+		)
 
 		return create_proto_field(template, args)
 	end
@@ -1657,7 +1671,9 @@ do
 
 	function stringz(...)
 		local args = make_args_table_with_positional_map(
-				{"label", "length", "eos"}, unpack(arg))
+				{"label", "length", "eos"},
+				...
+		)
 
 		return create_proto_field(template, args)
 	end
@@ -1695,7 +1711,9 @@ do
 
 	function wintime(...)
 		local args = make_args_table_with_positional_map(
-				{"label"}, unpack(arg))
+				{"label"},
+				...
+		)
 
 		return create_proto_field(template, args)
 	end
@@ -1727,7 +1745,9 @@ do
 
 	function posixtime(...)
 		local args = make_args_table_with_positional_map(
-				{"label"}, unpack(arg))
+				{"label"},
+				...
+		)
 
 		return create_proto_field(template, args)
 	end
@@ -1804,7 +1824,8 @@ do
 	function iterator(...)
 		local args = make_args_table_with_positional_map({
 			"label", "refkey", "repeated", "node", "subnode"},
-			unpack(arg))
+			...
+		)
 
 		-- translate alias to protofield_type
 		if args.alias then
@@ -1864,6 +1885,7 @@ do
 	--
 	--]]
 	function casewhen (...)
+		local arg = {...}
 		local tmp = create_proto_field(template, {})
 		if (#arg == 1) and arg[1].tests then
 			tmp.tests = arg[1].tests
@@ -1902,7 +1924,9 @@ do
 	--]]
 	function when (...)
 		local args = make_args_table_with_positional_map(
-				{"condition", "block", "otherwise"}, unpack(arg))
+				{"condition", "block", "otherwise"},
+				...
+		)
 		if args.params then
 			error(package.loaded.debug.traceback())
 		end
@@ -1911,7 +1935,9 @@ do
 		if args.otherwise then
 			par[2] = { function() return true end, args.otherwise }
 		end
-		return casewhen (unpack(par))
+		return casewhen (
+			table.unpack(par)
+		)
 	end
 end
 
@@ -1925,7 +1951,9 @@ end
 --
 --]]
 function version (...)
-	local args = make_args_table(unpack(arg))
+	local args = make_args_table(
+		...
+	)
 	args.big_endian = false
 	return ipv4(args)
 end
@@ -1941,7 +1969,9 @@ end
 --]]
 function strdw (...)
 	local args = make_args_table_with_positional_map(
-	                {"label", "desc"}, unpack(arg))
+	                {"label", "desc"},
+			...
+	)
 	args.reversed = true
 	args.length = 4
 	args.priv = { desc = args.desc }
@@ -1979,7 +2009,9 @@ end
 --]]
 function array (...)
 	local args = make_args_table_with_positional_map(
-			{"label", "of", "num"}, unpack(arg))
+			{"label", "of", "num"},
+			...
+	)
 
 	if args.of ~= uint32 and args.of ~= uint8 then
 		error("Arrays of types other than uint32 or uint8 are not supported.")
@@ -2026,7 +2058,9 @@ end
 --]]
 function flags (...)
 	local args = make_args_table_with_positional_map(
-			{"label", "of", "fields"}, unpack(arg))
+			{"label", "of", "fields"},
+			...
+	)
 	
 	args.filter = "hasflags"
 
@@ -2134,7 +2168,9 @@ do
 
 	function sockaddr (...)
 		local args = make_args_table_with_positional_map(
-				{"real_label"}, unpack(arg))
+				{"real_label"},
+				...
+		)
 		args.label = "dummy string"
 		return create_proto_field(template, args)
 	end
@@ -3972,8 +4008,7 @@ end
 	stringz("Registry key value"),
 },
 	}
-	
-	setfenv(1, global_environment)
+
 
 	-- After all the initialization is finished, register plugin
 	-- to default port.

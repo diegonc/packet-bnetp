@@ -2,11 +2,13 @@ MKDIR?=mkdir
 RM?=rm
 ZIP?=zip
 PERL?=/usr/bin/perl
+LUA_VERSION?=530
 
 FILEPP=$(PERL) tools/filepp/filepp
 FILEPP_FLAGS= \
 	-m pb-utils.pm \
-	-m literal.pm
+	-m literal.pm \
+	-DLUA_VERSION=$(LUA_VERSION)
 
 GCUFLAGS?=-p packet-bnetp -s "packet-bnetp plugin"
 
