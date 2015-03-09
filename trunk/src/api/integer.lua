@@ -26,11 +26,15 @@ local function define_integer(isize)
 		end,
 	}
 
-	print ("defining: " .. typename)
-
-	getfenv(2)[typename] = function(...)
+	return function(...)
 		local args = make_args_table_with_positional_map(
-				{"label", "display", "desc"}, unpack(arg))
+				{"label", "display", "desc"},
+#if LUA_VERSION >= 510
+				...
+#else
+				unpack(arg)
+#endif
+		)
 
 		return create_proto_field(template, args)
 	end
@@ -52,7 +56,7 @@ end
 --  @see Base
 --
 --]]
-define_integer(8)
+uint64 = define_integer(8)
 
 --[[
 --  uint32
@@ -70,7 +74,7 @@ define_integer(8)
 --  @see Base
 --
 --]]
-define_integer(4)
+uint32 = define_integer(4)
 
 --[[
 --  uint16
@@ -88,7 +92,7 @@ define_integer(4)
 --  @see Base
 --
 --]]
-define_integer(2)
+uint16 = define_integer(2)
 
 --[[
 --  uint8
@@ -106,7 +110,7 @@ define_integer(2)
 --  @see Base
 --
 --]]
-define_integer(1)
+uint8 = define_integer(1)
 
 --[[
 --  int64
@@ -124,7 +128,7 @@ define_integer(1)
 --  @see Base
 --
 --]]
-define_integer(-8)
+int64 = define_integer(-8)
 
 --[[
 --  int32
@@ -142,7 +146,7 @@ define_integer(-8)
 --  @see Base
 --
 --]]
-define_integer(-4)
+int32 = define_integer(-4)
 
 --[[
 --  int16
@@ -160,7 +164,7 @@ define_integer(-4)
 --  @see Base
 --
 --]]
-define_integer(-2)
+int16 = define_integer(-2)
 
 --[[
 --  int8
@@ -178,6 +182,6 @@ define_integer(-2)
 --  @see Base
 --
 --]]
-define_integer(-1)
+int8 = define_integer(-1)
 
 end

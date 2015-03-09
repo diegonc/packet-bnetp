@@ -14,7 +14,13 @@
 --]]
 function array (...)
 	local args = make_args_table_with_positional_map(
-			{"label", "of", "num"}, unpack(arg))
+			{"label", "of", "num"},
+#if LUA_VERSION >= 510
+			...
+#else
+			unpack(arg)
+#endif
+	)
 
 	if args.of ~= uint32 and args.of ~= uint8 then
 		error("Arrays of types other than uint32 or uint8 are not supported.")

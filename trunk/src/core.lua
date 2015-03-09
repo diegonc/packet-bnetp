@@ -78,6 +78,9 @@ do
 
 	local function State(...)
 		local base = {}
+#if LUA_VERSION >= 510
+		local arg = {...}
+#endif
 		if arg and type(arg[1]) == "table" then
 			base = arg[1]
 		end
@@ -391,23 +394,46 @@ do
 	--	positional parameter.
 	--]]
 	local function make_args_table_with_positional_map(pmap, ...)
+#if LUA_VERSION >= 510
+		local arg = {...}
+#endif
 		local args = {}
+#if LUA_VERSION >= 510
+		local size = #arg
+#elif
 		local size = table.getn(arg)
+#endif
 		if size > 0 then
 			local orig = arg
 			if type(arg[1]) == "table"  then
 				-- Mixed
 				orig = arg[1]
+#if LUA_VERSION >= 510
+				size = #orig
+#elif
 				size = table.getn(orig)
+#endif
 			elseif type(arg[1]) ~= "string"  then
 				error("make_args_table called with wrong arguments types.")
 			end
 			-- Process positional parameters
-			for i=1, table.getn(pmap) do
+#if LUA_VERSION >= 510
+			local pmap_size = #pmap
+#else
+			local pmap_size = table.getn(pmap)
+#endif
+			for i=1, pmap_size do
 				args[pmap[i]] = orig[i]
 			end
-			if size > table.getn(pmap) then
-				args[pmap.unpacked or "params"] = { n=(size - table.getn(pmap)), unpack(orig, table.getn(pmap)) }
+			if size > pmap_size then
+				args[pmap.unpacked or "params"] = {
+					n=(size - pmap_size),
+#if LUA_VERSION >= 520
+					table.unpack(orig, pmap_size)
+#else
+					unpack(orig, pmap_size)
+#endif
+				}
 			end
 			-- Wipe positional parameters
 			-- for i=1, size do
@@ -424,11 +450,20 @@ do
 	end
 	
 	local function make_args_table(...)
+#if LUA_VERSION >= 510
+		local arg = {...}
+#endif
 		return make_args_table_with_positional_map({
 			"label",
 			"display",
 			"desc",
-			["unpacked"] = "params",}, unpack(arg))
+			["unpacked"] = "params",},
+#if LUA_VERSION >= 520
+			table.unpack(arg)
+#else
+			unpack(arg)
+#endif
+		)
 	end
 
 	local function verify_field_args(args)
@@ -500,7 +535,11 @@ do
 			--XXX: A filter string is required in newer versions of Wireshark.
 			-- We generate one automatically if none is provided.
 			if (instance.filter == nil) then
+#if LUA_VERSION >= 510
+				local n = # (p_bnetp.fields) + 1
+#else
 				local n = table.getn(p_bnetp.fields) + 1
+#endif
 				instance.filter = "filter" .. n
 			end
 
@@ -512,7 +551,12 @@ do
 					instance.label,
 					instance.display,
 					instance.desc,
-					unpack(instance.params or {}))
+#if LUA_VERSION >= 520
+					table.unpack(instance.params or {})
+#else
+					unpack(instance.params or {})
+#endif
+				)
 			end
 			-- Remove ProtoField arguments
 			instance.label = nil
@@ -532,7 +576,11 @@ do
 			end
 			-- Add the field to the protocol field list
 			if tmp.pf then
+#if LUA_VERSION >= 510
+				local n = # (p_bnetp.fields) + 1
+#else
 				local n = table.getn(p_bnetp.fields) + 1
+#endif
 				p_bnetp.fields[n] = tmp.pf
 			end
 			return tmp
@@ -541,9 +589,14 @@ do
 			.." " .. package.loaded.debug.traceback())
 	end
 
+	-- Wireshark 1.6.11 moved to Lua 5.2 which no longer has
+	-- getfenv/setfenv functions.
+	-- TODO: does the global environment get clobbered in Lua 5.2?
+#if LUA_VERSION < 520
 	-- Avoid clobbering global environment
 	local global_environment = getfenv(1)
 	setfenv(1, setmetatable({}, {__index = global_environment}))
+#endif
 
 	#include "constants.lua"
 	#include "valuemaps.lua"
@@ -572,8 +625,10 @@ do
 	#include cpackets_sid.lua
 	#include cpackets_w3gs.lua
 	}
-	
+
+#if LUA_VERSION < 520	
 	setfenv(1, global_environment)
+#endif
 
 	-- After all the initialization is finished, register plugin
 	-- to default port.
