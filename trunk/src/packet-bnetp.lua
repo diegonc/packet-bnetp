@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sun Mar  8 23:43:57 2015
+--[[ packet-bnetp.lua build on Mon Mar  9 00:40:16 2015
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -529,7 +529,13 @@ do
 			--      no node is added to the tree unless an alias is
 			--      explicitly given.
 			if (not instance.getvalueonly) or instance.protofield_type then
-				field = ProtoField[typename] -- XXX: "none" should be a special case
+				-- Since version 1.10.6, Wireshark no longer provides
+				-- a "none" field in ProtoField, field remains nil in
+				-- such case.
+				-- TODO: TEST
+				if typename ~= "none" then
+					field = ProtoField[typename] 
+				end
 			end
 
 			--XXX: A filter string is required in newer versions of Wireshark.
