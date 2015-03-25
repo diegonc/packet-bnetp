@@ -13,6 +13,8 @@ Feel free to give feedback, or don't wonder if the project dies.
 
 ### Since Wireshark 1.4.0
 
+Download [packet-bnetp](https://github.com/diegonc/packet-bnetp/releases).
+
 Place the file `packet-bnetp.lua` in one of the directories in the Lua search path. Wireshark will then load it automatically during startup.
 
 **UNIX**
@@ -28,7 +30,7 @@ Place the file `packet-bnetp.lua` in one of the directories in the Lua search pa
 ### Earlier Versions
 
 1. Install Wireshark. The installation program may show Lua as an optional plugin. If it does, enable it. Using 1.2.x version or higher is highly recommended.
-1. Download [packet-bnetp](http://code.google.com/p/packet-bnetp/downloads/list) and unpack it to wireshark installation directory. If you want, you may place it anywhere else provided you give the full path to dofile in the next step.
+1. Download [packet-bnetp](https://github.com/diegonc/packet-bnetp/releases) and unpack it to wireshark installation directory. If you want, you may place it anywhere else provided you give the full path to dofile in the next step.
 1. Open init.lua located at Wireshark installation directory and replace
         -- Lua is disabled by default, comment out the following line to enable Lua support.
         disable_lua = true; do return end;
