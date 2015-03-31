@@ -19,7 +19,7 @@ Place the file `packet-bnetp.lua` in one of the directories in the Lua search pa
 
 **UNIX**
 
-  * /share/wireshark/plugins/foo.lua (global)
+  * /usr/share/wireshark/plugins/foo.lua (global)
   * $HOME/.wireshark/plugins/foo.lua (user-specific)
 
 **Windows**
