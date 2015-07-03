@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Mon Mar  9 00:40:16 2015
+--[[ packet-bnetp.lua build on Fri Jul  3 02:43:43 2015
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: http://code.google.com/p/packet-bnetp/
@@ -253,7 +253,14 @@ do
 					end
 				end
 			end
-			return state.used
+			-- Segment doesn't start with a known pattern,
+			-- reject whole segment
+			if rejected and state.used == 0 then
+				return 0
+			end
+			-- Some packets, either complete or not, were
+			-- found in the segment, accept it as ours
+			return buf:len()
 		else
 			-- Are we ever called with a nil root?
 			info ("p_bnetp dissector called with a nil root node.")
