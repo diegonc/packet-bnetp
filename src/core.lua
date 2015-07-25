@@ -190,17 +190,17 @@ do
 				local r, need_more, missing = coroutine.resume(thread, state)
 				if (r and (need_more == NEED_MORE)) then
 					state:error("This is an incomplete packet. Refer to next pdu")
-					if missing then
-						pkt.desegment_len = missing
-					else
-						pkt.desegment_len = DESEGMENT_ONE_MORE_SEGMENT
-					end
-					pkt.desegment_offset = pdu_start
-					info ("dissector: requesting data -" 
+					if pkt.can_desegment > 0 then
+						pkt.desegment_len = missing or DESEGMENT_ONE_MORE_SEGMENT
+						pkt.desegment_offset = pdu_start
+						info ("dissector: requesting data -"
 							.. " r: " .. tostring(r)
 							.. " need_more: " .. tostring(need_more)
 							.. " missing: " .. tostring(missing)
 							.. " deseg_len: " .. tostring(pkt.desegment_len))
+					else
+						state:error("Desegmentation required but not allowed by parent dissector.")
+					end
 					available  = pdu_start
 					state.used = pdu_start
 				elseif r and (need_more==ENOUGH) and (missing==REJECTED) then
@@ -229,7 +229,14 @@ do
 					end
 				end
 			end
-			return state.used
+			-- Segment doesn't start with a known pattern,
+			-- reject whole segment
+			if rejected and state.used == 0 then
+				return 0
+			end
+			-- Some packets, either complete or not, were
+			-- found in the segment, accept it as ours
+			return buf:len()
 		else
 			-- Are we ever called with a nil root?
 			info ("p_bnetp dissector called with a nil root node.")
