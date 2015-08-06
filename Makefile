@@ -14,7 +14,7 @@ GCUFLAGS?=-p packet-bnetp -s "packet-bnetp plugin"
 
 PKGNAME=packet-bnetp
 DISTNAME=packet-bnetp-src
-VERSION:=$(shell date +%Y%m%d)
+VERSION:=$(shell date +%Y_%m_%d)
 
 PKG = \
 	src/packet-bnetp.lua
@@ -91,11 +91,11 @@ run-xmlexport: tools/xmlexport/export.lua
 
 .PHONY: pkg upload clean
 
+# Junk the directories in the zip file
+# to align with previously released archives.
+# TODO: avoid name clashes in PKG
 $(PKGNAME)-$(VERSION).zip: $(PKG)
-	$(MKDIR) $(PKGNAME)-$(VERSION) && (\
-		( cp $(PKG) $(PKGNAME)-$(VERSION) && \
-		  $(ZIP) -9 -r $(PKGNAME)-$(VERSION).zip $(PKGNAME)-$(VERSION) ); \
-		$(RM) -r $(PKGNAME)-$(VERSION) )
+	$(ZIP) -9 -j $(PKGNAME)-$(VERSION).zip $(PKG)
 
 pkg: $(PKGNAME)-$(VERSION).zip
 upload: pkg
