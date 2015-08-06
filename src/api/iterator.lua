@@ -87,9 +87,9 @@ do
 		end
 
 		-- defaults for node creation
-		if not args.node
+		if args.node == nil
 			then args.node = true end
-		if not args.subnode
+		if args.subnode == nil
 			then args.subnode = (#args.repeated > 1) end
 
 		return create_proto_field(template, args)

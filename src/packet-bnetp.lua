@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Wed Aug  5 21:15:43 2015
+--[[ packet-bnetp.lua build on Thu Aug  6 20:00:04 2015
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: https://github.com/diegonc/packet-bnetp/
@@ -1833,9 +1833,9 @@ do
 		end
 
 		-- defaults for node creation
-		if not args.node
+		if args.node == nil
 			then args.node = true end
-		if not args.subnode
+		if args.subnode == nil
 			then args.subnode = (#args.repeated > 1) end
 
 		return create_proto_field(template, args)
