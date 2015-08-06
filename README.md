@@ -7,7 +7,7 @@
 
 _packet-bnetp_ is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol and Warcraft 3 game protocol.
 
-Feel free to give feedback, or don't wonder if the project dies.
+Feel free to give feedback!
 
 ## How to install?
 
