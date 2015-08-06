@@ -9,12 +9,17 @@ FILEPP_FLAGS= \
 	-m pb-utils.pm \
 	-m literal.pm \
 	-DLUA_VERSION=$(LUA_VERSION)
-
-GCUFLAGS?=-p packet-bnetp -s "packet-bnetp plugin"
+# GitHub upload params should be defined in Makefile.local
+# GHU_USER: uploader's username
+# GHU_PASS: uploader's password
+# GHU_REPO: repository where release is created
 
 PKGNAME=packet-bnetp
 DISTNAME=packet-bnetp-src
 VERSION:=$(shell date +%Y_%m_%d)
+REL_TAG:=v$(shell date +%Y.%m.%d)
+REL_NAME:=$(REL_TAG)
+REL_BODY:=$(REL_TAG)
 
 PKG = \
 	src/packet-bnetp.lua
@@ -99,9 +104,14 @@ $(PKGNAME)-$(VERSION).zip: $(PKG)
 
 pkg: $(PKGNAME)-$(VERSION).zip
 upload: pkg
-	tools/googlecode_upload.py \
-		$(GCUFLAGS) \
-		$(PKGNAME)-$(VERSION).zip
+	tools/github_upload.py \
+		$(GHU_USER) \
+		$(GHU_PASS) \
+		$(GHU_REPO) \
+		$(REL_TAG)  \
+		$(REL_NAME) \
+		$(REL_BODY) \
+		-a $(PKGNAME)-$(VERSION).zip:$(PKGNAME)-$(VERSION).zip
 
 clean:
 	$(RM) src/packet-bnetp.lua
