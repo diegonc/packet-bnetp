@@ -349,8 +349,8 @@
 	uint16("Send interval"),
 	uint16("CRC-16 encryption"),
 	uint8("Player number"),
-	uint16("Length of action data"),
-	bytes("Action data"),
+	uint16 {"Length of action data", key="action_length"},
+	bytes("Action data", "key", "action_length"),
 },
 --[[doc
     Message ID:    0x0F
