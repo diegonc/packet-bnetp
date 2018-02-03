@@ -16,15 +16,22 @@ def read_file (path):
     with open (path, 'rb') as f:
         return f.read ()
 
-def create_release (release_info):
+def find_or_create_release (repo, release_info):
+    release = repo.release_from_tag(release_info['tag'])
+    if release:
+        return release
+    else:
+        return repo.create_release (
+            release_info['tag'], release_info['commitish'],
+            release_info['name'], release_info['body'],
+            release_info['draft'], release_info['pre_release'])
+
+def upsert_release (release_info):
     user = release_info['user']
     password = release_info['pass']
     gh = github3.login (user, password)
     repo = gh.repository (user, release_info['repo'])
-    release = repo.create_release (
-        release_info['tag'], release_info['commitish'],
-        release_info['name'], release_info['body'],
-        release_info['draft'], release_info['pre_release'])
+    release = find_or_create_release(repo, release_info)
     for asset in release_info['assets']:
         release.upload_asset (
             # TODO: add parameter for content_type
@@ -54,7 +61,7 @@ def main():
     if len(rest) < 6:
         args.error ('USER, PASS, REPO, TAG, NAME or BODY not specified')
 
-    release = create_release (
+    release = upsert_release (
         { 'user': rest[0],
           'pass': rest[1],
           'repo': rest[2],

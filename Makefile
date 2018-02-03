@@ -99,10 +99,10 @@ run-xmlexport: tools/xmlexport/export.lua
 # Junk the directories in the zip file
 # to align with previously released archives.
 # TODO: avoid name clashes in PKG
-$(PKGNAME)-$(VERSION).zip: $(PKG)
-	$(ZIP) -9 -j $(PKGNAME)-$(VERSION).zip $(PKG)
+$(PKGNAME)-$(VERSION)_lua$(LUA_VERSION).zip: $(PKG)
+	$(ZIP) -9 -j $(PKGNAME)-$(VERSION)_lua$(LUA_VERSION).zip $(PKG)
 
-pkg: $(PKGNAME)-$(VERSION).zip
+pkg: $(PKGNAME)-$(VERSION)_lua$(LUA_VERSION).zip
 upload: pkg
 	tools/github_upload.py \
 		$(GHU_USER) \
@@ -111,7 +111,7 @@ upload: pkg
 		$(REL_TAG)  \
 		$(REL_NAME) \
 		$(REL_BODY) \
-		-a $(PKGNAME)-$(VERSION).zip:$(PKGNAME)-$(VERSION).zip
+		-a $(PKGNAME)-$(VERSION)_lua$(LUA_VERSION).zip:$(PKGNAME)-$(VERSION)_lua$(LUA_VERSION).zip
 
 clean:
 	$(RM) src/packet-bnetp.lua
