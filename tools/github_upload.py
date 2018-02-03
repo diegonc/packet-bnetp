@@ -13,7 +13,7 @@ def parse_assets (raw_assets):
     return assets
 
 def read_file (path):
-    with open (path) as f:
+    with open (path, 'rb') as f:
         return f.read ()
 
 def create_release (release_info):
