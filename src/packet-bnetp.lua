@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sun Feb  4 04:53:11 2018
+--[[ packet-bnetp.lua build on Sun Feb  4 05:27:17 2018
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: https://github.com/diegonc/packet-bnetp/
@@ -1996,8 +1996,8 @@ end
 --]]
 function strdw (...)
 	local args = make_args_table_with_positional_map(
-	                {"label", "desc"},
-			...
+		{"label", "desc"},
+		...
 	)
 	args.reversed = true
 	args.length = 4
