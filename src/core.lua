@@ -593,14 +593,14 @@ do
 	
 	-- Packets from server to client
 	SPacketDescription = {
-	#include spackets_sid.lua
-	#include spackets_w3gs.lua
+	#include "spackets_sid.lua"
+	#include "spackets_w3gs.lua"
 	}
 	
 	-- Packets from client to server
 	CPacketDescription = {
-	#include cpackets_sid.lua
-	#include cpackets_w3gs.lua
+	#include "cpackets_sid.lua"
+	#include "cpackets_w3gs.lua"
 	}
 
 	-- XXX Wireshark eventually moved to Lua 5.2 which no longer has
