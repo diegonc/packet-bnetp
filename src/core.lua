@@ -546,14 +546,9 @@ do
 			end
 
 			--XXX: A filter string is required in newer versions of Wireshark.
-			-- We generate one automatically if none is provided.
+			-- We use 'anythingelse' as default if none is provided.
 			if (instance.filter == nil) then
-#if LUA_VERSION >= 510
-				local n = # (p_bnetp.fields) + 1
-#else
-				local n = table.getn(p_bnetp.fields) + 1
-#endif
-				instance.filter = "filter" .. n
+				instance.filter = "anythingelse"
 			end
 
 			-- TODO: some fields do not expect display

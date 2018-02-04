@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sat Feb  3 22:29:09 2018
+--[[ packet-bnetp.lua build on Sun Feb  4 04:35:30 2018
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: https://github.com/diegonc/packet-bnetp/
@@ -427,7 +427,7 @@ do
 			if size > pmap_size then
 				args[pmap.unpacked or "params"] = {
 					n=(size - pmap_size),
-					table.unpack(orig, pmap_size)
+					unpack(orig, pmap_size)
 				}
 			end
 			-- Wipe positional parameters
@@ -451,7 +451,7 @@ do
 			"display",
 			"desc",
 			["unpacked"] = "params",},
-			table.unpack(arg)
+			unpack(arg)
 		)
 	end
 
@@ -528,10 +528,9 @@ do
 			end
 
 			--XXX: A filter string is required in newer versions of Wireshark.
-			-- We generate one automatically if none is provided.
+			-- We use 'anythingelse' as default if none is provided.
 			if (instance.filter == nil) then
-				local n = # (p_bnetp.fields) + 1
-				instance.filter = "filter" .. n
+				instance.filter = "anythingelse"
 			end
 
 			-- TODO: some fields do not expect display
@@ -542,7 +541,7 @@ do
 					instance.label,
 					instance.display,
 					instance.desc,
-					table.unpack(instance.params or {})
+					unpack(instance.params or {})
 				)
 			end
 			-- Remove ProtoField arguments
@@ -575,6 +574,9 @@ do
 	-- Wireshark 1.6.11 moved to Lua 5.2 which no longer has
 	-- getfenv/setfenv functions.
 	-- TODO: does the global environment get clobbered in Lua 5.2?
+	-- Avoid clobbering global environment
+	local global_environment = getfenv(1)
+	setfenv(1, setmetatable({}, {__index = global_environment}))
 
 packet_names = {
 [0xFF00] = "SID_NULL",
@@ -1956,7 +1958,7 @@ do
 			par[2] = { function() return true end, args.otherwise }
 		end
 		return casewhen (
-			table.unpack(par)
+			unpack(par)
 		)
 	end
 end
@@ -4029,6 +4031,7 @@ end
 },
 	}
 
+	setfenv(1, global_environment)
 
 	-- After all the initialization is finished, register plugin
 	-- to default port.
