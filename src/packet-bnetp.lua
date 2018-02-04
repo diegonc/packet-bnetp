@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sun Feb  4 05:27:17 2018
+--[[ packet-bnetp.lua build on Sun Feb  4 06:08:30 2018
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: https://github.com/diegonc/packet-bnetp/
@@ -199,7 +199,8 @@ do
 				local r, need_more, missing = coroutine.resume(thread, state)
 				if (r and (need_more == NEED_MORE)) then
 					state:error("This is an incomplete packet. Refer to next pdu")
-					if pkt.can_desegment > 0 then
+					-- XXX older versions of Wireshark did not provide the can_desegment field
+					if pkt.can_desegment == nil or pkt.can_desegment > 0 then
 						pkt.desegment_len = missing or DESEGMENT_ONE_MORE_SEGMENT
 						pkt.desegment_offset = pdu_start
 						info ("dissector: requesting data -"
