@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sun Feb  4 04:35:30 2018
+--[[ packet-bnetp.lua build on Sun Feb  4 04:53:11 2018
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: https://github.com/diegonc/packet-bnetp/
@@ -26,9 +26,12 @@ do
 		SPacketDescription,
 		dissect_packet
 
+	-- XXX Lua 5.2 moved the unpack function to the table namespace.
+	local unpack = unpack or table.unpack
+
 	-- To disable debugging output and improve dissector speed uncomment
 	-- the folowing line.
-	--local info = function(...) end
+	local info = function(...) end
 
 	-- A BitOp library replacement is needed for wireshark's stable version
 	--     http://lua-users.org/wiki/BitUtils
@@ -571,12 +574,14 @@ do
 			.." " .. package.loaded.debug.traceback())
 	end
 
-	-- Wireshark 1.6.11 moved to Lua 5.2 which no longer has
+	-- XXX Wireshark eventually moved to Lua 5.2 which no longer has
 	-- getfenv/setfenv functions.
 	-- TODO: does the global environment get clobbered in Lua 5.2?
-	-- Avoid clobbering global environment
-	local global_environment = getfenv(1)
-	setfenv(1, setmetatable({}, {__index = global_environment}))
+	-- 2018-02: To remove conditional code, give up and clobber environment
+	---- Avoid clobbering global environment
+	--local global_environment = getfenv(1)
+	--setfenv(1, setmetatable({}, {__index = global_environment}))
+
 
 packet_names = {
 [0xFF00] = "SID_NULL",
@@ -4031,7 +4036,11 @@ end
 },
 	}
 
-	setfenv(1, global_environment)
+	-- XXX Wireshark eventually moved to Lua 5.2 which no longer has
+	-- getfenv/setfenv functions.
+	-- TODO: does the global environment get clobbered in Lua 5.2?
+	-- 2018-02: To remove conditional code, give up and clobber environment
+	--setfenv(1, global_environment)
 
 	-- After all the initialization is finished, register plugin
 	-- to default port.

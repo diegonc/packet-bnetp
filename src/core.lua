@@ -588,14 +588,14 @@ do
 			.." " .. package.loaded.debug.traceback())
 	end
 
-	-- Wireshark 1.6.11 moved to Lua 5.2 which no longer has
+	-- XXX Wireshark eventually moved to Lua 5.2 which no longer has
 	-- getfenv/setfenv functions.
 	-- TODO: does the global environment get clobbered in Lua 5.2?
-#if LUA_VERSION < 520
-	-- Avoid clobbering global environment
-	local global_environment = getfenv(1)
-	setfenv(1, setmetatable({}, {__index = global_environment}))
-#endif
+	-- 2018-02: To remove conditional code, give up and clobber environment
+	---- Avoid clobbering global environment
+	--local global_environment = getfenv(1)
+	--setfenv(1, setmetatable({}, {__index = global_environment}))
+
 
 	#include "constants.lua"
 	#include "valuemaps.lua"
@@ -625,9 +625,11 @@ do
 	#include cpackets_w3gs.lua
 	}
 
-#if LUA_VERSION < 520	
-	setfenv(1, global_environment)
-#endif
+	-- XXX Wireshark eventually moved to Lua 5.2 which no longer has
+	-- getfenv/setfenv functions.
+	-- TODO: does the global environment get clobbered in Lua 5.2?
+	-- 2018-02: To remove conditional code, give up and clobber environment
+	--setfenv(1, global_environment)
 
 	-- After all the initialization is finished, register plugin
 	-- to default port.
