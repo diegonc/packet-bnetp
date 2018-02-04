@@ -18,6 +18,9 @@ do
 		SPacketDescription,
 		dissect_packet
 
+	-- XXX Lua 5.2 moved the unpack function to the table namespace.
+	local unpack = unpack or table.unpack
+
 	-- To disable debugging output and improve dissector speed uncomment
 	-- the folowing line.
 	local info = function(...) end
@@ -435,11 +438,7 @@ do
 			if size > pmap_size then
 				args[pmap.unpacked or "params"] = {
 					n=(size - pmap_size),
-#if LUA_VERSION >= 520
-					table.unpack(orig, pmap_size)
-#else
 					unpack(orig, pmap_size)
-#endif
 				}
 			end
 			-- Wipe positional parameters
@@ -465,11 +464,7 @@ do
 			"display",
 			"desc",
 			["unpacked"] = "params",},
-#if LUA_VERSION >= 520
-			table.unpack(arg)
-#else
 			unpack(arg)
-#endif
 		)
 	end
 
@@ -559,11 +554,7 @@ do
 					instance.label,
 					instance.display,
 					instance.desc,
-#if LUA_VERSION >= 520
-					table.unpack(instance.params or {})
-#else
 					unpack(instance.params or {})
-#endif
 				)
 			end
 			-- Remove ProtoField arguments
