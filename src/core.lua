@@ -20,7 +20,7 @@ do
 
 	-- To disable debugging output and improve dissector speed uncomment
 	-- the folowing line.
-	--local info = function(...) end
+	local info = function(...) end
 
 	-- A BitOp library replacement is needed for wireshark's stable version
 	--     http://lua-users.org/wiki/BitUtils
