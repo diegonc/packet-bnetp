@@ -36,9 +36,7 @@ do
 	--
 	--]]
 	function casewhen (...)
-#if LUA_VERSION >= 510
 		local arg = {...}
-#endif
 		local tmp = create_proto_field(template, {})
 		if (#arg == 1) and arg[1].tests then
 			tmp.tests = arg[1].tests
@@ -78,11 +76,7 @@ do
 	function when (...)
 		local args = make_args_table_with_positional_map(
 				{"condition", "block", "otherwise"},
-#if LUA_VERSION >= 510
 				...
-#else
-				unpack(arg)
-#endif
 		)
 		if args.params then
 			error(package.loaded.debug.traceback())
@@ -93,11 +87,7 @@ do
 			par[2] = { function() return true end, args.otherwise }
 		end
 		return casewhen (
-#if LUA_VERSION >= 520
-			table.unpack(par)
-#else
 			unpack(par)
-#endif
 		)
 	end
 end

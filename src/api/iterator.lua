@@ -69,11 +69,7 @@ do
 	function iterator(...)
 		local args = make_args_table_with_positional_map({
 			"label", "refkey", "repeated", "node", "subnode"},
-#if LUA_VERSION >= 510
 			...
-#else
-			unpack(arg)
-#endif
 		)
 
 		-- translate alias to protofield_type

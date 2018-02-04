@@ -29,11 +29,7 @@ local function define_integer(isize)
 	return function(...)
 		local args = make_args_table_with_positional_map(
 				{"label", "display", "desc"},
-#if LUA_VERSION >= 510
 				...
-#else
-				unpack(arg)
-#endif
 		)
 
 		return create_proto_field(template, args)

@@ -59,11 +59,7 @@ do
 	function sockaddr (...)
 		local args = make_args_table_with_positional_map(
 				{"real_label"},
-#if LUA_VERSION >= 510
 				...
-#else
-				unpack(arg)
-#endif
 		)
 		args.label = "dummy string"
 		return create_proto_field(template, args)

@@ -9,11 +9,7 @@
 --]]
 function version (...)
 	local args = make_args_table(
-#if LUA_VERSION >= 510
 		...
-#else
-		unpack(arg)
-#endif
 	)
 	args.big_endian = false
 	return ipv4(args)

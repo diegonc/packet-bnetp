@@ -81,9 +81,7 @@ do
 
 	local function State(...)
 		local base = {}
-#if LUA_VERSION >= 510
 		local arg = {...}
-#endif
 		if arg and type(arg[1]) == "table" then
 			base = arg[1]
 		end
@@ -404,34 +402,20 @@ do
 	--	positional parameter.
 	--]]
 	local function make_args_table_with_positional_map(pmap, ...)
-#if LUA_VERSION >= 510
 		local arg = {...}
-#endif
 		local args = {}
-#if LUA_VERSION >= 510
 		local size = #arg
-#elif
-		local size = table.getn(arg)
-#endif
 		if size > 0 then
 			local orig = arg
 			if type(arg[1]) == "table"  then
 				-- Mixed
 				orig = arg[1]
-#if LUA_VERSION >= 510
 				size = #orig
-#elif
-				size = table.getn(orig)
-#endif
 			elseif type(arg[1]) ~= "string"  then
 				error("make_args_table called with wrong arguments types.")
 			end
 			-- Process positional parameters
-#if LUA_VERSION >= 510
 			local pmap_size = #pmap
-#else
-			local pmap_size = table.getn(pmap)
-#endif
 			for i=1, pmap_size do
 				args[pmap[i]] = orig[i]
 			end
@@ -456,9 +440,7 @@ do
 	end
 	
 	local function make_args_table(...)
-#if LUA_VERSION >= 510
 		local arg = {...}
-#endif
 		return make_args_table_with_positional_map({
 			"label",
 			"display",
@@ -575,11 +557,7 @@ do
 			end
 			-- Add the field to the protocol field list
 			if tmp.pf then
-#if LUA_VERSION >= 510
 				local n = # (p_bnetp.fields) + 1
-#else
-				local n = table.getn(p_bnetp.fields) + 1
-#endif
 				p_bnetp.fields[n] = tmp.pf
 			end
 			return tmp

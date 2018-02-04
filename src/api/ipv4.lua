@@ -24,11 +24,7 @@ do
 	function ipv4(...)
 		local args = make_args_table_with_positional_map(
 				{"label", "big_endian"},
-#if LUA_VERSION >= 510
 				...
-#else
-				unpack(arg)
-#endif
 		)
 
 		return create_proto_field(template, args)

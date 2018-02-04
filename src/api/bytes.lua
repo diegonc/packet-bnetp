@@ -46,11 +46,7 @@ do
 	function bytes(...)
 		local args = make_args_table_with_positional_map(
 				{"label", "length", "refkey"},
-#if LUA_VERSION >= 510
 				...
-#else
-				unpack(arg)
-#endif
 		)
 
 		return create_proto_field(template, args)

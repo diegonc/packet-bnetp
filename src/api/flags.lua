@@ -15,11 +15,7 @@
 function flags (...)
 	local args = make_args_table_with_positional_map(
 			{"label", "of", "fields"},
-#if LUA_VERSION >= 510
 			...
-#else
-			unpack(arg)
-#endif
 	)
 	
 	args.filter = "hasflags"
