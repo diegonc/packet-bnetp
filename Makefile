@@ -2,6 +2,7 @@ MKDIR?=mkdir
 RM?=rm
 ZIP?=zip
 PERL?=/usr/bin/perl
+LUA?=lua
 LUA_VERSION?=530
 
 FILEPP=$(PERL) tools/filepp/filepp
@@ -91,7 +92,7 @@ tools/xmlexport/export.lua: tools/xmlexport/export.lua.filepp
 
 .PHONY: run-xmlexport
 run-xmlexport: tools/xmlexport/export.lua
-	LUA_PATH="./tools/xmlexport/lib/LuaExpatUtils/lua/?.lua;./tools/xmlexport/?.lua" lua tools/xmlexport/export.lua
+	LUA_PATH="./tools/xmlexport/lib/LuaExpatUtils/lua/?.lua;./tools/xmlexport/?.lua" $(LUA) tools/xmlexport/export.lua
 
 
 .PHONY: pkg upload clean
