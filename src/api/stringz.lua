@@ -39,7 +39,8 @@ do
 			state.bnet_node:add(self.pf, state:read(size), str)
 		end,
 		value = function (self, state)
-			local val = state:peek(self:size(state))
+			-- Subtract one from size to remove string terminator
+			local val = state:peek(self:size(state) - 1)
 			return val:string()
 		end,
 	}

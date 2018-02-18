@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sun Feb  4 06:15:08 2018
+--[[ packet-bnetp.lua build on Sun Feb 18 23:49:06 2018
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: https://github.com/diegonc/packet-bnetp/
@@ -1692,7 +1692,8 @@ do
 			state.bnet_node:add(self.pf, state:read(size), str)
 		end,
 		value = function (self, state)
-			local val = state:peek(self:size(state))
+			-- Subtract one from size to remove string terminator
+			local val = state:peek(self:size(state) - 1)
 			return val:string()
 		end,
 	}
