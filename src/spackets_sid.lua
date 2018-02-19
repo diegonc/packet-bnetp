@@ -463,7 +463,8 @@
 	iterator{
 		alias="none",
 		--condition = function(self, state) return state.packet.chan ~="" end,
-		condition = Cond.nequals("chan", ""),
+		condition = Cond.nequals("chan", "", "notempty"),
+		evaluate_packet_before_condition = true,
 		repeated = {
 			stringz{"Channel name", key="chan"},
 		}

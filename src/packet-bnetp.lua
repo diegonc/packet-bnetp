@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Sun Feb 18 23:49:06 2018
+--[[ packet-bnetp.lua build on Mon Feb 19 03:59:29 2018
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: https://github.com/diegonc/packet-bnetp/
@@ -1279,10 +1279,13 @@ Cond = {
 		end
 	end,
 	
-	nequals = function(key, value)
+	nequals = function(key, value, ...)
+		local args = {...}
 		return function(self, state)
-			Cond.assert_key(state, key)
-			return state.packet[key] ~= value
+			if #args == 0 then
+				Cond.assert_key(state, key)
+			end
+			return (state.packet[key] or args[1]) ~= value
 		end
 	end,
 	
@@ -2367,7 +2370,8 @@ end
 	iterator{
 		alias="none",
 		--condition = function(self, state) return state.packet.chan ~="" end,
-		condition = Cond.nequals("chan", ""),
+		condition = Cond.nequals("chan", "", "notempty"),
+		evaluate_packet_before_condition = true,
 		repeated = {
 			stringz{"Channel name", key="chan"},
 		}

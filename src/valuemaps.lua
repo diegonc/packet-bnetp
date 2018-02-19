@@ -581,10 +581,13 @@ Cond = {
 		end
 	end,
 	
-	nequals = function(key, value)
+	nequals = function(key, value, ...)
+		local args = {...}
 		return function(self, state)
-			Cond.assert_key(state, key)
-			return state.packet[key] ~= value
+			if #args == 0 then
+				Cond.assert_key(state, key)
+			end
+			return (state.packet[key] or args[1]) ~= value
 		end
 	end,
 	
