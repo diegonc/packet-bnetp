@@ -9,9 +9,11 @@ _packet-bnetp_ is a Wireshark plugin written in Lua for dissecting the Battle.ne
 
 Feel free to give feedback!
 
-## How to install?
+## Requirements
 
-### Since Wireshark 1.4.0
+_packet-bnetp_ was tested with Wireshark 1.10.5, which is Windows XP compatible. Older versions with Lua 5.1 may work too, newer should work too.
+
+## How to install?
 
 Download [packet-bnetp](https://github.com/diegonc/packet-bnetp/releases).
 
@@ -26,27 +28,6 @@ Place the file `packet-bnetp.lua` in one of the directories in the Lua search pa
 
   * %PROGRAMFILES%\Wireshark\plugins\%WIRESHARK\_VERSION%\foo.lua (global)
   * %APPDATA%\Wireshark\plugins\foo.lua (user-specific)
-
-### Earlier Versions
-
-1. Install Wireshark. The installation program may show Lua as an optional plugin. If it does, enable it. Using 1.2.x version or higher is highly recommended.
-1. Download [packet-bnetp](https://github.com/diegonc/packet-bnetp/releases) and unpack it to wireshark installation directory. If you want, you may place it anywhere else provided you give the full path to dofile in the next step.
-1. Open init.lua located at Wireshark installation directory and replace
-        -- Lua is disabled by default, comment out the following line to enable Lua support.
-        disable_lua = true; do return end;
-    
-    with
-    
-        -- Lua is disabled by default, comment out the following line to enable Lua support.
-        -- disable_lua = true; do return end;
-    
-    (it can be already enabled on newer Wireshark versions).
-    
-    Then insert
-    
-        dofile("packet-bnetp.lua")
-    
-    at the end of the file.
 
 ## Screenshots
 Click on images to enlarge.
