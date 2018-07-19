@@ -5,7 +5,7 @@
 
 ## What is this?
 
-_packet-bnetp_ is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol and Warcraft 3 game protocol.
+_packet-bnetp_ is a Wireshark plugin written in Lua for dissecting the Battle.net® client-server protocol, which is used by Starcraft, Warcraft 2 Battle.Net edition, Warcraft 3, Diablo 1, Diablo 2, and Warcraft 3 game protocol.
 
 Feel free to give feedback!
 
