@@ -1,15 +1,19 @@
 --[[
---  sockaddr([label])
+--  slot([label])
 --
 --
---	Displays sockaddr struct.
+--	Displays a slot struct.
 --	Is equals to the sequence
 --
---		uint16("Address Family", nil, {[0]="AF_UNSPEC",[2]="AF_INET"}),
---		uint16("Port", big_endian=true},
---		ipv4("Host's IP"},
---		uint32("sin_zero"),
---		uint32("sin_zero"),
+--		uint8  {"Player Number"},
+--		uint8  {"Download status"},
+--		uint8  {"Slot status"},
+--		uint8  {"Computer status"},
+--		uint8  {"Team"},
+--		uint8  {"Colour"},
+--		uint8  {"Race"},
+--		uint8  {"Computer type"},
+--		uint8  {"Handicap"},
 --
 --	with some summary.
 --
@@ -22,16 +26,20 @@ do
 	local template = {
 		protofield_type = "bytes",
 		imp = {
-			uint16 {"Address Family", nil, {[0]="AF_UNSPEC",[2]="AF_INET"}, key="af"},
-			uint16 {"Port", big_endian=true, key="port"},
-			ipv4   {"Host's IP", key="ip"},
-			uint32 {"sin_zero", key="sz1"},
-			uint32 {"sin_zero", key="sz2"},
+			uint8  {"Player Number", key="num"},
+			int8  {"Download status", key="dl"},
+			uint8  {"Slot status", key="status"},
+			uint8  {"Computer status", key="comp"},
+			uint8  {"Team", key="team"},
+			uint8  {"Colour", key="color"},
+			uint8  {"Race", key="race"},
+			uint8  {"Computer type", key="diff"}, -- difficulty
+			uint8  {"Handicap", key="handicap"},
 		},
 	}
 
 	function template:size()
-		return 16
+		return 9
 	end
 
 	function template:dissect(state)
@@ -42,13 +50,7 @@ do
 			state.bnet_node = bn:add_le(self.pf, state:peek(self:size()))
 		end
 		dissect_packet(state, self.imp)
-		if state.packet.sz1 ~= 0 or state.packet.sz2 ~= 0 then
-			state:error("sin_zero is not zero.");
-		end
-		if state.packet.af ~= 2 then
-			state:error("Adress Family is not AF_INET.")
-		end
-		local summary = string.format("IP: %s, Port: %d", state.packet.ip, state.packet.port)
+		local summary = string.format("Slot %d", state.packet.num)
 		if self.label ~= nil then
 			summary = self.label .. ": " .. summary 
 		end
@@ -56,7 +58,7 @@ do
 		state.bnet_node = bn
 	end
 
-	function sockaddr (...)
+	function slot (...)
 		local args = make_args_table_with_positional_map(
 				{"real_label"},
 				...
