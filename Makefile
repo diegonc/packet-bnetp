@@ -39,6 +39,7 @@ SOURCES = \
 	src/api/iterator.lua \
 	src/api/ipv4.lua \
 	src/api/sockaddr.lua \
+	src/api/slot.lua \
 	src/api/bytes.lua \
 	src/api/version.lua \
 	src/valuemaps.lua \

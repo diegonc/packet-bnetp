@@ -7,7 +7,7 @@
 
     Used By:       Warcraft III: The Frozen Throne, Warcraft III
 
-    Format:        [blank]
+    Format:        (DWORD) Tick Count
 
     Remarks:       This is sent every 30 seconds to make sure that the client is still
                    responsive.
@@ -16,6 +16,7 @@
 
 ]]
 [W3GS_PING_FROM_HOST] = { -- 0x01
+	uint32("tickCount"),
 },
 --[[doc
     Message ID:    0x04
@@ -33,10 +34,7 @@
                    (BYTE) Game type
                    (BYTE) Number of player slots without observers
                    (BYTE) Player number
-                   (DWORD) Port
-                   (DWORD) External IP
-                   (DWORD) Unknown (0)
-                   (DWORD) Unknown (0)
+                   (SOCKADDR) Player's socket data
 
                    For each slot:
                    (BYTE) Player number
@@ -46,7 +44,7 @@
                    (BYTE) Team
                    (BYTE) Color
                    (BYTE) Race
-                   (BYTE) Computer type
+                   (BYTE) Computer type (Difficulty)
                    (BYTE) Handicap
 
     Remarks:       This is sent to tell the client about the game slots, upon entry of
@@ -88,25 +86,15 @@
 ]]
 [W3GS_SLOTINFOJOIN] = { -- 0x04
 	uint16("Length of Slot Info"),
-	uint8("Number of slots"),
-	uint8("[] Slot data"),
+	uint8{"Number of slots", key="length"},
+	iterator{alias="none", label="Slot data", refkey="length", repeated={
+		slot()
+	}},
 	uint32("Random seed"),
 	uint8("Game type"),
 	uint8("Number of player slots without observers"),
 	uint8("Player number"),
-	uint32("Port"),
-	uint32("External IP"),
-	uint32("Unknown"),
-	uint32("Unknown"),
-	uint8("Player number"),
-	uint8("Download status"),
-	uint8("Slot status"),
-	uint8("Computer status"),
-	uint8("Team"),
-	uint8("Color"),
-	uint8("Race"),
-	uint8("Computer type"),
-	uint8("Handicap"),
+	sockaddr("Socket"),
 },
 --[[doc
     Message ID:    0x05
@@ -149,17 +137,9 @@
     Format:          (DWORD) Player Counter
                      (BYTE) Player number
                      (STRING) Player name
-                     (WORD) Unknown (1)
-                     (WORD) AF_INET (2)
-                     (WORD) Port
-                     (DWORD) External IP
-                     (DWORD) Unknown (0)
-                     (DWORD) Unknown (0)
-                     (WORD) AF_INET (2)
-                     (WORD) Port
-                     (DWORD) Internal IP
-                     (DWORD) Unknown (0)
-                     (DWORD) Unknown (0)
+                     (BYTE)[] Unknown
+                     (SOCKADDR) External
+                     (SOCKADDR) Internal
 
     Remarks:         Tells a client about a player's information.
 
@@ -173,17 +153,12 @@
 	uint32("Player Counter"),
 	uint8("Player number"),
 	stringz("Player name"),
-	uint16("Unknown"),
-	uint16("AF_INET"),
-	uint16("Port"),
-	uint32("External IP"),
-	uint32("Unknown"),
-	uint32("Unknown"),
-	uint16("AF_INET"),
-	uint16("Port"),
-	uint32("Internal IP"),
-	uint32("Unknown"),
-	uint32("Unknown"),
+	uint8{"Unknown", key="length"},
+	iterator{alias="none", label="Unknown", refkey="length", repeated={
+		uint8("Unknown")
+	}},
+	sockaddr("External Socket"),
+	sockaddr("Internal Socket"),
 },
 --[[doc
     Message ID:    0x07
@@ -247,6 +222,11 @@
     Used By:       Warcraft III: The Frozen Throne, Warcraft III
 
     Format:        (WORD) Length of Slot Info
+                   (BYTE) Number of slots
+                   (BYTE)[] Slot data
+                   (DWORD) Random seed
+                   (BYTE) Game type
+                   (BYTE) Number of player slots without observers
 
                    Slot Info:
                    (BYTE) Player number
@@ -268,15 +248,18 @@
 ]]
 [W3GS_SLOTINFO] = { -- 0x09
 	uint16("Length of Slot Info"),
-	uint8("Player number"),
-	uint8("Download status"),
-	uint8("Slot status"),
-	uint8("Computer status"),
-	uint8("Team"),
-	uint8("Color"),
-	uint8("Race"),
-	uint8("Computer type"),
-	uint8("Handicap"),
+	uint8{"Number of slots", key="length"},
+	iterator{alias="none", label="Slot data", refkey="length", repeated={
+		slot()
+	}},
+	uint32("Random seed"),
+	uint8("Layout status", nil, {
+		[0x00] = "Melee",
+		[0x01] = "Custom forces",
+		[0x02] = "Fixed player settings",
+		[0x03] = "Custom forces and fixed player settings",
+	}),
+	uint8("Non-observer slots")
 },
 --[[doc
     Message ID:    0x0A
@@ -365,20 +348,43 @@
                    (BYTE)[] Player numbers that will receive the message
                    (BYTE) Player number that sent the message
                    (BYTE) Flags
-                   (DWORD) Extra Flags
-                   (STRING) Message
+                   (BYTE)[] Data
 
     Remarks:       This is sent to the clients to print a message on the screen from
                    another player.
 
 ]]
 [W3GS_CHAT_FROM_HOST] = { -- 0x0F
-	uint8("Player count"),
-	uint8("[] Player numbers that will receive the message"),
+	uint8{"Player count", key="count"},
+	iterator{alias="none", label="Slot data", refkey="count", repeated={
+		uint8("  Player number"),
+	}},
 	uint8("Player number that sent the message"),
-	uint8("Flags"),
-	uint32("Extra Flags"),
-	stringz("Message"),
+	uint8{"Flags", key="flags"},
+	casewhen{
+		{Cond.equals("flags", 0x10), {
+			stringz("Message"),
+		}},
+		{Cond.equals("flags", 0x11), {
+			uint8("Team"),
+		}},
+		{Cond.equals("flags", 0x12), {
+			uint8("Color"),
+		}},
+		{Cond.equals("flags", 0x13), {
+			uint8("Race"),
+		}},
+		{Cond.equals("flags", 0x14), {
+			uint8("Handicap"),
+		}},
+		{Cond.equals("flags", 0x20), {
+			uint32("Extra Flags"),	--message scope
+			stringz("Message"),
+		}},
+		{Cond.always(), {	--Probably never happens
+			stringz("Message"),
+		}},
+	},
 },
 --[[doc
     Message ID:    0x1B
@@ -435,6 +441,7 @@
     Format:        (DWORD) Product
                    (DWORD) Host Counter
                    (DWORD) Players In Game
+                   (DWORD) Entry Key
                    (STRING) Game name
                    (BYTE) Unknown (0)
                    (STRING) Statstring
@@ -456,11 +463,13 @@
 	uint32("Product"),
 	uint32("Host Counter"),
 	uint32("Players In Game"),
+	uint32("Entry Key"),
 	stringz("Game name"),
 	uint8("Unknown"),
 	stringz("Statstring"),
 	uint32("Slots total"),
-	uint8("[] Game Type Info"),
+	uint32("Game Type Info"),
+	uint32("Unknown"),
 	uint32("Slots available"),
 	uint32("Time since creation"),
 	uint16("Game Port"),
@@ -570,9 +579,9 @@
 	uint32("Unknown"),
 	stringz("File Path"),
 	uint32("File size"),
-	uint32("Map info"),
-	uint32("File CRC encryption"),
-	uint32("File SHA-1 hash"),
+	uint32{"Map info", base.HEX},
+	uint32{"File CRC encryption", base.HEX},
+	array("File SHA-1 hash", uint8, 20),
 },
 --[[doc
     Message ID:    0x3F
@@ -697,7 +706,7 @@
     Related:         [0x17] SID_READMEMORY (C->S)
 
 ]]
-[SID_READMEMORY] = { -- 0x17
+[SID_READMEMORY] = { -- 0x17     (Why are these here?)
 	uint32("Request ID"),
 	uint32("Address"),
 	uint32("Length"),

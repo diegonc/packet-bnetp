@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Mon Feb 19 03:59:29 2018
+--[[ packet-bnetp.lua build on Fri Jun 17 15:19:24 2022
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: https://github.com/diegonc/packet-bnetp/
@@ -2147,7 +2147,7 @@ end
 --	Displays sockaddr struct.
 --	Is equals to the sequence
 --
---		uint16("Address Family", nil, {[2]="AF_INET"}),
+--		uint16("Address Family", nil, {[0]="AF_UNSPEC",[2]="AF_INET"}),
 --		uint16("Port", big_endian=true},
 --		ipv4("Host's IP"},
 --		uint32("sin_zero"),
@@ -2164,7 +2164,7 @@ do
 	local template = {
 		protofield_type = "bytes",
 		imp = {
-			uint16 {"Address Family", nil, {[2]="AF_INET"}, key="af"},
+			uint16 {"Address Family", nil, {[0]="AF_UNSPEC",[2]="AF_INET"}, key="af"},
 			uint16 {"Port", big_endian=true, key="port"},
 			ipv4   {"Host's IP", key="ip"},
 			uint32 {"sin_zero", key="sz1"},
@@ -2199,6 +2199,76 @@ do
 	end
 
 	function sockaddr (...)
+		local args = make_args_table_with_positional_map(
+				{"real_label"},
+				...
+		)
+		args.label = "dummy string"
+		return create_proto_field(template, args)
+	end
+end
+
+--[[
+--  slot([label])
+--
+--
+--	Displays a slot struct.
+--	Is equals to the sequence
+--
+--		uint8  {"Player Number"},
+--		uint8  {"Download status"},
+--		uint8  {"Slot status"},
+--		uint8  {"Computer status"},
+--		uint8  {"Team"},
+--		uint8  {"Colour"},
+--		uint8  {"Race"},
+--		uint8  {"Computer type"},
+--		uint8  {"Handicap"},
+--
+--	with some summary.
+--
+--  Quick call:
+--    @par label   Name of the field. It will be used as a label for the
+--                 field's node at the dissection tree.
+--
+--]]
+do
+	local template = {
+		protofield_type = "bytes",
+		imp = {
+			uint8  {"Player Number", key="num"},
+			int8  {"Download status", key="dl"},
+			uint8  {"Slot status", key="status"},
+			uint8  {"Computer status", key="comp"},
+			uint8  {"Team", key="team"},
+			uint8  {"Colour", key="color"},
+			uint8  {"Race", key="race"},
+			uint8  {"Computer type", key="diff"}, -- difficulty
+			uint8  {"Handicap", key="handicap"},
+		},
+	}
+
+	function template:size()
+		return 9
+	end
+
+	function template:dissect(state)
+		local bn = state.bnet_node
+		if self.big_endian then
+			state.bnet_node = bn:add(self.pf, state:peek(self:size()))
+		else
+			state.bnet_node = bn:add_le(self.pf, state:peek(self:size()))
+		end
+		dissect_packet(state, self.imp)
+		local summary = string.format("Slot %d", state.packet.num)
+		if self.label ~= nil then
+			summary = self.label .. ": " .. summary
+		end
+		state.bnet_node:set_text(summary)
+		state.bnet_node = bn
+	end
+
+	function slot (...)
 		local args = make_args_table_with_positional_map(
 				{"real_label"},
 				...
@@ -3164,28 +3234,19 @@ end
 },
 -- End spackets_sid.lua
 [0xF701] = { -- 0x01
+	uint32("tickCount"),
 },
 [0xF704] = { -- 0x04
 	uint16("Length of Slot Info"),
-	uint8("Number of slots"),
-	uint8("[] Slot data"),
+	uint8{"Number of slots", key="length"},
+	iterator{alias="none", label="Slot data", refkey="length", repeated={
+		slot()
+	}},
 	uint32("Random seed"),
 	uint8("Game type"),
 	uint8("Number of player slots without observers"),
 	uint8("Player number"),
-	uint32("Port"),
-	uint32("External IP"),
-	uint32("Unknown"),
-	uint32("Unknown"),
-	uint8("Player number"),
-	uint8("Download status"),
-	uint8("Slot status"),
-	uint8("Computer status"),
-	uint8("Team"),
-	uint8("Color"),
-	uint8("Race"),
-	uint8("Computer type"),
-	uint8("Handicap"),
+	sockaddr("Socket"),
 },
 [0xF705] = { -- 0x05
 	uint32("Reason"),
@@ -3194,17 +3255,12 @@ end
 	uint32("Player Counter"),
 	uint8("Player number"),
 	stringz("Player name"),
-	uint16("Unknown"),
-	uint16("AF_INET"),
-	uint16("Port"),
-	uint32("External IP"),
-	uint32("Unknown"),
-	uint32("Unknown"),
-	uint16("AF_INET"),
-	uint16("Port"),
-	uint32("Internal IP"),
-	uint32("Unknown"),
-	uint32("Unknown"),
+	uint8{"Unknown", key="length"},
+	iterator{alias="none", label="Unknown", refkey="length", repeated={
+		uint8("Unknown")
+	}},
+	sockaddr("External Socket"),
+	sockaddr("Internal Socket"),
 },
 [0xF707] = { -- 0x07
 	uint8("Player number"),
@@ -3215,15 +3271,18 @@ end
 },
 [0xF709] = { -- 0x09
 	uint16("Length of Slot Info"),
-	uint8("Player number"),
-	uint8("Download status"),
-	uint8("Slot status"),
-	uint8("Computer status"),
-	uint8("Team"),
-	uint8("Color"),
-	uint8("Race"),
-	uint8("Computer type"),
-	uint8("Handicap"),
+	uint8{"Number of slots", key="length"},
+	iterator{alias="none", label="Slot data", refkey="length", repeated={
+		slot()
+	}},
+	uint32("Random seed"),
+	uint8("Layout status", nil, {
+		[0x00] = "Melee",
+		[0x01] = "Custom forces",
+		[0x02] = "Fixed player settings",
+		[0x03] = "Custom forces and fixed player settings",
+	}),
+	uint8("Non-observer slots")
 },
 [0xF70A] = { -- 0x0A
 },
@@ -3237,12 +3296,36 @@ end
 	bytes("Action data", "key", "action_length"),
 },
 [0xF70F] = { -- 0x0F
-	uint8("Player count"),
-	uint8("[] Player numbers that will receive the message"),
+	uint8{"Player count", key="count"},
+	iterator{alias="none", label="Slot data", refkey="count", repeated={
+		uint8("  Player number"),
+	}},
 	uint8("Player number that sent the message"),
-	uint8("Flags"),
-	uint32("Extra Flags"),
-	stringz("Message"),
+	uint8{"Flags", key="flags"},
+	casewhen{
+		{Cond.equals("flags", 0x10), {
+			stringz("Message"),
+		}},
+		{Cond.equals("flags", 0x11), {
+			uint8("Team"),
+		}},
+		{Cond.equals("flags", 0x12), {
+			uint8("Color"),
+		}},
+		{Cond.equals("flags", 0x13), {
+			uint8("Race"),
+		}},
+		{Cond.equals("flags", 0x14), {
+			uint8("Handicap"),
+		}},
+		{Cond.equals("flags", 0x20), {
+			uint32("Extra Flags"),	--message scope
+			stringz("Message"),
+		}},
+		{Cond.always(), {	--Probably never happens
+			stringz("Message"),
+		}},
+	},
 },
 [0xF71B] = { -- 0x1B
 },
@@ -3255,11 +3338,13 @@ end
 	uint32("Product"),
 	uint32("Host Counter"),
 	uint32("Players In Game"),
+	uint32("Entry Key"),
 	stringz("Game name"),
 	uint8("Unknown"),
 	stringz("Statstring"),
 	uint32("Slots total"),
-	uint8("[] Game Type Info"),
+	uint32("Game Type Info"),
+	uint32("Unknown"),
 	uint32("Slots available"),
 	uint32("Time since creation"),
 	uint16("Game Port"),
@@ -3283,9 +3368,9 @@ end
 	uint32("Unknown"),
 	stringz("File Path"),
 	uint32("File size"),
-	uint32("Map info"),
-	uint32("File CRC encryption"),
-	uint32("File SHA-1 hash"),
+	uint32{"Map info", base.HEX},
+	uint32{"File CRC encryption", base.HEX},
+	array("File SHA-1 hash", uint8, 20),
 },
 [0xF73F] = { -- 0x3F
 	uint32("Unknown"),
@@ -3306,7 +3391,7 @@ end
 	uint16("Length of action data"),
 	bytes("Action data"),
 },
-[0xFF17] = { -- 0x17
+[0xFF17] = { -- 0x17     (Why are these here?)
 	uint32("Request ID"),
 	uint32("Address"),
 	uint32("Length"),
@@ -3970,9 +4055,11 @@ end
 	uint16("Listen Port"),
 	uint32("Peer Key"),
 	stringz("Player name"),
-	uint32("Unknown"),
-	uint16("Internal Port"),
-	uint32("Internal IP"),
+	uint8{"Unknown", key="length"},
+	iterator{alias="none", label="Unknown", refkey="length", repeated={
+		uint8("Unknown")
+	}},
+	sockaddr("Socket"),
 },
 [0xF721] = { -- 0x21
 	uint32("Reason"),
@@ -3984,20 +4071,37 @@ end
 	bytes("Action data"),
 },
 [0xF727] = { -- 0x27
-	uint32("Unknown"),
+	array("Unknown", uint8, 5),
 },
 [0xF728] = { -- 0x28
 	uint8("Total"),
 	uint8("To player number"),
 	uint8("From player number"),
-	uint8("Flags"),
-	stringz("Message"),
-	uint8("Team"),
-	uint8("Color"),
-	uint8("Race"),
-	uint8("Handicap"),
-	uint32("Extra Flags"),
-	stringz("Message"),
+	uint8{"Flags", key="flags"},
+	casewhen{
+		{Cond.equals("flags", 0x10), {
+			stringz("Message"),
+		}},
+		{Cond.equals("flags", 0x11), {
+			uint8("Team"),
+		}},
+		{Cond.equals("flags", 0x12), {
+			uint8("Color"),
+		}},
+		{Cond.equals("flags", 0x13), {
+			uint8("Race"),
+		}},
+		{Cond.equals("flags", 0x14), {
+			uint8("Handicap"),
+		}},
+		{Cond.equals("flags", 0x20), {
+			uint32("Extra Flags"),	--message scope
+			stringz("Message"),
+		}},
+		{Cond.always(), {	--Probably never happens
+			stringz("Message"),
+		}},
+	},
 },
 [0xF72F] = { -- 0x2F
 	uint32("Product"),

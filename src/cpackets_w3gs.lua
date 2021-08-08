@@ -13,9 +13,8 @@
                    (WORD) Listen Port
                    (DWORD) Peer Key
                    (STRING) Player name
-                   (DWORD) Unknown
-                   (WORD) Internal Port
-                   (DWORD) Internal IP
+                   (BYTE)[] Unknown
+                   (SOCKADDR) Internal
 
     Remarks:       A client sends this to the host to enter the game lobby.
 
@@ -32,9 +31,11 @@
 	uint16("Listen Port"),
 	uint32("Peer Key"),
 	stringz("Player name"),
-	uint32("Unknown"),
-	uint16("Internal Port"),
-	uint32("Internal IP"),
+	uint8{"Unknown", key="length"},
+	iterator{alias="none", label="Unknown", refkey="length", repeated={
+		uint8("Unknown")
+	}},
+	sockaddr("Socket"),
 },
 --[[doc
     Message ID:    0x21
@@ -119,7 +120,7 @@
 
     Used By:       Warcraft III: The Frozen Throne, Warcraft III
 
-    Format:        (DWORD) Unknown
+    Format:        (BYTE)[] Unknown
 
     Remarks:       This is sent to the host from each client.
 
@@ -127,7 +128,7 @@
 
 ]]
 [W3GS_OUTGOING_KEEPALIVE] = { -- 0x27
-	uint32("Unknown"),
+	array("Unknown", uint8, 5),
 },
 --[[doc
     Message ID:    0x28
@@ -180,14 +181,31 @@
 	uint8("Total"),
 	uint8("To player number"),
 	uint8("From player number"),
-	uint8("Flags"),
-	stringz("Message"),
-	uint8("Team"),
-	uint8("Color"),
-	uint8("Race"),
-	uint8("Handicap"),
-	uint32("Extra Flags"),
-	stringz("Message"),
+	uint8{"Flags", key="flags"},
+	casewhen{
+		{Cond.equals("flags", 0x10), {
+			stringz("Message"),
+		}},
+		{Cond.equals("flags", 0x11), {
+			uint8("Team"),
+		}},
+		{Cond.equals("flags", 0x12), {
+			uint8("Color"),
+		}},
+		{Cond.equals("flags", 0x13), {
+			uint8("Race"),
+		}},
+		{Cond.equals("flags", 0x14), {
+			uint8("Handicap"),
+		}},
+		{Cond.equals("flags", 0x20), {
+			uint32("Extra Flags"),	--message scope
+			stringz("Message"),
+		}},
+		{Cond.always(), {	--Probably never happens
+			stringz("Message"),
+		}},
+	},
 },
 --[[doc
     Message ID:    0x2F

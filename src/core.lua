@@ -591,6 +591,7 @@ do
 	#include "api/array.lua"
 	#include "api/flags.lua"
 	#include "api/sockaddr.lua"
+	#include "api/slot.lua"
 	
 	-- Packets from server to client
 	SPacketDescription = {
