@@ -228,7 +228,7 @@
 
 ]]
 [W3GS_SEARCHGAME] = { -- 0x2F
-	uint32("Product"),
+	strdw("Product", Descs.ClientTag),
 	uint32("Version"),
 	uint32("Unknown"),
 },

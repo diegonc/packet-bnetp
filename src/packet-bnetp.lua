@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Fri Jun 17 15:19:24 2022
+--[[ packet-bnetp.lua build on Fri Jun 17 15:26:35 2022
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: https://github.com/diegonc/packet-bnetp/
@@ -2187,7 +2187,7 @@ do
 		if state.packet.sz1 ~= 0 or state.packet.sz2 ~= 0 then
 			state:error("sin_zero is not zero.");
 		end
-		if state.packet.af ~= 2 then
+		if state.packet.af ~= 0 and state.packet.af ~= 2 then
 			state:error("Adress Family is not AF_INET.")
 		end
 		local summary = string.format("IP: %s, Port: %d", state.packet.ip, state.packet.port)
@@ -3330,17 +3330,17 @@ end
 [0xF71B] = { -- 0x1B
 },
 [0xF72F] = { -- 0x2F
-	uint32("Product"),
+	strdw("Product", Descs.ClientTag),
 	uint32("Version"),
 	uint32("Unknown"),
 },
 [0xF730] = { -- 0x30
-	uint32("Product"),
+	strdw("Product", Descs.ClientTag),
 	uint32("Host Counter"),
 	uint32("Players In Game"),
 	uint32("Entry Key"),
 	stringz("Game name"),
-	uint8("Unknown"),
+	stringz("Password"),
 	stringz("Statstring"),
 	uint32("Slots total"),
 	uint32("Game Type Info"),
@@ -3350,7 +3350,7 @@ end
 	uint16("Game Port"),
 },
 [0xF731] = { -- 0x31
-	uint32("Product"),
+	strdw("Product", Descs.ClientTag),
 	uint32("Host Counter"),
 	uint32("Players In Game"),
 },
@@ -3382,7 +3382,7 @@ end
 	uint32("Unknown"),
 	uint32("Chunk position in file"),
 	uint32("CRC-32 encryption"),
-	uint8("[1442] Data"),
+	array("Data", uint8, 1442),
 },
 [0xF748] = { -- 0x48
 	uint16("Send interval"),
@@ -4104,7 +4104,7 @@ end
 	},
 },
 [0xF72F] = { -- 0x2F
-	uint32("Product"),
+	strdw("Product", Descs.ClientTag),
 	uint32("Version"),
 	uint32("Unknown"),
 },
@@ -4154,8 +4154,8 @@ end
 
 	-- After all the initialization is finished, register plugin
 	-- to default port.
-	--local udp_encap_table = DissectorTable.get("udp.port")
+	local udp_encap_table = DissectorTable.get("udp.port")
 	local tcp_encap_table = DissectorTable.get("tcp.port")
-	--udp_encap_table:add(6112,p_bnetp)
+	udp_encap_table:add(6112,p_bnetp)
 	tcp_encap_table:add(Config.server_port,p_bnetp)
 end

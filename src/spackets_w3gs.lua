@@ -425,7 +425,7 @@
 
 ]]
 [W3GS_SEARCHGAME] = { -- 0x2F
-	uint32("Product"),
+	strdw("Product", Descs.ClientTag),
 	uint32("Version"),
 	uint32("Unknown"),
 },
@@ -460,12 +460,12 @@
 
 ]]
 [W3GS_GAMEINFO] = { -- 0x30
-	uint32("Product"),
+	strdw("Product", Descs.ClientTag),
 	uint32("Host Counter"),
 	uint32("Players In Game"),
 	uint32("Entry Key"),
 	stringz("Game name"),
-	uint8("Unknown"),
+	stringz("Password"),
 	stringz("Statstring"),
 	uint32("Slots total"),
 	uint32("Game Type Info"),
@@ -491,7 +491,7 @@
 
 ]]
 [W3GS_CREATEGAME] = { -- 0x31
-	uint32("Product"),
+	strdw("Product", Descs.ClientTag),
 	uint32("Host Counter"),
 	uint32("Players In Game"),
 },
@@ -642,7 +642,7 @@
 	uint32("Unknown"),
 	uint32("Chunk position in file"),
 	uint32("CRC-32 encryption"),
-	uint8("[1442] Data"),
+	array("Data", uint8, 1442),
 },
 --[[doc
     Message ID:    0x48

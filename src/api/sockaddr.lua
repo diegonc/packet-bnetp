@@ -45,7 +45,7 @@ do
 		if state.packet.sz1 ~= 0 or state.packet.sz2 ~= 0 then
 			state:error("sin_zero is not zero.");
 		end
-		if state.packet.af ~= 2 then
+		if state.packet.af ~= 0 and state.packet.af ~= 2 then
 			state:error("Adress Family is not AF_INET.")
 		end
 		local summary = string.format("IP: %s, Port: %d", state.packet.ip, state.packet.port)
