@@ -591,6 +591,7 @@ do
 	#include "api/array.lua"
 	#include "api/flags.lua"
 	#include "api/sockaddr.lua"
+	#include "api/slot.lua"
 	
 	-- Packets from server to client
 	SPacketDescription = {
@@ -612,8 +613,8 @@ do
 
 	-- After all the initialization is finished, register plugin
 	-- to default port.
-	--local udp_encap_table = DissectorTable.get("udp.port")
+	local udp_encap_table = DissectorTable.get("udp.port")
 	local tcp_encap_table = DissectorTable.get("tcp.port")
-	--udp_encap_table:add(6112,p_bnetp)
+	udp_encap_table:add(6112,p_bnetp)
 	tcp_encap_table:add(Config.server_port,p_bnetp)
 end
