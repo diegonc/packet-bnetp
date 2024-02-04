@@ -1,4 +1,4 @@
---[[ packet-bnetp.lua build on Fri Jun 17 15:26:35 2022
+--[[ packet-bnetp.lua build on Sun Feb  4 20:26:02 2024
 
 packet-bnetp is a Wireshark plugin written in Lua for dissecting the Battle.net® protocol. 
 Homepage: https://github.com/diegonc/packet-bnetp/
@@ -167,7 +167,7 @@ do
 		-- Column's text cannot be queried, only written.
 		-- It is cleared here to avoid keeping data from previous
 		-- dissector in case it is written by this one.
-		-- Ideally it should be retored to the old value if it is
+		-- Ideally it should be restored to the old value if it is
 		-- not used by this dissector.
 		if pkt.columns.info then
 			pkt.columns.info:clear()
