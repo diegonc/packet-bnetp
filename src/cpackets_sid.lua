@@ -1020,7 +1020,7 @@
                      User Profiles:
                      profile\sex **
 
-                     profile\age â€
+                     profile\age ***
 
                      profile\location
 
@@ -1084,7 +1084,7 @@
 
                      ** This field is defunct in STAR/SEXP/WAR3/W3XP.
 
-                     â€  This field is defunct.
+                     *** This field is defunct.
 
                      â€¡ W2BN only.
 
