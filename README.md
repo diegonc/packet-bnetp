@@ -32,9 +32,9 @@ Place the file `packet-bnetp.lua` in one of the directories in the Lua search pa
 ## Screenshots
 Click on images to enlarge.
 
-[![](https://github.com/diegonc/packet-bnetp/blob/master/screenshots/thumbs/bnetp_0x0f_channel_flags.jpg)](https://github.com/diegonc/packet-bnetp/blob/master/screenshots/bnetp_0x0f_channel_flags.png)
-[![](https://github.com/diegonc/packet-bnetp/blob/master/screenshots/thumbs/bnetp_0x0f_user_flags.jpg)](https://github.com/diegonc/packet-bnetp/blob/master/screenshots/bnetp_0x0f_user_flags.png)
-[![](https://github.com/diegonc/packet-bnetp/blob/master/screenshots/thumbs/bnetp_0x50.jpg)](https://github.com/diegonc/packet-bnetp/blob/master/screenshots/bnetp_0x50.png)
+[![](https://github.com/diegonc/packet-bnetp/blob/main/screenshots/thumbs/bnetp_0x0f_channel_flags.jpg)](https://github.com/diegonc/packet-bnetp/blob/main/screenshots/bnetp_0x0f_channel_flags.png)
+[![](https://github.com/diegonc/packet-bnetp/blob/main/screenshots/thumbs/bnetp_0x0f_user_flags.jpg)](https://github.com/diegonc/packet-bnetp/blob/main/screenshots/bnetp_0x0f_user_flags.png)
+[![](https://github.com/diegonc/packet-bnetp/blob/main/screenshots/thumbs/bnetp_0x50.jpg)](https://github.com/diegonc/packet-bnetp/blob/main/screenshots/bnetp_0x50.png)
 
 ## Understanding protocol
 Here is [the protocol documentation](http://bnetdocs.org/) which was used for creating packet-bnetp.
