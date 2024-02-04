@@ -1,7 +1,13 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
+import logging
 import github3
 import optparse
 import sys
+
+stream_handler = logging.StreamHandler()
+logger = logging.getLogger("github3")
+logger.addHandler(stream_handler)
+logger.setLevel(logging.DEBUG)
 
 def parse_assets (raw_assets):
     assets = []
@@ -17,14 +23,14 @@ def read_file (path):
         return f.read ()
 
 def find_or_create_release (repo, release_info):
-    release = repo.release_from_tag(release_info['tag'])
-    if release:
-        return release
-    else:
-        return repo.create_release (
-            release_info['tag'], release_info['commitish'],
-            release_info['name'], release_info['body'],
-            release_info['draft'], release_info['pre_release'])
+    try:
+      return repo.release_from_tag(release_info['tag'])
+    except:
+      print(release_info)
+      return repo.create_release (
+        release_info['tag'], release_info['commitish'],
+        release_info['name'], release_info['body'],
+        release_info['draft'], release_info['pre_release'])
 
 def upsert_release (release_info):
     user = release_info['user']
@@ -73,13 +79,13 @@ def main():
           'commitish': options.commitish,
           'assets': parse_assets (options.assets)})
 
-    print 'Created release %s' % release.name
-    print 'URL : %s' % release.url
-    print 'TAG : %s' % release.tag_name
-    print 'BODY: %s' % release.body
-    print 'Assets:'
+    print ('Created release %s' % release.name)
+    print ('URL : %s' % release.url)
+    print ('TAG : %s' % release.tag_name)
+    print ('BODY: %s' % release.body)
+    print ('Assets:')
     for asset in release.assets ():
-        print '\t%s: %s' % (asset.name, asset.url)
+        print ('\t%s: %s' % (asset.name, asset.url))
 
     return 0
 
