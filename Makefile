@@ -5,11 +5,6 @@ PERL?=/usr/bin/perl
 LUA?=lua
 LUA_VERSION?=530
 
-FILEPP=$(PERL) tools/filepp/filepp
-FILEPP_FLAGS= \
-	-m pb-utils.pm \
-	-m literal.pm \
-	-DLUA_VERSION=$(LUA_VERSION)
 # GitHub upload params should be defined in Makefile.local
 # GHU_USER: uploader's username
 # GHU_PASS: uploader's password
