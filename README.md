@@ -1,5 +1,6 @@
 ## News
 
+* _March 2024_: W3GS part of the plugin is now ported to **xproto**
 * _February 2024_: The BNETP part of the plugin was rewritten using [xproto](https://gitlab.com/diegonc/tp-85880) which is a DSL for writting dissectors based on the core of the legacy packet-bnetp. For now, Warcraft 3 Game Protocol is only supported in the [legacy](https://github.com/diegonc/packet-bnetp/tree/legacy) branch.
 * _March 2015_: The plugin was updated to make it work on newer versions of Wireshark. More testing needs to be done specially in previous versions (to make sure it still works on them)
 * _February 2011_: Now the plugin supports W3GS (Warcraft 3 game protocol).

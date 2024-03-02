@@ -1,6 +1,6 @@
 local X = require('xproto')
-local p = X.protocol('bnetp', 'Battle.net Protocol',
-  { key = 'tcp.port', value = 6112 })
+local p = X.protocol('bncs', 'Battle.net Chat Server Protocol',
+  { key = 'bnetp.type', value = 0xFF })
 
 --[[
   `request_packet_data` is a custom DSL construct that
@@ -43,14 +43,22 @@ p:entrypoint {
     key = 'type',
     filter = 'type'
   },
-  p:uint8 {
-    'Packet ID',
-    base.HEX,
-    -- Server/Client packet names are symmetric,
-    -- pick any one collection
-    p.descs.client_packets,
-    key = 'pid',
-    filter = 'pid'
+  p:when {
+    p.conditions.keyEquals('isServerPacket', true),
+    {p:uint8 {
+      'Packet ID',
+      base.HEX,
+      p.descs.server_packets,
+      key = 'pid',
+      filter = 'pid'
+    }},
+    {p:uint8 {
+      'Packet ID',
+      base.HEX,
+      p.descs.client_packets,
+      key = 'pid',
+      filter = 'pid'
+    }},
   },
   p:uint16 {
     label = 'Packet Length',
@@ -741,7 +749,7 @@ p:collection {
         Direction:     Client -> Server (Sent)
 
         Used By:       Starcraft Shareware, Starcraft Broodwar, Diablo Shareware, Diablo II,
-                      Warcraft II, Starcraft, Starcraft Japanese, Diablo, Diablo, 
+                      Warcraft II, Starcraft, Starcraft Japanese, Diablo, Diablo,
 
         Format:        (DWORD) Request ID
                       (VOID)  Memory
@@ -1098,7 +1106,7 @@ p:collection {
                       (DWORD) Second DWORD from S -> C
                       (STRING) Registry key name
                       (STRING) Registry key value
-      
+
         Purpose:       Much like a website cookie, simply stores some arbitrary string to a 'cookie jar' to save preferences et al. which can be retrieved later by the server. Not used because it was quickly discovered that storing preferences produces less problems and were faster by storing them server-side, associating them with the account. It is somewhat curious that these packet IDs are close to SID_PROFILE/SID_WRITEPROFILE (0x26 & 0x27).
     ]]
     {
@@ -2190,7 +2198,7 @@ p:collection {
       (BYTE) Unknown
 
     WID_SETICON 0x0A SEND
-      (DWORD) Icon 
+      (DWORD) Icon
 
     ]]
     {
@@ -2979,10 +2987,10 @@ p:collection {
 
                       0x00 - Warden Module Info
                       (BYTE) Success (0x00 = Don't have the module, 0x01 = Have the module)
-                      
+
               0x01 - Warden Module Data
                       (BYTE) Success (0x00 = MD5 doesn't match, 0x01 = MD5 matches)
-                      
+
               0x02 - Data Checker
                       (WORD) String Length
               (DWORD) String Checksum
@@ -4014,7 +4022,7 @@ p:collection {
                       For STAR/SEXP/SSHR/JSTR, Text is UTF-8 encoded (WIDESTRING).
 
                       Event IDs:
-              
+
                       [0x01] EID_SHOWUSER: User in channel
                       [0x02] EID_JOIN: User joined channel
                       [0x03] EID_LEAVE: User left channel
@@ -4119,7 +4127,7 @@ p:collection {
         Related:       [0x0E] SID_CHATCOMMAND (C->S), [0x0C] SID_JOINCHANNEL (C->S)
     --]]
     --[[doc
-      
+
         Battle.net Flags
 
         User Flags:
@@ -4147,10 +4155,10 @@ p:collection {
         0x02000000: PGL Player
 
         Order of implementation: SQUELCHED, BLIZZREP, ADMIN, SPEAKER, GUEST, PGLOFFICIAL, WCGOFFICIAL, GFOFFICIAL, CHANNELOP, PGLPLAYER, WCGPLAYER, KBKPLAYER, KBKBEGINNER, KBKWHITE, GFPLAYER, BEEPENABLED, NOUDP.
-        
-        
+
+
         Channel Flags:
-        
+
         0x00001: Public Channel
         0x00002: Moderated
         0x00004: Restricted
@@ -4326,7 +4334,7 @@ p:collection {
         Direction:     Server -> Client (Received)
 
         Used By:       Starcraft Shareware, Starcraft Broodwar, Diablo Shareware, Diablo II,
-                      Warcraft II, Starcraft, Starcraft Japanese, Diablo, Diablo, 
+                      Warcraft II, Starcraft, Starcraft Japanese, Diablo, Diablo,
 
         Format:        (DWORD) Request ID
                       (DWORD) Address
@@ -4513,7 +4521,7 @@ p:collection {
                       (STRING) Registry key value
 
         Purpose:       Much like a website cookie, simply stores some arbitrary string to a 'cookie jar' to save preferences et al. which can be retrieved later by the server. Not used because it was quickly discovered that storing preferences produces less problems and were faster by storing them server-side, associating them with the account. It is somewhat curious that these packet IDs are close to SID_PROFILE/SID_WRITEPROFILE (0x26 & 0x27).
-      
+
       Source: http://darkblizz.org/Forum2/starcraft/the-lost-packets/msg19580
     ]]
     {
@@ -4538,7 +4546,7 @@ p:collection {
                       (STRING) Registry key name
 
         Purpose:       Much like a website cookie, simply stores some arbitrary string to a 'cookie jar' to save preferences et al. which can be retrieved later by the server. Not used because it was quickly discovered that storing preferences produces less problems and were faster by storing them server-side, associating them with the account. It is somewhat curious that these packet IDs are close to SID_PROFILE/SID_WRITEPROFILE (0x26 & 0x27).
-      
+
       Source: http://darkblizz.org/Forum2/starcraft/the-lost-packets/msg19580
     ]]
     {
@@ -5402,9 +5410,9 @@ p:collection {
         Direction:     Server -> Client (Received)
 
         Format:        (DWORD) Unknown (0)
-      
+
         Purpose:       Unknown. I am unable to disassemble Warcraft 3's game.dll without a lot of trouble, and therefore I have limited knowledge of it. It has been seen once, after SID_LOGONPROOF (0x54) in the NLS logon sequence.
-      
+
       source: http://darkblizz.org/Forum2/starcraft/the-lost-packets/msg19580
     ]]
     {
@@ -5543,7 +5551,7 @@ p:collection {
 
         Related:         [0x44] SID_WARCRAFTGENERAL (C->S)
 
-      
+
       SID_WARCRAFTGENERAL
 
     WID_GAMESEARCH 0x00 SEND
@@ -5682,7 +5690,7 @@ p:collection {
       (BYTE) Unknown
 
     WID_SETICON 0x0A SEND
-      (DWORD) Icon 
+      (DWORD) Icon
     ]]
     {
       id = 0x44,
@@ -6339,7 +6347,7 @@ p:collection {
                       0x0E: An email address should be registered for this account.
                       0x0F: Custom error. A string at the end of this message contains
                       the error.
-              
+
                       This message confirms the validity of the client password proof and
                       supplies the server password proof. See [NLS/SRP Protocol] for more
                       information.
@@ -6962,9 +6970,9 @@ p:collection {
 
                       Valid Status codes:
 
-                      0x00: Successfully found candidate(s) 
-              0x01: Clan tag already taken 
-              0x08: Already in clan 
+                      0x00: Successfully found candidate(s)
+              0x01: Clan tag already taken
+              0x08: Already in clan
               0x0a: Invalid clan tag specified
 
         Related:       [0x70] SID_CLANFINDCANDIDATES (C->S), Clan Message Codes
@@ -7118,11 +7126,11 @@ p:collection {
         Remarks:       Notifies the sending client of the success/failure of its request.
                       Status:
 
-                      0x00: Success 
-              0x02: Can't change until clan is a week old 
-              0x04: Declined 
-              0x05: Failed 
-              0x07: Not Authorized 
+                      0x00: Success
+              0x02: Can't change until clan is a week old
+              0x04: Declined
+              0x05: Failed
+              0x07: Not Authorized
               0x08: Not Allowed
 
         Related:       [0x74] SID_CLANMAKECHIEFTAIN (C->S), Clan Message Codes
@@ -7162,9 +7170,9 @@ p:collection {
                       Possible values for Rank:
 
                       0x00: Initiate that has been in the clan for less than one week
-                      0x01: Initiate that has been in the clan for over one week 
-              0x02: Member 
-              0x03: Officer 
+                      0x01: Initiate that has been in the clan for over one week
+              0x02: Member
+              0x03: Officer
               0x04: Leader
 
         Related:       Clan Message Codes
@@ -7220,9 +7228,9 @@ p:collection {
 
                       Result:
 
-                      0x00: Invitation accepted 
-              0x04: Invitation declined 
-              0x05: Failed to invite user 
+                      0x00: Invitation accepted
+              0x04: Invitation declined
+              0x05: Failed to invite user
               0x09: Clan is full
 
         Related:       [0x77] SID_CLANINVITATION (C->S)
@@ -7257,10 +7265,10 @@ p:collection {
 
                       Status constants:
 
-                      0x00: Removed 
-              0x01: Removal failed 
+                      0x00: Removed
+              0x01: Removal failed
               0x02: Can not be removed yet
-                      0x07: Not authorized to remove 
+                      0x07: Not authorized to remove
               0x08: Not allowed to remove
 
         Related:       [0x78] SID_CLANREMOVEMEMBER (C->S), Clan Message Codes
@@ -7325,10 +7333,10 @@ p:collection {
 
                       Result:
 
-                      0x00: Successfully changed rank 
+                      0x00: Successfully changed rank
               0x01: Failed to change rank
-                      0x02: Cannot change user's rank yet 
-              0x07: Not authorized to change user rank * 
+                      0x02: Cannot change user's rank yet
+              0x07: Not authorized to change user rank *
               0x08: Not allowed to change user rank **
 
                       * This will be received when you are not a shaman/chieftain and you're
@@ -7403,15 +7411,15 @@ p:collection {
 
                       Online Status:
 
-                      0x00: Offline 
+                      0x00: Offline
               0x01: Online
 
                       Rank:
 
                       0x00: Initiate that has been in the clan for less than one week
-                      0x01: Initiate that has been in the clan for over one week 
-              0x02: Member 
-              0x03: Officer 
+                      0x01: Initiate that has been in the clan for over one week
+              0x02: Member
+              0x03: Officer
               0x04: Leader
 
                       Location:
@@ -7485,9 +7493,9 @@ p:collection {
                       Rank:
 
                       0x00: Initiate that has been in the clan for less than one week
-                      0x01: Initiate that has been in the clan for over one week 
-              0x02: Member 
-              0x03: Officer 
+                      0x01: Initiate that has been in the clan for over one week
+              0x02: Member
+              0x03: Officer
               0x04: Leader
 
                       Status:

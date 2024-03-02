@@ -18,7 +18,9 @@ REL_NAME:=$(REL_TAG)
 REL_BODY:=$(REL_TAG)
 
 PKG = \
-	packet-bnetp.lua
+	packet-bnetp-base.lua \
+	packet-bnetp-bncs.lua \
+	packet-bnetp-w3gs.lua
 
 
 DIST = \
